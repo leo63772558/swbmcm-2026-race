@@ -8,17 +8,24 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{caption}
-\captionsetup[table]{position=top}
-\captionsetup[figure]{position=bottom}
+\usepackage{xcolor}
+\definecolor{paperink}{HTML}{172D43}
+\captionsetup{font=normalsize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=8pt}
+\captionsetup[figure]{position=bottom,skip=8pt}
 \usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\raggedbottom
 
 \newcommand{\ProblemLetter}{B}
 \newcommand{\TeamNumber}{SWBMCM2613050}
 \newcommand{\PaperTitle}{Rapid UAV Localization via Coordinated Mobile Vehicles}
+\hypersetup{pdftitle={\PaperTitle},pdfauthor={}}
 \newcommand{\TeamPageHeader}{%
   \fancyhf{}%
-  \fancyhead[L]{Team\#\TeamNumber}%
-  \fancyhead[R]{Page \thepage\ of \pageref*{LastPage}}%
+  \fancyhead[L]{\color{paperink}Team\#\TeamNumber}%
+  \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
   \renewcommand{\headrulewidth}{0.4pt}%
 }
 \fancypagestyle{fancy}{\TeamPageHeader}
@@ -31,10 +38,12 @@
 \pagestyle{fancy}
 \thispagestyle{empty}
 \begin{center}
-\begin{tabular}{@{}lll@{}}
-  Problem Chosen & 2026 ShuWei Cup & Team Control Number \\
-  \ProblemLetter & Summary Sheet & \TeamNumber
-\end{tabular}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcr@{}}
+  \toprule
+  Problem Chosen & 2026 ShuWei Cup & Team Control Number\\
+  \textbf{\ProblemLetter} & \textbf{Summary Sheet} & \textbf{\TeamNumber}\\
+  \bottomrule
+\end{tabular*}
 
 \vspace{1em}
 {\Large\bfseries\PaperTitle}
@@ -58,15 +67,17 @@ The selected station is (77.516, 72.593) m. Its elevation is 80.0 degrees and it
 
 \[r \ge (H-h)/\tan\beta_{\max},\qquad Q=1/r\]
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
 
 \centering
 
-\includegraphics[width=0.8\linewidth]{b_geometry}
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_geometry}
 
-\caption{Observable footprint for T1 (light teal), a selected station (red ring), and T2 viewing rays (teal).}
+\caption{T1 observability and the selected minimum-range station, with a local inset of the T2 bearing intersection.}
 
 \end{figure}
+
+\clearpage
 
 \section{Dual-Station Localization for T2}
 
@@ -80,6 +91,8 @@ Both ranges meet the pitch-imposed lower bound and the sine factor attains one. 
 
 \[\operatorname{RMS}\approx\frac{\sigma_\theta\sqrt{r_1^2+r_2^2}}{|\sin\gamma|}\]
 
+\clearpage
+
 \section{Multi-Alert Vehicle Scheduling}
 
 Shortest routes on a waypoint graph use conservative rectangular expansions of the buildings by the disc radius. Expanded corners with a small clearance and the start and finish points form the graph. This makes each computed route feasible for the vehicle disc, while potentially excluding shorter rounded-corner paths [3].
@@ -92,15 +105,33 @@ The last start is 11.03 s for beam search and 11.72 s for nearest assignment, a 
 
 \[t_{\mathrm{start},j}=\max_{i\in A_j}t_{\mathrm{ready},i,j},\qquad\min\max_j t_{\mathrm{start},j}\]
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
 
 \centering
 
-\includegraphics[width=0.8\linewidth]{b_timeline}
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_timeline}
 
-\caption{Per-vehicle timeline for beam search (B) and nearest assignment (N).}
+\caption{Paired per-vehicle timelines. The dashed line in each panel marks its last observation start.}
 
 \end{figure}
+
+\clearpage
+
+\section{Nominal Driving Routes}
+
+The map links the timing sequence to the physical station choices. Filled markers show vehicle origins and open rings show selected observation stations. A repeated vehicle can travel on multiple segments of the same color. Building footprints are shaded. V3 starts its leg for T3 already at the assigned station, so this leg consumes slew time but no driving time.
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_routes}
+
+\caption{Nominal paths for the five available vehicles. Paths use conservative obstacle clearance.}
+
+\end{figure}
+
+\clearpage
 
 \section{Horizontal Pointing Error}
 
@@ -114,15 +145,33 @@ The linearized variance shares near the threshold are 84.6\% for the vehicle pos
 
 \[\Delta\psi=\operatorname{wrap}\left(\operatorname{atan2}(-Y,r-X)+\epsilon_0+\epsilon_c\right)\]
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
 
 \centering
 
-\includegraphics[width=0.8\linewidth]{b_coverage}
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_coverage}
 
-\caption{Calculated probability of remaining within the two-sided pointing limit.}
+\caption{Pointing coverage versus travel distance. Red points show the Monte Carlo checks with Wilson intervals.}
 
 \end{figure}
+
+\clearpage
+
+\section{Admissible Position-Error Parameters}
+
+For the fixed check distance, the permitted combinations of error intercept and growth coefficient form a triangle in the nonnegative parameter region. Its sloped edge collects the intercept–slope combinations that meet the target coverage at equality.
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_parameters}
+
+\caption{Admissible intercept and growth coefficient under the two-sided coverage requirement.}
+
+\end{figure}
+
+\clearpage
 
 \section{Rescheduling After Disturbances}
 
@@ -136,21 +185,23 @@ Replanning improves 23 cases, ties 4, and worsens 1. In failure\_V5, the fixed p
 
 \[\operatorname{lex\,max}\;(\eta,-t_{\rm last}),\qquad\eta=k/N\]
 
-\begin{figure}[htbp]
+\begin{figure}[!ht]
 
 \centering
 
-\includegraphics[width=0.8\linewidth]{b_disturbances}
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_disturbances}
 
-\caption{Completion ratios across selected cases, in order: new\_1, failure\_V1, failure\_V5, outage\_upper\_time, new\_failure\_V1, failure\_outage\_V1, new\_outage, all\_V1, all\_duration\_sensitivity.}
+\caption{Completion and last-start times under both policies for representative disturbance cases.}
 
 \end{figure}
+
+\clearpage
 
 \section{Paired Scenario Results}
 
 For each row, the completion fraction counts alert starts within the evaluation window. The last-start column follows the specified horizon convention when an alert is unfinished.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 
 \centering
 
@@ -226,13 +277,19 @@ all duration sensitivity & 0.50 & 60.00 & 1.00 & 39.83 \\
 
 \end{table}
 
-\section{Validation, Limitations, and References}
+\clearpage
+
+\section{Validation and Limitations}
 
 The implementation checks station visibility, collision-free route segments, joint observation start, task duration, and nonoverlapping vehicle timelines. Replans are checked against the recovery time and failed vehicle identity. The search is deterministic. Auditable numerical outputs and the full scenario timelines are stored separately. A separate seeded Monte Carlo check evaluates exact bearing intersections and the wrapped pointing error. A wider beam can perform worse under partial-plan pruning, so the best previously found feasible schedule is retained.
 
 Across 100,000 draws, the exact-intersection RMS was 0.1439 m. Pointing coverage was 0.95016 at the threshold (Wilson interval 0.94879 to 0.95149) and 0.91688 at the specified 80 m check distance.
 
 The model treats targets as stationary, ignores interactions between moving vehicles as in the nominal timing assumptions, and uses finite station candidates. The scenario study is conditional on the stated continuation and cancellation rules. Further sensitivity checks should examine station discretization, clearance, the chosen outage interpretation, and sample coverage.
+
+\section{References}
+
+\begingroup\raggedright
 
 [1] Liang and Barsky. A New Concept and Method for Line Clipping. ACM Transactions on Graphics, 1984. doi:10.1145/357332.357333.
 
@@ -245,6 +302,10 @@ The model treats targets as stationary, ignores interactions between moving vehi
 [5] Pillac et al. A Review of Dynamic Vehicle Routing Problems. European Journal of Operational Research, 2013. doi:10.1016/j.ejor.2012.08.015.
 
 [6] OpenAI ChatGPT (Codex, GPT-6 series), used on 20 November 2026.
+
+\par\endgroup
+
+\clearpage
 
 \section{AI Tool Usage Report}
 

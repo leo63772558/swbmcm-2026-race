@@ -1,5 +1,6 @@
 """Stage the draft paper and reproducibility archive for handoff (OpenAI Codex)."""
 
+from argparse import ArgumentParser
 from pathlib import Path
 from shutil import copyfile
 from zipfile import ZIP_DEFLATED, ZipFile
@@ -14,8 +15,7 @@ STEM = "B" + TEAM
 MAX_BYTES = 20_000_000
 
 
-def stage_paper():
-    source = ROOT / "paper" / "B_prototype_preview.pdf"
+def stage_paper(source):
     pdf = PdfReader(source)
     pages = pdf.pages
     assert 3 <= len(pages) <= 25
@@ -32,6 +32,16 @@ def stage_paper():
     assert all("[FILL:" not in page.extract_text() for page in pages)
     assert not pdf.attachments
     assert "AI Tool Usage Report" in pages[-1].extract_text()
+    assert pdf.metadata is not None and not (pdf.metadata.author or "").strip()
+    for page in pages:
+        fonts = page["/Resources"]["/Font"]
+        times = [reference.get_object() for reference in fonts.values()
+                 if "TimesNewRoman" in str(reference.get_object().get("/BaseFont", ""))]
+        assert times, "Missing Times New Roman in page resources"
+        for font in times:
+            descriptor_owner = font["/DescendantFonts"][0].get_object() if "/DescendantFonts" in font else font
+            descriptor = descriptor_owner["/FontDescriptor"]
+            assert any(kind in descriptor for kind in ("/FontFile", "/FontFile2", "/FontFile3"))
     destination = SUBMISSION / (STEM + ".pdf")
     copyfile(source, destination)
     assert destination.stat().st_size < MAX_BYTES
@@ -50,7 +60,7 @@ def stage_archive():
     ]
     entries.extend(ROOT / "src" / name for name in (
         "problem_b_geometry.py", "solve_problem_b.py", "check_problem_b.py",
-        "render_problem_b.py", "package_problem_b.py",
+        "plot_problem_b.py", "render_problem_b.py", "package_problem_b.py", "verify_handoff.py",
     ))
     path = SUBMISSION / (STEM + "fj.zip")
     with ZipFile(path, "w", compression=ZIP_DEFLATED, compresslevel=9) as archive:
@@ -65,6 +75,10 @@ def stage_archive():
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--paper", type=Path, default=ROOT / "paper" / "B_prototype.pdf",
+                        help="Path to the compiled manuscript PDF")
+    args = parser.parse_args()
     SUBMISSION.mkdir(exist_ok=True)
-    stage_paper()
+    stage_paper(args.paper)
     stage_archive()

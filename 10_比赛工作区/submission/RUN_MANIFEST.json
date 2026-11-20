@@ -1,0 +1,120 @@
+{
+  "problem": "B",
+  "build": {
+    "python": "3.14.7",
+    "tex": "Tectonic 0.17.0+20260731"
+  },
+  "inputs": {
+    "data/B题题面参数.csv": {
+      "bytes": 5728,
+      "sha256": "a0e0b2867e08334b43696f41e0faa482130c226ec664b505ceac34f7f2a8935b"
+    }
+  },
+  "outputs": {
+    "submission/BSWBMCM2613050.pdf": {
+      "bytes": 657011,
+      "sha256": "731ac53d864fea7dbe7bc621fe828d3c484a267a56d7b31e8e83fe92ccb6b99e"
+    },
+    "submission/BSWBMCM2613050fj.zip": {
+      "bytes": 608755,
+      "sha256": "aa02cce908f7659146767b4980b86219b8266d80c57379bb278643b838d19722"
+    },
+    "paper/B_prototype.tex": {
+      "bytes": 15791,
+      "sha256": "de0a3a5b79bbefd230bc07e8ec571d352fe9026bb005cceb439dc43014cb63de"
+    },
+    "paper/main.tex": {
+      "bytes": 2247,
+      "sha256": "c57232f27c3b265549b9f142a7b814cb5b1a0d81123bbb22337f30578f15216d"
+    },
+    "results/B_timelines.json": {
+      "bytes": 171162,
+      "sha256": "3ee1d79952067bead5559e4e0469842f60a03385278a56830a4eba0149056466"
+    },
+    "figures/B_figure_overview.png": {
+      "bytes": 309496,
+      "sha256": "a4559b68e708cb96b1e456bfa9ed50a09a16e65e742cdc3b6dd24044b18d351e"
+    },
+    "src/check_problem_b.py": {
+      "bytes": 6443,
+      "sha256": "3a26ede3ab08eaa98488f0d2493d83e7a79466c7432017bde2aca904c2628c31"
+    },
+    "src/package_problem_b.py": {
+      "bytes": 3414,
+      "sha256": "a6b92144d23163b2ed75c24c342c3679ac014d88dd1ec9220243c26f1bad90f3"
+    },
+    "src/plot_problem_b.py": {
+      "bytes": 12985,
+      "sha256": "4237383216072e0f74ef1a5f97892036b6025fa038e4a5180aaeae0aae8a4601"
+    },
+    "src/problem_b_geometry.py": {
+      "bytes": 5899,
+      "sha256": "6b6c9881f38f57bafe90e8e89acd2d36fdac0fd9fefe6b89a30b442c181ea1da"
+    },
+    "src/render_problem_b.py": {
+      "bytes": 25764,
+      "sha256": "46f75a256b48263f3ac6760b09a0396e1257a839bc6e82c51f1101fb03d273db"
+    },
+    "src/solve_problem_b.py": {
+      "bytes": 16328,
+      "sha256": "02d1c15ba3738b03aa99ca6c7d5db935400e3c9ff288deb1fc5a82d4b3eb45b6"
+    },
+    "results/B_P1.csv": {
+      "bytes": 150,
+      "sha256": "e39785c6221b465365b6165f49401f3ca5f1303279ad479224247ca424f9fa12"
+    },
+    "results/B_P2_localization.csv": {
+      "bytes": 276,
+      "sha256": "c6190a2fa019b583d0a436e6d70e8df69fe995e1d431e7492be2518cb1a86d1e"
+    },
+    "results/B_P2_schedules.csv": {
+      "bytes": 1587,
+      "sha256": "4c8fa88562dfa845bd3b429906f84d95096324227dc72997b2600bcea2aec1df"
+    },
+    "results/B_P3.csv": {
+      "bytes": 300,
+      "sha256": "96e1550c839b688356ff2b4675d2344a11f5883ceed62daa80bc5e341d5f28fe"
+    },
+    "results/B_P3_coverage.csv": {
+      "bytes": 1416,
+      "sha256": "9e6bca814252436d9bb539f9143ca221287a7bd452f0fe8fda5eda940012d7fa"
+    },
+    "results/B_P4.csv": {
+      "bytes": 3742,
+      "sha256": "6d4797fb383f199cde449df210627823ef7e20ecfee2007f2099bbcb0419812d"
+    },
+    "results/B_validation.csv": {
+      "bytes": 593,
+      "sha256": "c3bffa2b1307bc2b19abc75bea1e3a78bc9263381e859686d9c31ff85b373d62"
+    },
+    "figures/b_coverage.pdf": {
+      "bytes": 93667,
+      "sha256": "bc18fac160264a085f0350485d539b532b364773dd9958734a2cc1ab156ae873"
+    },
+    "figures/b_disturbances.pdf": {
+      "bytes": 94019,
+      "sha256": "1bee622d91b2098cf86b052044f236ea3f6edc57f49340857a5de146ca760703"
+    },
+    "figures/b_geometry.pdf": {
+      "bytes": 117375,
+      "sha256": "86bf726e674f3a075703810c20eccc4585f97e326c81645d0a807e9d1c7a9ffa"
+    },
+    "figures/b_parameters.pdf": {
+      "bytes": 92488,
+      "sha256": "9370c697a3f67036388f8f580cfb4853fe0a31014c199f96ae8a05d5132b23f5"
+    },
+    "figures/b_routes.pdf": {
+      "bytes": 93756,
+      "sha256": "406f7a57fe0c1ee1702689cb4299f2d2bc21f15e7a03f3e1d75113176d2b0fe4"
+    },
+    "figures/b_timeline.pdf": {
+      "bytes": 93280,
+      "sha256": "f7ff67d4bf5438bdeed0bd82329901e865fd9db51f484112bd59476bb0427c08"
+    }
+  },
+  "checks": {
+    "paper_pages": 12,
+    "toc_entries": 11,
+    "byte_identical_reproduced_files": 15
+  }
+}

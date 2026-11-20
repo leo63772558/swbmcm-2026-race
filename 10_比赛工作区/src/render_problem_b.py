@@ -1,6 +1,7 @@
 """Generate an English draft and vector figures. AI-assisted (OpenAI Codex)."""
 
 import csv
+import json
 from collections import Counter
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -11,16 +12,19 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
 from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from problem_b_geometry import BUILDINGS, ROOT, TARGETS, VEHICLES, visible
+from problem_b_geometry import ROOT
+from plot_problem_b import (
+    draw_coverage, draw_disturbances, draw_map, draw_parameter_region, draw_routes, draw_timeline,
+)
 
 
 FIGURES, PAPER, RESULTS = (ROOT / name for name in ("figures", "paper", "results"))
 INK = colors.HexColor("#172D43")
 TEAL = colors.HexColor("#136C74")
 RED = colors.HexColor("#B24933")
+GRID = colors.HexColor("#DAE2EA")
 EQUATIONS = {
     "Observation Region and Station Selection": (
         "r ≥ (H − h) / tan βmax,     Q = 1/r",
@@ -57,148 +61,7 @@ def fmt(value, digits=2):
     return f"{float(value):.{digits}f}"
 
 
-def base_chart(name, x_max, y_max, x_label, y_label, width=440, height=250):
-    chart = canvas.Canvas(str(FIGURES / name), pagesize=(width, height))
-    chart.setStrokeColor(INK)
-    chart.setFillColor(INK)
-    chart.setFont("Times-Roman", 11)
-    chart.line(43, 31, width - 16, 31)
-    chart.line(43, 31, 43, height - 25)
-    chart.drawCentredString(width / 2, 8, x_label)
-    chart.drawString(43, height - 16, y_label)
-
-    def point(x, y):
-        return 43 + x / x_max * (width - 59), 31 + y / y_max * (height - 56)
-
-    return chart, point
-
-
-def draw_map(p1, p2):
-    chart, point = base_chart("b_geometry.pdf", 100, 100, "East (m)", "North (m)", 300, 297)
-    for n in range(0, 101, 20):
-        x, y0 = point(n, 0)
-        x0, y = point(0, n)
-        chart.drawCentredString(x, y0 - 13, str(n))
-        chart.drawRightString(x0 - 5, y - 3, str(n))
-    chart.setFillColor(colors.HexColor("#D0E8E5"))
-    for x in range(1, 100):
-        for y in range(1, 100):
-            if visible((x, y), TARGETS["T1"]):
-                chart.rect(*point(x - .5, y - .5), 2.41, 2.41, fill=1, stroke=0)
-    chart.setFillColor(colors.HexColor("#4B5563"))
-    for i, (left, right, bottom, top, _) in enumerate(BUILDINGS, 1):
-        x, y = point(left, bottom)
-        right_x, top_y = point(right, top)
-        chart.rect(x, y, right_x - x, top_y - y, fill=1, stroke=0)
-        chart.setFillColor(colors.white)
-        chart.drawCentredString((x + right_x) / 2, (y + top_y) / 2 - 3, f"B{i}")
-        chart.setFillColor(colors.HexColor("#4B5563"))
-    chart.setFillColor(INK)
-    for i, vehicle in enumerate(VEHICLES, 1):
-        x, y = point(*vehicle)
-        chart.circle(x, y, 2, stroke=0, fill=1)
-        chart.drawString(x + 3, y + 4, f"V{i}")
-    chart.setFillColor(RED)
-    for label, goal in TARGETS.items():
-        x, y = point(*goal[:2])
-        chart.circle(x, y, 3, stroke=0, fill=1)
-        chart.drawString(x + 4, y - 10, label)
-    chart.setStrokeColor(RED)
-    chart.circle(*point(float(p1["x_m"]), float(p1["y_m"])), 4, stroke=1, fill=0)
-    chart.setStrokeColor(TEAL)
-    for index in (1, 2):
-        station = point(float(p2[f"x_{index}_m"]), float(p2[f"y_{index}_m"]))
-        chart.line(*station, *point(*TARGETS["T2"][:2]))
-        chart.circle(*station, 2.5, stroke=1, fill=0)
-    chart.save()
-
-
-def draw_timeline(rows):
-    last_reset = max(float(row["reset"]) for row in rows)
-    chart, point = base_chart("b_timeline.pdf", last_reset + 1, 11.5, "Time (s)", "Timeline")
-    bands = [("travel", "depart", "arrival", colors.HexColor("#B8CBDD")),
-             ("slew", "arrival", "ready", colors.HexColor("#E9BB84")),
-             ("wait", "ready", "start", colors.HexColor("#DDDDE0")),
-             ("observe", "start", "end", TEAL), ("reset", "end", "reset", RED)]
-    for tick in range(0, int(last_reset) + 1, 5):
-        x, y = point(tick, 0)
-        chart.drawCentredString(x, y - 13, str(tick))
-    for index, (label, _, _, fill) in enumerate(bands):
-        x = 127 + 59 * index
-        chart.setFillColor(fill)
-        chart.rect(x, 233, 8, 8, stroke=0, fill=1)
-        chart.setFillColor(INK)
-        chart.drawString(x + 10, 233, label)
-    for policy, offset in (("beam", 6), ("nearest", 0)):
-        for vehicle in range(5):
-            _, y = point(0, offset + 5 - vehicle)
-            chart.setFillColor(INK)
-            chart.drawRightString(39, y - 3, f"{policy[0].upper()}-V{vehicle + 1}")
-        for row in rows:
-            if row["policy"] != policy:
-                continue
-            y_index = offset + 5 - int(row["vehicle"])
-            for _, start, end, fill in bands:
-                x, y = point(float(row[start]), y_index)
-                next_x, _ = point(float(row[end]), y_index)
-                chart.setFillColor(fill)
-                chart.rect(x, y - 4, next_x - x, 8, stroke=0, fill=1)
-                if start == "start":
-                    chart.setFillColor(colors.white)
-                    chart.setFont("Times-Roman", 8)
-                    chart.drawCentredString((x + next_x) / 2, y - 2.6, row["alert"])
-                    chart.setFont("Times-Roman", 11)
-    chart.save()
-
-
-def draw_coverage(rows):
-    chart, point = base_chart("b_coverage.pdf", 120, .55, "Cumulative travel (m)", "Coverage")
-    for y in (.5, .6, .7, .8, .9, 1):
-        x, yy = point(0, y - .45)
-        chart.drawRightString(x - 5, yy - 3, f"{y:.1f}")
-    for x_tick in range(0, 121, 20):
-        x, y = point(x_tick, 0)
-        chart.drawCentredString(x, y - 13, str(x_tick))
-    chart.setStrokeColor(RED)
-    chart.setDash(4, 3)
-    chart.line(*point(0, .50), *point(120, .50))
-    chart.setDash()
-    chart.setStrokeColor(TEAL)
-    chart.setLineWidth(2)
-    path = chart.beginPath()
-    for i, row in enumerate(rows):
-        where = point(float(row["path_m"]), float(row["coverage"]) - .45)
-        (path.moveTo if i == 0 else path.lineTo)(*where)
-    chart.drawPath(path)
-    chart.save()
-
-
-def draw_disturbances(rows):
-    names = ("new_1", "failure_V1", "failure_V5", "outage_upper_time", "new_failure_V1",
-             "failure_outage_V1", "new_outage", "all_V1", "all_duration_sensitivity")
-    chart, point = base_chart("b_disturbances.pdf", 9, 1.1, "Scenario index", "Completion ratio")
-    for tick in range(6):
-        x, y = point(0, tick / 5)
-        chart.drawRightString(x - 5, y - 3, f"{tick / 5:.1f}")
-    for i, name in enumerate(names):
-        chart.setFillColor(INK)
-        x, _ = point(i + .5, 0)
-        chart.drawCentredString(x, 17, str(i + 1))
-        for row in rows:
-            if row["scenario"] == name:
-                left = x + (-14 if row["policy"] == "keep" else 1)
-                _, top = point(i, float(row["completion_ratio"]))
-                chart.setFillColor(RED if row["policy"] == "keep" else TEAL)
-                chart.rect(left, 31, 13, top - 31, stroke=0, fill=1)
-    chart.setFillColor(RED)
-    chart.drawString(313, 231, "Keep")
-    chart.setFillColor(TEAL)
-    chart.drawString(350, 231, "Reschedule")
-    chart.save()
-    return names
-
-
-def sections(p1, p2, timings, p3, p4, cases, audit):
+def sections(p1, p2, timings, p3, p4, audit, visits):
     latest = {
         policy: max(float(row["start"]) for row in timings if row["policy"] == policy)
         for policy in ("beam", "nearest")
@@ -213,6 +76,12 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
         for v in outcomes.values()
     )
     mc_rms, mc_threshold, mc_check = audit[:3]
+    zero_legs = [visit for visit in visits if visit["path"][0] == visit["path"][-1]]
+    reuse_text = " ".join(
+        f"V{visit['vehicle'] + 1} starts its leg for {visit['alert']} already at the assigned station, "
+        "so this leg consumes slew time but no driving time."
+        for visit in zero_legs
+    )
     adverse = next(((name, pair) for name, pair in outcomes.items()
                     if pair["reschedule"] < pair["keep"]), None)
     adverse_text = (
@@ -247,7 +116,7 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
             f"{fmt(p1['elevation_deg'], 1)} degrees and its inverse-range quality is "
             f"{fmt(p1['quality_m_inv'], 5)} per metre. The plotted region is a one-metre raster, "
             "while the selected station uses continuous coordinates.",
-        ], "b_geometry", "Observable footprint for T1 (light teal), a selected station (red ring), and T2 viewing rays (teal)."),
+        ], "b_geometry", "T1 observability and the selected minimum-range station, with a local inset of the T2 bearing intersection."),
         ("Dual-Station Localization for T2", [
             "Let r1 and r2 be the horizontal sensor ranges, and let gamma be the smaller angle between "
             "the two bearings. The first-order error normal to each bearing is range times the angular "
@@ -282,7 +151,12 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
             f"The last start is {fmt(latest['beam'])} s for beam search and {fmt(latest['nearest'])} s "
             f"for nearest assignment, a difference of {fmt(latest['nearest'] - latest['beam'])} s. "
             "The comparison is between evaluated feasible schedules. No global optimality claim is made.",
-        ], "b_timeline", "Per-vehicle timeline for beam search (B) and nearest assignment (N)."),
+        ], "b_timeline", "Paired per-vehicle timelines. The dashed line in each panel marks its last observation start."),
+        ("Nominal Driving Routes", [
+            "The map links the timing sequence to the physical station choices. Filled markers show vehicle "
+            "origins and open rings show selected observation stations. A repeated vehicle can travel on "
+            "multiple segments of the same color. Building footprints are shaded. " + reuse_text,
+        ], "b_routes", "Nominal paths for the five available vehicles. Paths use conservative obstacle clearance."),
         ("Horizontal Pointing Error", [
             "By rotational symmetry, put the target on the positive horizontal axis. The position error "
             "changes the bearing through atan2 of the lateral displacement and the perturbed longitudinal "
@@ -302,7 +176,12 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
             f"{fmt(100*float(p3['position_variance_share']),1)}% for the vehicle position, "
             f"{fmt(100*float(p3['zero_offset_variance_share']),1)}% for gimbal offset, and "
             f"{fmt(100*float(p3['control_variance_share']),1)}% for gimbal control.",
-        ], "b_coverage", "Calculated probability of remaining within the two-sided pointing limit."),
+        ], "b_coverage", "Pointing coverage versus travel distance. Red points show the Monte Carlo checks with Wilson intervals."),
+        ("Admissible Position-Error Parameters", [
+            "For the fixed check distance, the permitted combinations of error intercept and growth "
+            "coefficient form a triangle in the nonnegative parameter region. Its sloped edge collects "
+            "the intercept–slope combinations that meet the target coverage at equality.",
+        ], "b_parameters", "Admissible intercept and growth coefficient under the two-sided coverage requirement."),
         ("Rescheduling After Disturbances", [
             "At time zero both policies begin with the same nominal plan. In the fixed plan, a new alert "
             "remains unassigned and a scheduled observation involving a failed vehicle cannot start after "
@@ -319,12 +198,12 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
             "population probabilities.",
             f"Replanning improves {counts['better']} cases, ties {counts['tied']}, and worsens "
             f"{counts['worse']}. " + adverse_text,
-        ], "b_disturbances", "Completion ratios across selected cases, in order: " + ", ".join(cases) + "."),
+        ], "b_disturbances", "Completion and last-start times under both policies for representative disturbance cases."),
         ("Paired Scenario Results", [
             "For each row, the completion fraction counts alert starts within the evaluation window. "
             "The last-start column follows the specified horizon convention when an alert is unfinished.",
         ], None, None),
-        ("Validation, Limitations, and References", [
+        ("Validation and Limitations", [
             "The implementation checks station visibility, collision-free route segments, joint observation "
             "start, task duration, and nonoverlapping vehicle timelines. Replans are checked against the "
             "recovery time and failed vehicle identity. The search is deterministic. Auditable numerical "
@@ -340,6 +219,8 @@ def sections(p1, p2, timings, p3, p4, cases, audit):
             "nominal timing assumptions, and uses finite station candidates. The scenario study is conditional "
             "on the stated continuation and cancellation rules. Further sensitivity checks should examine "
             "station discretization, clearance, the chosen outage interpretation, and sample coverage.",
+        ], None, None),
+        ("References", [
             "[1] Liang and Barsky. A New Concept and Method for Line Clipping. ACM Transactions on Graphics, "
             "1984. doi:10.1145/357332.357333.",
             "[2] Bishop et al. Optimality Analysis of Sensor-Target Localization Geometries. Automatica, "
@@ -383,13 +264,20 @@ def write_tex(summary, body, scenario_rows):
     clean = clean.replace("[FILL: Summary]", tex_escape(summary))
     clean = clean.replace("[FILL: Keywords]", "Bearing-only localization; vehicle scheduling; uncertainty; rescheduling")
     output = [clean.rstrip()]
-    for title, paragraphs, figure, caption in body:
-        output.extend([r"\section{" + title + "}", *(tex_escape(p) for p in paragraphs)])
+    for index, (title, paragraphs, figure, caption) in enumerate(body):
+        if index and title != "References":
+            output.append(r"\clearpage")
+        output.append(r"\section{" + title + "}")
+        if title == "References":
+            output.extend([r"\begingroup\raggedright",
+                           *(tex_escape(text) for text in paragraphs), r"\par\endgroup"])
+        else:
+            output.extend(tex_escape(text) for text in paragraphs)
         if title in EQUATIONS:
             output.append(r"\[" + EQUATIONS[title][1] + r"\]")
         if title == "Paired Scenario Results":
             output.extend([
-                r"\begin{table}[htbp]", r"\centering",
+                r"\begin{table}[!ht]", r"\centering",
                 r"\caption{Completion ratios and latest-start times in seconds}",
                 r"\begin{tabular}{@{}lrrrr@{}}", r"\toprule",
                 " & ".join(scenario_rows[0]) + r" \\", r"\midrule",
@@ -397,8 +285,8 @@ def write_tex(summary, body, scenario_rows):
                 r"\bottomrule", r"\end{tabular}", r"\end{table}",
             ])
         if figure:
-            output.extend([r"\begin{figure}[htbp]", r"\centering",
-                           r"\includegraphics[width=0.8\linewidth]{" + figure + "}",
+            output.extend([r"\begin{figure}[!ht]", r"\centering",
+                           r"\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{" + figure + "}",
                            r"\caption{" + tex_escape(caption) + "}", r"\end{figure}"])
     output.append(r"\end{document}")
     (PAPER / "B_prototype.tex").write_text("\n\n".join(output) + "\n", encoding="utf-8")
@@ -421,9 +309,6 @@ def vector_pdf_to_drawing(path, max_width):
 
 
 def write_preview(summary, body, scenario_rows):
-    font_dir = Path("C:/Windows/Fonts")
-    pdfmetrics.registerFont(TTFont("BodyTimes", str(font_dir / "times.ttf")))
-    pdfmetrics.registerFont(TTFont("TitleTimes", str(font_dir / "timesbd.ttf")))
     normal = ParagraphStyle("body", fontName="BodyTimes", fontSize=12, leading=16, spaceAfter=9)
     heading = ParagraphStyle("heading", parent=normal, fontName="TitleTimes",
                              fontSize=16, leading=20, spaceAfter=14, textColor=INK)
@@ -491,13 +376,24 @@ def write_preview(summary, body, scenario_rows):
 
 def main():
     FIGURES.mkdir(exist_ok=True)
+    font_dir = Path("C:/Windows/Fonts")
+    pdfmetrics.registerFont(TTFont("BodyTimes", str(font_dir / "times.ttf")))
+    pdfmetrics.registerFont(TTFont("TitleTimes", str(font_dir / "timesbd.ttf")))
     p1, p2, p3 = (read(name)[0] for name in ("B_P1.csv", "B_P2_localization.csv", "B_P3.csv"))
     timings, coverage, p4 = (read(name) for name in ("B_P2_schedules.csv", "B_P3_coverage.csv", "B_P4.csv"))
+    audit = read("B_validation.csv")
+    route_data = json.loads((RESULTS / "B_timelines.json").read_text(encoding="utf-8"))
     draw_map(p1, p2)
     draw_timeline(timings)
-    draw_coverage(coverage)
-    cases = draw_disturbances(p4)
-    summary, body, scenario_rows = sections(p1, p2, timings, p3, p4, cases, read("B_validation.csv"))
+    draw_routes(route_data["nominal"])
+    cover_audit = [
+        (float(distance), *(float(row[key]) for key in ("estimate", "lower", "upper")))
+        for distance, row in ((p3["path_cap_m"], audit[1]), (p3["parameter_check_distance_m"], audit[2]))
+    ]
+    draw_coverage(coverage, float(p3["path_cap_m"]), cover_audit)
+    draw_parameter_region(p3)
+    draw_disturbances(p4)
+    summary, body, scenario_rows = sections(p1, p2, timings, p3, p4, audit, route_data["nominal"])
     write_tex(summary, body, scenario_rows)
     write_preview(summary, body, scenario_rows)
 

@@ -8,17 +8,24 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{caption}
-\captionsetup[table]{position=top}
-\captionsetup[figure]{position=bottom}
+\usepackage{xcolor}
+\definecolor{paperink}{HTML}{172D43}
+\captionsetup{font=normalsize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=8pt}
+\captionsetup[figure]{position=bottom,skip=8pt}
 \usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\raggedbottom
 
 \newcommand{\ProblemLetter}{B}
 \newcommand{\TeamNumber}{SWBMCM2613050}
 \newcommand{\PaperTitle}{[FILL: Paper Title]}
+\hypersetup{pdftitle={\PaperTitle},pdfauthor={}}
 \newcommand{\TeamPageHeader}{%
   \fancyhf{}%
-  \fancyhead[L]{Team\#\TeamNumber}%
-  \fancyhead[R]{Page \thepage\ of \pageref*{LastPage}}%
+  \fancyhead[L]{\color{paperink}Team\#\TeamNumber}%
+  \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
   \renewcommand{\headrulewidth}{0.4pt}%
 }
 \fancypagestyle{fancy}{\TeamPageHeader}
@@ -31,10 +38,12 @@
 \pagestyle{fancy}
 \thispagestyle{empty}
 \begin{center}
-\begin{tabular}{@{}lll@{}}
-  Problem Chosen & 2026 ShuWei Cup & Team Control Number \\
-  \ProblemLetter & Summary Sheet & \TeamNumber
-\end{tabular}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcr@{}}
+  \toprule
+  Problem Chosen & 2026 ShuWei Cup & Team Control Number\\
+  \textbf{\ProblemLetter} & \textbf{Summary Sheet} & \textbf{\TeamNumber}\\
+  \bottomrule
+\end{tabular*}
 
 \vspace{1em}
 {\Large\bfseries\PaperTitle}
@@ -61,10 +70,3 @@
 % its references. Add the required AI Tool Usage Report after the main text
 % or after References, following the official regulations.
 \end{document}
-Name         Length
-----         ------
-times.ttf   1190952
-timesbd.ttf 1170312
-timesbi.ttf  904428
-timesi.ttf   963084
-

@@ -15,6 +15,9 @@ shapely==2.1.2
 
 # PDF 与题图处理
 pymupdf==1.28.2
+pypdf==6.21.4
+reportlab==5.1.0
+Pillow==13.0.0
 
 # 测试
 pytest==8.4.2

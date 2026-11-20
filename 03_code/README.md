@@ -9,6 +9,8 @@ python 03_code/run_all.py          # 跑全部（P1→P2→P3→P4）
 python 03_code/run_all.py --only P2 # 只跑某一问
 ```
 
+当前队内交接包的一键复跑入口为 `python 03_code/run_all.py --workpack`。它在临时目录解压，重生成结果、复核数据和图，再逐一核对归档字节。绘图需要 Windows Times New Roman 与 Poppler 的 `pdftoppm`。依赖版本和输入输出说明见 [复现说明](../10_比赛工作区/paper/B_reproduce.md) 与 [交接清单](../10_比赛工作区/submission/B题交接清单.md)。
+
 ## 目录
 
 | 目录 | 内容 | 负责人 |

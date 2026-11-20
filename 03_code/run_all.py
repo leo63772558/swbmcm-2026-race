@@ -6,7 +6,8 @@
 哪一问还没写就不跑，只提示，不算失败。
 
 用法：
-    python 03_code/run_all.py            # 跑全部
+    python 03_code/run_all.py --workpack # 解压当前 B 题工作包并复跑
+    python 03_code/run_all.py            # 跑已完成的分题入口
     python 03_code/run_all.py --only P2  # 只跑 P2 下所有子任务
     python 03_code/run_all.py --list     # 只看有哪些任务
 """
@@ -15,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import subprocess
 import sys
 import time
 import traceback
@@ -22,6 +24,8 @@ from pathlib import Path
 
 CODE_DIR = Path(__file__).resolve().parent
 REPO = CODE_DIR.parent
+WORKSPACE = REPO / "10_比赛工作区"
+WORKPACK = WORKSPACE / "submission" / "prototype-handoff" / "BSWBMCM2613050fj.zip"
 
 # 执行顺序即依赖顺序：P1 的可观测区域是 P2 的可行域，P2(2) 的方案是 P4 的基线
 TASKS = [
@@ -53,7 +57,15 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", help="只跑指定前缀，如 P2 / P3 / P4.1")
     ap.add_argument("--list", action="store_true", help="只列出任务")
+    ap.add_argument("--workpack", action="store_true", help="解压当前队内工作包并复核产物")
     args = ap.parse_args()
+    if args.workpack:
+        if args.only or args.list:
+            ap.error("--workpack 和分题模式分开运行")
+        if not WORKPACK.is_file():
+            ap.error(f"找不到工作包：{WORKPACK}")
+        checker = WORKSPACE / "src" / "verify_handoff.py"
+        return subprocess.run([sys.executable, str(checker), "--reproduce-zip", str(WORKPACK)]).returncode
 
     tasks = TASKS
     if args.only:

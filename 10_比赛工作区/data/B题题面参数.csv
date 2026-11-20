@@ -1,0 +1,98 @@
+group,entity,parameter,value,unit,page,source,status,note
+field,field,x_min,0,m,1,Background,derived,西南角作原点
+field,field,x_max,100,m,1,Background,derived,由场地尺寸和原点得到
+field,field,y_min,0,m,1,Background,derived,西南角作原点
+field,field,y_max,100,m,1,Background,derived,由场地尺寸和原点得到
+field,field,width,100,m,1,Background,stated,东西方向
+field,field,length,100,m,1,Background,stated,南北方向
+field,field,x_direction,east,,1,Background,stated,
+field,field,y_direction,north,,1,Background,stated,
+field,field,azimuth_reference,east_ccw,,1,Background,stated,正东为零且逆时针为正
+field,O,x,50,m,1,Background,stated,调度中心
+field,O,y,50,m,1,Background,stated,调度中心
+building,B1,x_min,22,m,1,Table 1,stated,
+building,B1,x_max,34,m,1,Table 1,stated,
+building,B1,y_min,16,m,1,Table 1,stated,
+building,B1,y_max,26,m,1,Table 1,stated,
+building,B1,height,20,m,1,Table 1,stated,
+building,B2,x_min,63,m,1,Table 1,stated,
+building,B2,x_max,79,m,1,Table 1,stated,
+building,B2,y_min,59,m,1,Table 1,stated,
+building,B2,y_max,71,m,1,Table 1,stated,
+building,B2,height,28,m,1,Table 1,stated,
+building,B3,x_min,10,m,1,Table 1,stated,
+building,B3,x_max,24,m,1,Table 1,stated,
+building,B3,y_min,65,m,1,Table 1,stated,
+building,B3,y_max,76,m,1,Table 1,stated,
+building,B3,height,12,m,1,Table 1,stated,
+building,B4,x_min,72,m,1,Table 1,stated,
+building,B4,x_max,86,m,1,Table 1,stated,
+building,B4,y_min,22,m,1,Table 1,stated,
+building,B4,y_max,34,m,1,Table 1,stated,
+building,B4,height,24,m,1,Table 1,stated,
+building,B5,x_min,41,m,1,Table 1,stated,
+building,B5,x_max,51,m,1,Table 1,stated,
+building,B5,y_min,38,m,1,Table 1,stated,
+building,B5,y_max,46,m,1,Table 1,stated,
+building,B5,height,32,m,1,Table 1,stated,
+vehicle,V1,initial_x,15,m,1,Background,stated,
+vehicle,V1,initial_y,14,m,1,Background,stated,
+vehicle,V2,initial_x,88,m,1,Background,stated,
+vehicle,V2,initial_y,10,m,1,Background,stated,
+vehicle,V3,initial_x,14,m,1,Background,stated,
+vehicle,V3,initial_y,86,m,1,Background,stated,
+vehicle,V4,initial_x,88,m,1,Background,stated,
+vehicle,V4,initial_y,68,m,1,Background,stated,
+vehicle,V5,initial_x,50,m,1,Background,stated,
+vehicle,V5,initial_y,93,m,1,Background,stated,
+vehicle,vehicle,radius,1.5,m,2,Observation vehicle,stated,车体等效圆盘
+vehicle,vehicle,speed,3,m/s,2,Observation vehicle,stated,匀速行驶
+alert,T1,azimuth,30,deg,2,Base alerts,stated,
+alert,T1,horizontal_range,40,m,2,Base alerts,stated,相对调度中心
+alert,T1,altitude,45,m,2,Base alerts,stated,
+alert,T2,azimuth,150,deg,2,Base alerts,stated,
+alert,T2,horizontal_range,45,m,2,Base alerts,stated,相对调度中心
+alert,T2,altitude,35,m,2,Base alerts,stated,
+alert,T3,azimuth,285,deg,2,Base alerts,stated,
+alert,T3,horizontal_range,38,m,2,Base alerts,stated,相对调度中心
+alert,T3,altitude,55,m,2,Base alerts,stated,
+camera,camera,height,2,m,3,Camera and gimbal,stated,镜头位于车辆圆盘几何中心正上方
+camera,gimbal,elevation_min,-10,deg,3,Camera and gimbal,stated,闭区间
+camera,gimbal,elevation_max,80,deg,3,Camera and gimbal,stated,闭区间
+camera,gimbal,pan_speed_max,30,deg/s,3,Camera and gimbal,stated,
+camera,gimbal,tilt_speed_max,30,deg/s,3,Camera and gimbal,stated,两轴允许同时旋转
+camera,gimbal,park_azimuth,0,deg,3,Camera and gimbal,derived,正东姿态换算
+camera,gimbal,park_elevation,0,deg,3,Camera and gimbal,derived,水平姿态换算
+camera,sight,building_contact_occludes,true,,3,Observability conditions,stated,有限视线段触及建筑面棱顶点即遮挡
+observation,joint,duration,5,s,3,Observation and reset rules,stated,两车均完成云台对准后开始
+p2_1,bearing,error_mean,0,deg,4,P2(1),stated,两车误差独立正态
+p2_1,bearing,error_std,1,deg,4,P2(1),stated,
+p2_1,vehicle,travel_time_max,30,s,4,P2(1),stated,每车从初始点出发的行驶时间
+p2_2,alerts,release_time,0,s,4,P2(2),stated,三个告警同时发布
+p2_2,alerts,count,3,count,4,P2(2),stated,
+p2_2,alert,vehicles_required,2,count,4,P2(2),stated,每个告警
+p3,error,wrap_min,-180,deg,4,P3,stated,含下界
+p3,error,wrap_max,180,deg,4,P3,stated,不含上界
+p3,position,coordinate_std_intercept,0.3,m,4,P3,stated,两个坐标方向各自独立且均值为零
+p3,position,coordinate_std_slope,0.02,m/m,4,P3,stated,自变量为累计行驶距离
+p3,gimbal,zero_offset_std,0.8,deg,4,P3,stated,零均值
+p3,gimbal,control_error_std,0.6,deg,4,P3,stated,零均值
+p3,target,horizontal_range,40,m,4,P3,stated,相对车辆且固定
+p3,error,absolute_error_max,5,deg,4,P3,stated,双侧含边界
+p3,error,coverage_min,0.95,probability,4,P3,stated,
+p3,vehicle,parameter_check_distance,80,m,4,P3,stated,非负参数 a 和 b 的检验条件
+p4,disturbance,occurrence_time,5,s,5,P4,stated,绝对时刻
+p4,new_alert,azimuth_min,0,deg,5,P4,stated,含下界
+p4,new_alert,azimuth_max,360,deg,5,P4,stated,不含上界
+p4,new_alert,horizontal_range_min,30,m,5,P4,stated,含下界且相对调度中心
+p4,new_alert,horizontal_range_max,50,m,5,P4,stated,含上界
+p4,new_alert,altitude,50,m,5,P4,stated,
+p4,new_alert,vehicles_required,2,count,5,P4,stated,
+p4,failure,failed_vehicle_count,1,count,5,P4,stated,五辆车中等概率抽一辆
+p4,outage_formula,recovery_time_min,5,s,5,P4,conflict,为绝对时刻且不含下界
+p4,outage_formula,recovery_time_max,30,s,5,P4,conflict,为绝对时刻且含上界
+p4,outage_prose,duration_min,5,s,5,P4,conflict,为持续时间且含下界
+p4,outage_prose,duration_max,30,s,5,P4,conflict,为持续时间且含上界
+p4,evaluation,window_start,0,s,5,P4,stated,
+p4,evaluation,window_end,60,s,5,P4,stated,
+p4,evaluation,incomplete_latest_start,60,s,5,P4,stated,有任务未能按期开始的最晚开始时刻记为此值

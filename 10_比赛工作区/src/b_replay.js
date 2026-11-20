@@ -1,5 +1,6 @@
-/* AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
- * Public model release date not verified. Interactive rendering of recorded data. */
+/* AI assistance: Antigravity (Gemini) & ChatGPT (Codex), 2026-11-21.
+ * Interactive digital twin controller over verified event intervals.
+ */
 "use strict";
 
 const data = JSON.parse(document.getElementById("payload").textContent);
@@ -9,6 +10,7 @@ let selected = "failure_V5";
 let currentPolicy = "keep";
 let time = data.cases[selected].disturbance_s;
 let playing = false;
+let playbackSpeed = 1.0;
 let lastDraw = 0;
 let drawInProgress = null;
 let drawPending = false;
@@ -75,236 +77,296 @@ function hitBuilding(a, b) {
   }
   return null;
 }
-function titleCase(s) { return s.replaceAll("_"," ").replace(/^\w/, x => x.toUpperCase()); }
+function titleCase(s) { return s.replaceAll("_", " ").replace(/^\w/, x => x.toUpperCase()); }
 function node(tag, text, className = "") {
   const el = document.createElement(tag);
   if (text !== undefined) el.textContent = text;
   el.className = className;
   return el;
 }
+
 function makeScore(record) {
-  const box=$("score");
+  const box = $("score");
   box.replaceChildren();
-  for (const [p,s] of Object.entries(record.scores)) {
-    const wrap=node("article");
-    const count=Object.values(s.starts).filter(t => t <= time && t < data.field.horizon).length;
-    wrap.append(node("div",data.policy_labels[p]+" • at replay time","metric"),
-      node("strong",count+" / "+s.alerts+" started"),
-      node("small","Window score "+s.successes+"/"+s.alerts+" • last "+fmt(s.latest_start_s)+" s","hint"));
-    box.append(wrap);
-  }
-  if (record.disturbance_s !== null) {
-    const wrap=node("article"), clock=record.absolute_recovery_s;
-    wrap.append(node("div","Disturbance and communication","metric"),
-      node("strong",record.failed_vehicle ? "V"+record.failed_vehicle+" failure" :
-        record.new_target ? "New target" : "Outage"),
-      node("small",clock === null ? "Event at "+fmt(record.disturbance_s)+" s • link active"
-        : "Recovery "+fmt(clock)+" s • duration "+fmt(record.outage_duration_s)+" s","hint"));
+  for (const [p, s] of Object.entries(record.scores)) {
+    const wrap = node("article", undefined, "kpi-card");
+    const count = Object.values(s.starts).filter(t => t <= time && t < data.field.horizon).length;
+    const pct = s.alerts ? Math.round((count / s.alerts) * 100) : 0;
+    const track = node("div", undefined, "progress-track");
+    const fill = node("div", undefined, "progress-fill");
+    fill.style.width = pct + "%";
+    track.append(fill);
+    wrap.append(
+      node("div", data.policy_labels[p], "metric"),
+      node("strong", count + " / " + s.alerts + " started"),
+      node("small", "Window " + s.successes + "/" + s.alerts + " · last " + fmt(s.latest_start_s, 3) + " s"),
+      track
+    );
     box.append(wrap);
   }
 }
+
+function updateEventLog(record) {
+  const log = $("eventLog");
+  if (!log) return;
+  log.replaceChildren();
+  const items = [];
+  if (record.disturbance_s !== null) {
+    const label = record.failed_vehicle ? "FAULT: V" + record.failed_vehicle + " offline"
+      : record.new_target ? "ALERT: New target T4 spawned"
+      : "COMMS: Dispatch link outage";
+    items.push({ t: record.disturbance_s, text: label, fault: true });
+    if (record.absolute_recovery_s !== null) {
+      items.push({ t: record.absolute_recovery_s, text: "COMMS: Link restored (outage " + fmt(record.outage_duration_s, 1) + " s)", fault: false });
+    }
+  }
+  const starts = record.scores[currentPolicy].starts;
+  for (const [alertId, tStart] of Object.entries(starts)) {
+    if (tStart < data.field.horizon) {
+      items.push({ t: tStart, text: alertId + " dual-observation started (" + data.policy_labels[currentPolicy] + ")", fault: false });
+    }
+  }
+  items.sort((a, b) => a.t - b.t);
+  for (const item of items) {
+    const li = node("li", "[" + fmt(item.t, 3) + " s] " + item.text, item.fault ? "fault" : "");
+    if (item.t > time + 1e-9) li.style.opacity = "0.45";
+    log.append(li);
+  }
+}
+
 function makeTimelines() {
-  const record=data.cases[selected], box=$("timelines");
+  const record = data.cases[selected], box = $("timelines");
   box.replaceChildren();
-  const last=Math.max(...Object.values(record.policies).flat()
-    .filter(e=>!["idle","failed"].includes(e.phase)).map(e=>e.end_s),record.absolute_recovery_s || 0);
-  const end=Math.min(data.field.horizon,Math.max(25,5*Math.ceil(last/5)));
-  $("period").textContent="0–"+end+" s • shared clock";
-  for (const [policy,rows] of Object.entries(record.policies)) {
-    const div=node("div",undefined,"policy");
-    const header=node("h3");
-    header.append(node("span",data.policy_labels[policy]),
-      node("small",fmt(record.scores[policy].latest_start_s,3)+" s last start","hint"));
-    const lanes=node("div",undefined,"lanes");
-    for (let v=1;v<=data.field.vehicles.length;v++) {
-      const track=node("div",undefined,"track");
-      for (const e of rows.filter(e=>e.vehicle===v && e.phase!=="idle")) {
-        const left=e.start_s/end*100, width=Math.min(e.end_s,end)/end*100-left;
-        if (left>=100 || width<=0) continue;
-        const bar=node("div",undefined,"bar");
-        bar.title=(e.alert||"")+" "+data.phases[e.phase][0]+" "+fmt(e.start_s)+"–"+fmt(e.end_s)+" s";
-        bar.style.cssText="left:"+left+"%;width:"+width+"%;background:"+data.phases[e.phase][1];
+  const last = Math.max(...Object.values(record.policies).flat()
+    .filter(e => !["idle", "failed"].includes(e.phase)).map(e => e.end_s), record.absolute_recovery_s || 0);
+  const end = Math.min(data.field.horizon, Math.max(25, 5 * Math.ceil(last / 5)));
+  $("period").textContent = "0–" + end + " s";
+  for (const [policy, rows] of Object.entries(record.policies)) {
+    const div = node("div", undefined, "policy");
+    const header = node("h3");
+    header.append(node("span", data.policy_labels[policy]),
+      node("small", fmt(record.scores[policy].latest_start_s, 3) + " s", "hint"));
+    const lanes = node("div", undefined, "lanes");
+    for (let v = 1; v <= data.field.vehicles.length; v++) {
+      const track = node("div", undefined, "track");
+      for (const e of rows.filter(e => e.vehicle === v && e.phase !== "idle")) {
+        const left = (e.start_s / end) * 100, width = (Math.min(e.end_s, end) / end) * 100 - left;
+        if (left >= 100 || width <= 0) continue;
+        const bar = node("div", undefined, "bar");
+        bar.title = (e.alert || "") + " " + data.phases[e.phase][0] + " " + fmt(e.start_s) + "–" + fmt(e.end_s) + " s";
+        bar.style.cssText = "left:" + left + "%;width:" + width + "%;background:" + data.phases[e.phase][1];
         track.append(bar);
       }
       if (record.disturbance_s !== null && record.disturbance_s <= end) {
-        const pin=node("div",undefined,"event-pin");
-        pin.style.left=record.disturbance_s/end*100+"%";
-        pin.title="Disturbance at "+fmt(record.disturbance_s,3)+" s";
+        const pin = node("div", undefined, "event-pin");
+        pin.style.left = (record.disturbance_s / end) * 100 + "%";
+        pin.title = "Disturbance at " + fmt(record.disturbance_s, 3) + " s";
         track.append(pin);
       }
-      const cursor=node("div",undefined,"pin");
-      cursor.dataset.range=end;
+      const cursor = node("div", undefined, "pin");
+      cursor.dataset.range = end;
       track.append(cursor);
       track.addEventListener("pointerdown", e => {
-        const rect=track.getBoundingClientRect();
-        setTime(Math.max(0,Math.min(end,(e.clientX-rect.left)/rect.width*end)));
+        const rect = track.getBoundingClientRect();
+        setTime(Math.max(0, Math.min(end, ((e.clientX - rect.left) / rect.width) * end)));
       });
-      lanes.append(node("span","V"+v), track);
+      lanes.append(node("span", "V" + v), track);
     }
-    const ticks=node("div",undefined,"ticks");
-    for (let i=0;i<=4;i++) ticks.append(node("span",fmt(i*end/4, (end%4===0 ? 0 : 1))));
+    const ticks = node("div", undefined, "ticks");
+    for (let i = 0; i <= 4; i++) ticks.append(node("span", fmt((i * end) / 4, end % 4 === 0 ? 0 : 1)));
     lanes.append(ticks);
-    div.append(header,lanes);
+    div.append(header, lanes);
     box.append(div);
   }
 }
+
 function updateStates(states) {
-  const rows=$("states");
+  const rows = $("states");
   rows.replaceChildren();
   for (const s of states) {
-    const e=node("li");
-    const text="V"+s.vehicle+"  "+data.phases[s.phase][0]+(s.alert?" · "+s.alert:"");
-    e.append(node("strong",text),node("small",fmt(s.point[0],1)+", "+fmt(s.point[1],1)+" m   /   "+
-      fmt(s.pan,0)+"°, "+fmt(s.tilt,0)+"°"));
-    rows.append(e);
+    const li = node("li");
+    const badge = node("span", undefined, "veh-badge");
+    const dot = node("i", undefined, "veh-dot");
+    dot.style.backgroundColor = data.vehicle_colors[s.vehicle - 1];
+    const pill = node("span", data.phases[s.phase][0] + (s.alert ? " · " + s.alert : ""), "phase-pill");
+    pill.style.backgroundColor = data.phases[s.phase][1];
+    if (["idle", "wait_partner", "reset", "failed"].includes(s.phase)) pill.style.color = "#F8FAFC";
+    badge.append(dot, document.createTextNode("V" + s.vehicle), pill);
+    li.append(badge, node("small", fmt(s.point[0], 1) + ", " + fmt(s.point[1], 1) + " · " +
+      fmt(s.pan, 0) + "°, " + fmt(s.tilt, 0) + "°"));
+    rows.append(li);
   }
-  $("viewPolicy").textContent=data.policy_labels[currentPolicy];
+  $("viewPolicy").textContent = data.policy_labels[currentPolicy];
 }
+
 async function drawOnce() {
-  const record=data.cases[selected], states=stateFor(selected,currentPolicy,time);
-  const frame=frameGeometry(record,states);
-  $("clock").textContent=fmt(time,3)+" s";
-  $("time").value=time;
+  const record = data.cases[selected], states = stateFor(selected, currentPolicy, time);
+  const frame = frameGeometry(record, states);
+  $("clock").textContent = fmt(time, 3) + " s";
+  $("time").value = time;
   document.querySelectorAll(".pin").forEach(p =>
-    p.style.left=Math.min(100,time*100/Number(p.dataset.range))+"%");
+    p.style.left = Math.min(100, (time * 100) / Number(p.dataset.range)) + "%");
   makeScore(record);
   updateStates(states);
-  const afterEvent=record.disturbance_s !== null && time >= record.disturbance_s;
-  $("branch").dataset.active=String(afterEvent);
-  const eventLabel=record.failed_vehicle ? "V"+record.failed_vehicle+" failure" :
-    record.new_target ? "New target" : "Communication outage";
-  $("branch").textContent=afterEvent ?
-    eventLabel+" at "+fmt(record.disturbance_s,3)+" s"+
-      (frame.branch.length ? " · other policy paths dotted" : "") : "";
-  const rendered = {time:String(time),case:selected,policy:currentPolicy,drawnCamera:cameraMode};
+  updateEventLog(record);
+  const afterEvent = record.disturbance_s !== null && time >= record.disturbance_s;
+  $("branch").dataset.active = String(afterEvent);
+  const eventLabel = record.failed_vehicle ? "V" + record.failed_vehicle + " failure"
+    : record.new_target ? "New target" : "Communication outage";
+  $("branch").textContent = afterEvent ?
+    eventLabel + " at " + fmt(record.disturbance_s, 3) + " s" +
+      (frame.branch.length ? " · alternate policy dashed" : "") : "Nominal corridor active";
+  if ($("faultBanner")) {
+    $("faultBanner").dataset.active = String(afterEvent);
+    $("faultBanner").textContent = afterEvent ? "ALERT · " + eventLabel + " @ t = " + fmt(record.disturbance_s, 2) + " s" : "";
+  }
+  if ($("hudScenario")) {
+    $("hudScenario").textContent = "Scenario: " + (selected === "nominal" ? "Nominal Coordination" : selected) +
+      " · " + data.policy_labels[currentPolicy] + " · t = " + fmt(time, 2) + " s";
+  }
+  const rendered = { time: String(time), case: selected, policy: currentPolicy, drawnCamera: cameraMode };
   try {
     await renderField(frame);
-    Object.assign($("field").dataset,rendered);
-    window.BReplayRendered=true;
+    Object.assign($("field").dataset, rendered);
+    window.BReplayRendered = true;
   } catch (e) {
-    playing=false;
-    $("renderer").textContent="The browser could not initialize field rendering.";
+    playing = false;
+    $("renderer").textContent = "The browser could not initialize field rendering.";
     console.error(e);
   }
 }
+
 function draw() {
-  drawPending=true;
+  drawPending = true;
   if (!drawInProgress) {
-    drawInProgress=(async () => {
+    drawInProgress = (async () => {
       try {
-        while (drawPending) { drawPending=false; await drawOnce(); }
-      } finally { drawInProgress=null; }
+        while (drawPending) { drawPending = false; await drawOnce(); }
+      } finally { drawInProgress = null; }
     })();
   }
   return drawInProgress;
 }
+
 function setTime(t) {
-  time=Math.max(0,Math.min(data.field.horizon,t));
-  if (time===data.field.horizon) {
-    playing=false;
-    $("play").textContent="Play";
+  time = Math.max(0, Math.min(data.field.horizon, t));
+  if (time === data.field.horizon) {
+    playing = false;
+    $("play").textContent = "Play";
   }
   return draw();
 }
+
 function setCase(id, policy, t) {
-  playing=false;
-  $("play").textContent="Play";
-  selected=id; $("case").value=id;
-  const p=$("policy"); p.replaceChildren();
+  playing = false;
+  $("play").textContent = "Play";
+  selected = id; $("case").value = id;
+  const p = $("policy"); p.replaceChildren();
   for (const name of Object.keys(data.cases[id].policies)) {
-    const opt=node("option",data.policy_labels[name]); opt.value=name; p.append(opt);
+    const opt = node("option", data.policy_labels[name]); opt.value = name; p.append(opt);
   }
-  currentPolicy=policy || p.options[0].value; p.value=currentPolicy;
+  currentPolicy = policy || p.options[0].value; p.value = currentPolicy;
   makeTimelines();
-  return setTime(t===undefined ? 0 : t);
+  return setTime(t === undefined ? 0 : t);
 }
+
 function setCamera(mode) {
-  cameraMode=mode;
+  cameraMode = mode;
   cameraRevision++;
-  for (const view of ["iso","top","follow"]) $(view).setAttribute("aria-pressed",String(mode===view));
-  $("field").dataset.camera=mode;
+  for (const view of ["iso", "top", "follow"]) $(view).setAttribute("aria-pressed", String(mode === view));
+  $("field").dataset.camera = mode;
   return draw();
 }
+
 function playStep(frameTime) {
   if (!playing) return;
-  if (!lastDraw) lastDraw=frameTime;
-  if (frameTime-lastDraw>=125) {
-    setTime(time+(frameTime-lastDraw)/1000);
-    lastDraw=frameTime;
+  if (!lastDraw) lastDraw = frameTime;
+  if (frameTime - lastDraw >= 90) {
+    setTime(time + ((frameTime - lastDraw) / 1000) * playbackSpeed);
+    lastDraw = frameTime;
   }
   if (playing) requestAnimationFrame(playStep);
 }
+
 for (const id of scenarioNames) {
-  const title=id==="nominal"?"Nominal comparison":id==="failure_V5"?"V5 failure":titleCase(id);
-  const opt=node("option",title); opt.value=id; $("case").append(opt);
+  const title = id === "nominal" ? "Nominal comparison" : id === "failure_V5" ? "V5 failure" : titleCase(id);
+  const opt = node("option", title); opt.value = id; $("case").append(opt);
 }
-for (let i=0;i<data.field.vehicles.length;i++) {
-  const label="V"+(i+1);
-  const opt=node("option",label);
-  opt.value=i+1;
+for (let i = 0; i < data.field.vehicles.length; i++) {
+  const label = "V" + (i + 1);
+  const opt = node("option", label);
+  opt.value = i + 1;
   $("tracked").append(opt);
-  const span=node("span"), chip=node("i");
-  chip.style.backgroundColor=data.vehicle_colors[i];
-  span.append(chip,document.createTextNode(label));
+  const span = node("span"), chip = node("i");
+  chip.style.backgroundColor = data.vehicle_colors[i];
+  span.append(chip, document.createTextNode(label));
   $("routes").append(span);
 }
 const v5 = data.cases.failure_V5;
 const bookmarks = [
-  ["Nominal observation","nominal","beam",Math.min(...Object.values(data.cases.nominal.scores.beam.starts))],
-  ["V5 fault","failure_V5","keep",v5.disturbance_s],
-  ["V5 recovery","failure_V5","reschedule",v5.scores.reschedule.latest_start_s]
+  ["Nominal observation", "nominal", "beam", Math.min(...Object.values(data.cases.nominal.scores.beam.starts))],
+  ["V5 fault", "failure_V5", "keep", v5.disturbance_s],
+  ["V5 recovery", "failure_V5", "reschedule", v5.scores.reschedule.latest_start_s],
 ];
-for (const [title,id,policy,at] of bookmarks) {
-  const button=node("button",title);
-  button.type="button";
-  button.title=fmt(at,3)+" s";
-  button.addEventListener("click",()=>setCase(id,policy,at));
+for (const [title, id, policy, at] of bookmarks) {
+  const button = node("button", title);
+  button.type = "button";
+  button.title = fmt(at, 3) + " s";
+  button.addEventListener("click", () => setCase(id, policy, at));
   $("bookmarks").append(button);
 }
-for (const [label,color] of Object.values(data.phases)) {
-  if (label==="Idle") continue;
-  const span=node("span");
-  const chip=node("i"); chip.style.backgroundColor=color;
-  span.append(chip,document.createTextNode(label)); $("phases").append(span);
+for (const [label, color] of Object.values(data.phases)) {
+  if (label === "Standby") continue;
+  const span = node("span");
+  const chip = node("i"); chip.style.backgroundColor = color;
+  span.append(chip, document.createTextNode(label)); $("phases").append(span);
 }
-$("case").addEventListener("change",e=>setCase(e.target.value));
-for (const mode of ["iso","top","follow"]) $(mode).addEventListener("click",()=>setCamera(mode));
-$("tracked").addEventListener("change",()=>setCamera("follow"));
-$("policy").addEventListener("change",e=>{currentPolicy=e.target.value;draw();});
-$("time").addEventListener("input",e=>setTime(Number(e.target.value)));
-$("los").addEventListener("change",draw);
-$("play").addEventListener("click",()=> {
-  if (!playing && time===data.field.horizon) time=0;
-  playing=!playing; lastDraw=0;
-  $("play").textContent=playing?"Pause":"Play";
+$("case").addEventListener("change", e => setCase(e.target.value));
+for (const mode of ["iso", "top", "follow"]) $(mode).addEventListener("click", () => setCamera(mode));
+$("tracked").addEventListener("change", () => setCamera("follow"));
+$("policy").addEventListener("change", e => { currentPolicy = e.target.value; draw(); });
+$("time").addEventListener("input", e => setTime(Number(e.target.value)));
+$("los").addEventListener("change", draw);
+if ($("p1layer")) $("p1layer").addEventListener("change", draw);
+if ($("dualOverlay")) $("dualOverlay").addEventListener("change", draw);
+if ($("bldgTrans")) $("bldgTrans").addEventListener("change", draw);
+if ($("speed")) $("speed").addEventListener("change", e => { playbackSpeed = Number(e.target.value) || 1.0; });
+$("play").addEventListener("click", () => {
+  if (!playing && time === data.field.horizon) time = 0;
+  playing = !playing; lastDraw = 0;
+  $("play").textContent = playing ? "Pause" : "Play";
   if (playing) requestAnimationFrame(playStep);
 });
-$("event").addEventListener("click",()=> {
-  const c=data.cases[selected];
-  const bounds=Object.values(c.policies).flat().flatMap(e=>[e.start_s,e.end_s]);
-  bounds.push(c.disturbance_s,c.absolute_recovery_s);
-  setTime(Math.min(...bounds.filter(x=>x!==null && x>time+1e-9),data.field.horizon));
+$("event").addEventListener("click", () => {
+  const c = data.cases[selected];
+  const bounds = Object.values(c.policies).flat().flatMap(e => [e.start_s, e.end_s]);
+  bounds.push(c.disturbance_s, c.absolute_recovery_s);
+  setTime(Math.min(...bounds.filter(x => x !== null && x > time + 1e-9), data.field.horizon));
 });
-$("export").addEventListener("click",()=> {
+$("export").addEventListener("click", () => {
   if (!window.BReplayRendered) return;
-  const filename="B_"+selected+"_"+currentPolicy+"_"+fmt(time,3)+"s";
-  if (activeRenderer==="webgl") {
-    window.Plotly.downloadImage($("plot3d"),{format:"png",width:1800,height:1250,filename});
-  } else if (activeRenderer==="canvas") {
-    const canvas=node("canvas");
-    drawCanvas(canvas,frameGeometry(data.cases[selected],stateFor(selected,currentPolicy,time)),900,625,2);
-    const link=node("a");
-    link.download=filename+".png"; link.href=canvas.toDataURL("image/png"); link.click();
+  const filename = "B_" + selected + "_" + currentPolicy + "_" + fmt(time, 3) + "s";
+  if (activeRenderer === "webgl") {
+    window.Plotly.downloadImage($("plot3d"), { format: "png", width: 1800, height: 1250, filename });
+  } else if (activeRenderer === "canvas") {
+    const canvas = node("canvas");
+    drawCanvas(canvas, frameGeometry(data.cases[selected], stateFor(selected, currentPolicy, time)), 900, 625, 2);
+    const link = node("a");
+    link.download = filename + ".png"; link.href = canvas.toDataURL("image/png"); link.click();
   }
 });
-$("field").addEventListener("webglcontextlost",e=>{
+$("field").addEventListener("webglcontextlost", e => {
   e.preventDefault();
-  activeRenderer="canvas";
+  activeRenderer = "canvas";
   draw();
-},true);
-window.addEventListener("resize",()=>{if (activeRenderer==="canvas") draw();});
-$("provenance").textContent="Source: verified event intervals • nominal plan "+data.plan_id.slice(0,12)+
-  " • field parameter SHA-256 "+data.input_sha256.slice(0,12)+" • team review edition";
-window.BReplay={stateFor, setCase, setCamera, hitBuilding, checkedKeyframes:data.keyframes, bookmarks};
-$("field").dataset.camera="iso";
-setCase(selected,currentPolicy,time);
+}, true);
+window.addEventListener("resize", () => { if (activeRenderer === "canvas") draw(); });
+if ($("hudMetrics") && data.p1_overlay) {
+  $("hudMetrics").textContent = "P2(1) RMS: " + fmt(data.p1_overlay.p2_rms_m, 6) + " m · Safety r = " +
+    fmt(data.p1_overlay.vehicle_radius_m, 1) + " m";
+}
+$("provenance").textContent = "Source: verified event intervals · nominal plan " + data.plan_id.slice(0, 12) +
+  " · field parameter SHA-256 " + data.input_sha256.slice(0, 12) + " · dark digital twin v2";
+window.BReplay = { stateFor, setCase, setCamera, hitBuilding, checkedKeyframes: data.keyframes, bookmarks };
+$("field").dataset.camera = "iso";
+setCase(selected, currentPolicy, time);

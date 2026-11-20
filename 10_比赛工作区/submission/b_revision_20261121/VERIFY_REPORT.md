@@ -15,8 +15,9 @@
 
 ## 前后对照
 
-- 浏览器验证：Chromium 157 独立打开 `file://` 版本，WebGL（SwiftShader）与禁用 WebGL 的 Canvas 分别渲染和导出三组 1800×1250 画面。三视角切换、强制 WebGL 上下文丢失后的回退均通过。网络请求与页面错误均为零。以 892 段行车路径及 4,503 个静止阶段位置核查建筑底面，均未相交；JS 与原事件的 770 条状态一致。
-- 图件验证：八组组合图和三组独立关键帧各有矢量 PDF 与 320 dpi PNG。另一个空目录重绘的 25 件图和索引逐字节一致。Fig. 5 散点重放已登记种子的首 1,200 点，统计曲线和区间仍从记录读取。Fig. 6 的 60 s 末端哨值在未完成场景中不拿来当时间差。
+- 浏览器验证（暗黑 3D 数字孪生指挥大屏 v2）：Headless Chromium 156 独立离线打开 `file://` 单文件 `B_Simulator.html`（3.08 MB），WebGL（SwiftShader）与禁用 WebGL 的暗黑 Canvas 2.5D 回退模式分别渲染并导出 3 组 `1800×1250` 高清关键帧（含三视角切换、强制 WebGL 上下文丢失回退、P1 地面叠加与双策略路径对比）。零外部网络请求、零页面报错；892 段行车路径与 4,503 个静止点均与建筑底面零穿模；Node.js 770 条状态断言全部通过。
+- 图件与新增计算验证：新增 `b_revision_sensitivity_pareto.py` 实跑生成全局敏感性（OAT/龙卷风/6×6 交互矩阵）与 16 组多目标 Pareto 权衡数据（`Global_sensitivity_oat.csv`、`Global_sensitivity_interaction.csv`、`Pareto_tradeoff.csv`），不改动既有 P1–P4 基线结果。全套 **10 组多面板科研图（`fig01`–`fig10`）** 与 3 组独立关键帧均以矢量 PDF + 320 dpi PNG 输出，色板与 3D 指挥大屏完全统一（V1–V5：`#0EA5E9/#38BDF8`、`#F59E0B`、`#10B981`、`#A855F7`、`#F43F5E`）。
+- 论文排版与合规交接：重构 `B_submission.tex`（XeLaTeX 实编译 16 页 A4 + 1 页 `P1_ERRATA.pdf`，12 pt Times New Roman，首页无页眉，第 2 页 `Content`，第 2–16 页统一匿名页眉 `Team#SWBMCM2613050` + `Page N of M`），移除文末冗长原始数据附表（保留在支撑 ZIP CSV），整合为各章精简 `booktabs` 三线汇总表，嵌入全部 10 组新图与 15 条可核验 IEEE 文献（含 12 篇带 DOI 权威学术文献），绑定 72 个数值宏。遵守 `AGENTS.md` 红线（不代写终稿正文），13 个 `paper/team/*.tex` 均已落盘结构化写作蓝图、Theorem 1 证明步骤与句式框架，供队员用自主语言改写后一键重编译定稿。
 
 | 指标 | 原基线 | 工程复核 |
 |---|---|---|

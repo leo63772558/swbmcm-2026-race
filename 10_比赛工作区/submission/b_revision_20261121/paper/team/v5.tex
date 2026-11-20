@@ -1,0 +1,5 @@
+\textit{[Team Drafting Blueprint --- Explain the V5 counterexample control-theoretic mechanism referencing Table~\ref{tab:v5} and Figure~\ref{fig:v5}.]}
+\begin{itemize}
+\item \textbf{Why rescheduling is slower here:} By $t=5.000$ s, T1 has already started paired observation and is locked. Under Keep Plan, remaining vehicles complete T2 and T3 without interruption ($t_{\mathrm{last}}=\BKeepLast{}$ s, bottleneck T3).
+\item \textbf{Cancellation-reset penalty:} Under Reschedule, aborting in-progress gimbal slews incurs mandatory zero-return resets on V1 (0.823 s), V2 (2.596 s), and V4 (2.019 s), while V3 is reassigned from T1--T3 to T1--T2, shifting the bottleneck to T2 at \BReplanLast{} s ($+\BVFiveDelay{}$ s delay).
+\end{itemize}

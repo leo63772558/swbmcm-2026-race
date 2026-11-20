@@ -1,0 +1,5 @@
+\textit{[Team Drafting Blueprint --- Explain cross-problem interfaces referencing Figure~\ref{fig:framework}.]}
+\begin{itemize}
+\item \textbf{Stage coupling:} P1 defines the exact feasible station and rounded-clearance road network $\to$ P2(1) evaluates local covariance on feasible station pairs $\to$ P2(2) freezes the nominal $k=8$ beam schedule (\BBeamEight{} s) $\to$ P3 bounds allowable vehicle travel drift (\BIntegratedCrossing{} m) $\to$ P4 replays \BCaseCount{} discrete-event disturbances \cite{vantendeloo2018} from the frozen nominal plan.
+\item \textbf{Unified evaluation:} Connect geometric quality $Q$, horizontal RMS, latest paired start $t_{\mathrm{last}}$, coverage probability, and lexicographic score $(\eta, -t_{\mathrm{last}})$.
+\end{itemize}

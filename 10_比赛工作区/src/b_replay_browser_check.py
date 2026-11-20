@@ -18,7 +18,11 @@ from playwright.sync_api import sync_playwright
 def pixels(png):
     with Image.open(BytesIO(png)).convert("RGB") as image:
         counts = Counter(image.get_flattened_data() if hasattr(image, "get_flattened_data") else image.getdata())
-        occupied = sum(n for rgb, n in counts.items() if min(rgb) < 230)
+        # Dark sci-fi canvas (#0B1020 -> 11,16,32): count non-background lit pixels
+        occupied = sum(
+            n for (r, g, b), n in counts.items()
+            if max(abs(r - 11), abs(g - 16), abs(b - 32)) > 16
+        )
         fraction = occupied / (image.width * image.height)
         assert fraction > .025, ("blank or mostly empty field", fraction)
         return {"width_px": image.width, "height_px": image.height,

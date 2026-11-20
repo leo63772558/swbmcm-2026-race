@@ -31,40 +31,46 @@ INK = "#17283A"
 MUTED = "#465A70"
 GRID = "#DCE4ED"
 PAPER = "#F1F5F9"
-BLUE = "#0072B2"
-TEAL = "#007A60"
-ORANGE = "#C44B17"
-GOLD = "#B37600"
-PURPLE = "#75549B"
-COLORS = (BLUE, ORANGE, TEAL, PURPLE, GOLD)
-UNAVAILABLE = "#788694"
+BLUE = "#0EA5E9"
+TEAL = "#10B981"
+ORANGE = "#F59E0B"
+GOLD = "#D97706"
+PURPLE = "#A855F7"
+CORAL = "#F43F5E"
+# Unified V1-V5 palette matching the dark 3D digital twin command dashboard
+COLORS = (BLUE, ORANGE, TEAL, PURPLE, CORAL)
+UNAVAILABLE = "#64748B"
 PHASES = {
-    "travel": ("Drive", BLUE),
-    "slew": ("Slew", "#E4A000"),
-    "wait_partner": ("Wait", "#B7C8D9"),
-    "observe": ("Observe", TEAL),
-    "reset": ("Reset", PURPLE),
-    "cancel_reset": ("Cancel / reset", ORANGE),
-    "missed_pair": ("Missed pair", "#DDADC0"),
-    "failed": ("Failed", UNAVAILABLE),
+    "travel": ("Driving", BLUE),
+    "slew": ("Slewing", ORANGE),
+    "wait_partner": ("Waiting", "#94A3B8"),
+    "observe": ("Observing", TEAL),
+    "reset": ("Resetting", PURPLE),
+    "cancel_reset": ("Cancel / reset", CORAL),
+    "missed_pair": ("Missed pair", "#FDA4AF"),
+    "failed": ("Fault", UNAVAILABLE),
 }
 FIGURE_MAP = (
     ("fig01_framework", "P1_station.csv; P2_precision.csv; priority_3.json; P3_verification.json",
-     "Shared field input and data dependencies between the four questions"),
+     "Interdisciplinary architecture and verified metric handoffs across P1-P4"),
     ("fig02_p1_geometry", "P1_grid_map.json; P1_geometry.json; P1_pitch_checks.csv; Route_clearance_comparison.csv; Route_summary.json",
-     "Grid evidence, shadow, exact-radius clearance, optimal arc, route changes and pitch sensitivity"),
+     "P1 observable field, building shadows, rounded Minkowski safety, route comparison and pitch sensitivity"),
     ("fig03_p2_precision", "P2_precision.csv; P2_precision_routes.json; B题题面参数.csv",
-     "Fixed-pair first-order RMS field and local position uncertainty"),
-    ("fig04_p2_dispatch", "Executed_timeline.json; P2_main_plans.json; P2_trials.csv; P2_visit_phases.csv; P2_critical_chains.csv",
-     "Shared-k schedule, vehicle trajectories and phase breakdown to the final paired start"),
-    ("fig05_p3_risk", "P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv",
-     "First draws of the recorded seeded run; position ellipse; coverage checks and parameter boundary"),
-    ("fig06_p4_resilience", "P4_cases.csv; Executed_timeline.json; priority_3.json",
-     "All case IDs, censoring-aware timing contrast, lexicographic score and replay flow"),
-    ("fig07_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json",
-     "Aligned V5 event clocks, cancellations, assignment changes and last paired starts"),
-    ("fig08_replay_frames", "Executed_timeline.json; P2_main_plans.json; B题题面参数.csv",
-     "3D projection of nominal observation, V5 failure and final-start recovery comparison"),
+     "P2(1) local first-order horizontal RMS contour field and 95% analytical error ellipse"),
+    ("fig04_p2_paths", "Executed_timeline.json; P2_main_plans.json; P2_visit_phases.csv",
+     "P2(2) multi-vehicle path planning comparison for representative reused vehicles and 5-vehicle global map"),
+    ("fig05_p2_dispatch", "Executed_timeline.json; P2_main_plans.json; P2_trials.csv; P2_visit_phases.csv; P2_critical_chains.csv",
+     "P2(2) shared-k schedule Gantt, vehicle trajectories and k=3 vs k=8 ranking-reversal breakdown"),
+    ("fig06_p3_risk", "P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv",
+     "P3 Monte Carlo scatter, analytical ellipse, 66.837 m coverage threshold inset and (a,b) admissible domain"),
+    ("fig07_p4_resilience", "P4_cases.csv; Executed_timeline.json; priority_3.json",
+     "P4 73-scenario disturbance resilience matrix, dual-policy distributions and event-driven rescheduling flow"),
+    ("fig08_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json",
+     "V5 single-fault counterexample aligned dual-policy Gantt showing +1.893 s bottleneck shift"),
+    ("fig09_global_sensitivity", "Global_sensitivity_oat.csv; Global_sensitivity_interaction.csv",
+     "Global parameter sensitivity: OAT ranking, tornado swing, 6x6 interaction matrix and Pareto cumulative share"),
+    ("fig10_pareto_and_3d", "Pareto_tradeoff.csv; Executed_timeline.json; browser_captures/webgl_*.png",
+     "Multi-objective Pareto tradeoff frontier and dark 3D digital twin three-stage keyframe triptych"),
 )
 PLOT_METADATA = {
     "Creator": "Matplotlib",
@@ -787,27 +793,263 @@ def replay_frames(results, directory):
     return fig
 
 
+def p2_paths(results):
+    """Fig. 4: Four-panel multi-vehicle path planning comparison (V3, V4, V1/V2, and 5-vehicle global map)."""
+    plans = read_json(results / "P2_main_plans.json")
+    beam_plan = plans["beam"]
+    near_plan = plans["nearest"]
+
+    fig, gs = layout("Multi-vehicle cooperative path planning  |  Rounded clearance routing", (10.6, 8.6), 2, 2,
+                     wspace=0.18, hspace=0.24)
+
+    def draw_vehicle_panel(ax, letter, title, v_ids):
+        panel(ax, letter, title)
+        xy_axes(ax)
+        footprint(ax, clearance=True, labels=True)
+        # Plot targets with non-overlapping label offsets
+        t_offsets = {"T1": (5, 4), "T2": (-16, 6), "T3": (5, -2)}
+        for tid, (tx, ty, _tz) in model.TARGETS.items():
+            ax.scatter([tx], [ty], marker="D", s=46, color=ORANGE, edgecolor=INK, linewidth=0.7, zorder=6)
+            ax.annotate(tid, (tx, ty), xytext=t_offsets.get(tid, (5, 4)), textcoords="offset points",
+                        fontsize=8.5, fontweight="bold", color=INK)
+        for vid in v_ids:
+            col = COLORS[vid - 1]
+            sx, sy = model.VEHICLES[vid - 1]
+            ax.scatter([sx], [sy], marker="s", s=42, color=col, edgecolor=INK, linewidth=0.8, zorder=7)
+            s_off = (4, -10) if vid != 2 else (-28, -2)
+            ax.annotate(f"V{vid}(0)", (sx, sy), xytext=s_off, textcoords="offset points", fontsize=8, fontweight="bold", color=col)
+            for item in near_plan:
+                if item["vehicle"] == vid and item.get("path"):
+                    pts = np.asarray(item["path"], float)
+                    ax.plot(pts[:, 0], pts[:, 1], linestyle="--", linewidth=1.7, color=MUTED, alpha=0.85, zorder=4)
+                    ax.scatter([pts[-1, 0]], [pts[-1, 1]], marker="^", s=34, color=MUTED, zorder=5)
+            for item in beam_plan:
+                if item["vehicle"] == vid and item.get("path"):
+                    pts = np.asarray(item["path"], float)
+                    ax.plot(pts[:, 0], pts[:, 1], linestyle="-", linewidth=2.4, color=col, zorder=5)
+                    ax.scatter([pts[-1, 0]], [pts[-1, 1]], marker="o", s=40, color=col, edgecolor="white", linewidth=0.8, zorder=6)
+                    e_off = (-28, 6) if vid == 1 else (4, 5)
+                    ax.annotate(f"V{vid}->{item['alert']}", (pts[-1, 0], pts[-1, 1]),
+                                xytext=e_off, textcoords="offset points", fontsize=7.5, color=INK)
+
+    draw_vehicle_panel(fig.add_subplot(gs[0, 0]), "a", "Reused vehicle V3 (T1 -> T3, zero wait)", [3])
+    draw_vehicle_panel(fig.add_subplot(gs[0, 1]), "b", "Vehicles V4 & V5 station assignments", [4, 5])
+    draw_vehicle_panel(fig.add_subplot(gs[1, 0]), "c", "Vehicles V1 & V2 (k=8 unlocked stations)", [1, 2])
+    ax_all = fig.add_subplot(gs[1, 1])
+    draw_vehicle_panel(ax_all, "d", "Global 5-vehicle routing (k=8 vs Nearest)", [1, 2, 3, 4, 5])
+    handles = [
+        Line2D([0], [0], color=INK, lw=2.2, linestyle="-", label="Beam Search (k=8)"),
+        Line2D([0], [0], color=MUTED, lw=1.7, linestyle="--", label="Nearest Baseline"),
+        Line2D([0], [0], marker="D", color="none", markerfacecolor=ORANGE, markeredgecolor=INK, markersize=6, label="UAV Alert"),
+    ]
+    ax_all.legend(handles=handles, loc="lower left", frameon=True, facecolor="white", framealpha=0.92, fontsize=7.8)
+    return fig
+
+
+def global_sensitivity(results):
+    """Fig. 9: Four-panel global sensitivity & interaction analysis from verified OAT/interaction CSVs."""
+    oat = read_csv(results / "Global_sensitivity_oat.csv")
+    inter = read_csv(results / "Global_sensitivity_interaction.csv")
+
+    fig, gs = layout("Global parameter sensitivity and interaction analysis", (11.2, 7.8), 2, 2,
+                     wspace=0.38, hspace=0.28)
+
+    short_names = {
+        "pitch_ceiling": r"Pitch ceiling $\beta_{\max}$",
+        "pos_error_slope": r"Drift slope $b$",
+        "outage_duration": r"Outage $\Delta t_{\mathrm{out}}$",
+        "pan_speed": r"Pan rate $\omega_{\mathrm{pan}}$",
+        "pos_error_intercept": r"Base std $a$",
+        "vehicle_speed": r"Speed $v$",
+    }
+    labels = [short_names.get(r["parameter"], r["label"]) for r in oat]
+    y_pos = np.arange(len(oat))
+
+    # (a) Main effect horizontal bar ranking
+    ax = fig.add_subplot(gs[0, 0])
+    panel(ax, "a", "One-at-a-time (OAT) main effect ranking")
+    swings = [float(r["swing_pct"]) for r in oat]
+    bar_cols = [BLUE, TEAL, ORANGE, PURPLE, CORAL, MUTED][:len(oat)]
+    ax.barh(y_pos, swings, color=bar_cols, edgecolor="white", height=0.62)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels)
+    ax.invert_yaxis()
+    ax.set_xlabel("Composite index swing (%)")
+    for idx, val in enumerate(swings):
+        ax.text(val + 0.25, idx, f"{val:.2f}%", va="center", fontsize=8.5, fontweight="bold", color=INK)
+    ax.set_xlim(0, max(swings) * 1.22)
+
+    # (b) Tornado chart (delta low vs delta high)
+    ax = fig.add_subplot(gs[0, 1])
+    panel(ax, "b", "Tornado sensitivity (±20% parameter sweep)")
+    d_lo = [float(r["delta_low_pct"]) for r in oat]
+    d_hi = [float(r["delta_high_pct"]) for r in oat]
+    ax.axvline(0.0, color=INK, linewidth=1.0, zorder=3)
+    ax.barh(y_pos, d_lo, color=CORAL, alpha=0.88, height=0.56, label="Low parameter bound")
+    ax.barh(y_pos, d_hi, color=BLUE, alpha=0.88, height=0.56, label="High parameter bound")
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(labels)
+    ax.invert_yaxis()
+    ax.set_xlabel(r"Relative change in composite index $\Delta J$ (%)")
+    ax.legend(loc="lower right", fontsize=8.5, frameon=True, facecolor="white")
+
+    # (c) 6x6 Pairwise Interaction Matrix Heatmap
+    ax = fig.add_subplot(gs[1, 0])
+    panel(ax, "c", "Pairwise parameter interaction matrix (%)")
+    p_order = [r["parameter"] for r in oat]
+    idx_map = {k: i for i, k in enumerate(p_order)}
+    mat = np.zeros((len(p_order), len(p_order)), dtype=float)
+    for r in inter:
+        if r["param_i"] in idx_map and r["param_j"] in idx_map:
+            mat[idx_map[r["param_i"]], idx_map[r["param_j"]]] = float(r["interaction_pct"])
+    im = ax.imshow(mat, cmap="YlGnBu", aspect="auto", vmin=0, vmax=max(0.2, float(mat.max())))
+    short_tick = [r"$\beta_{\max}$", r"$b$", r"$\Delta t_{\mathrm{out}}$", r"$\omega_{\mathrm{pan}}$", r"$a$", r"$v$"]
+    ax.set_xticks(range(len(p_order)))
+    ax.set_xticklabels(short_tick, fontsize=9)
+    ax.set_yticks(range(len(p_order)))
+    ax.set_yticklabels(short_tick, fontsize=9)
+    ax.grid(False)
+    for i in range(len(p_order)):
+        for j in range(len(p_order)):
+            v = mat[i, j]
+            txt = "--" if i == j else f"{v:.2f}"
+            ax.text(j, i, txt, ha="center", va="center", fontsize=8,
+                    color="white" if v > mat.max() * 0.55 else INK)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label("Interaction (%)", fontsize=8.5)
+
+    # (d) Pareto main-effect + cumulative contribution dual-axis
+    ax = fig.add_subplot(gs[1, 1])
+    panel(ax, "d", "Pareto share & cumulative sensitivity")
+    shares = [float(r["main_share_pct"]) for r in oat]
+    cum = [float(r["cumulative_share_pct"]) for r in oat]
+    x = np.arange(len(oat))
+    ax.bar(x, shares, color=TEAL, alpha=0.85, width=0.58, label="Main effect share (%)")
+    ax.set_xticks(x)
+    ax.set_xticklabels(short_tick, fontsize=9)
+    ax.set_ylabel("Individual share (%)", color=TEAL)
+    ax.set_ylim(0, max(shares) * 1.25)
+    ax2 = ax.twinx()
+    ax2.spines["top"].set_visible(False)
+    ax2.spines["right"].set_visible(True)
+    ax2.plot(x, cum, color=CORAL, marker="o", linewidth=2.0, markersize=5.5, label="Cumulative (%)")
+    ax2.axhline(80.0, color=MUTED, linestyle="--", linewidth=1.0)
+    ax2.text(len(x) - 0.5, 82.0, "80% rule", ha="right", fontsize=8, color=MUTED)
+    ax2.set_ylabel("Cumulative share (%)", color=CORAL)
+    ax2.set_ylim(0, 108)
+    ax2.grid(False)
+    for i, cval in enumerate(cum):
+        ax2.annotate(f"{cval:.1f}%", (i, cval), xytext=(0, 5), textcoords="offset points",
+                     ha="center", fontsize=7.5, color=CORAL, fontweight="bold")
+    return fig
+
+
+def pareto_and_3d(results, directory):
+    """Fig. 10: Multi-objective Pareto frontier + dark 3D digital twin three-stage keyframe triptych."""
+    from PIL import Image
+
+    pareto = read_csv(results / "Pareto_tradeoff.csv")
+    fig = plt.figure(figsize=(11.2, 7.6), constrained_layout=True)
+    fig.suptitle("Multi-objective Pareto tradeoff & 3D digital twin validation",
+                 fontsize=13, fontweight="bold", color=INK)
+    outer = fig.add_gridspec(2, 1, height_ratios=(1.05, 1.0), hspace=0.18)
+
+    # Top row: (a) Pareto tradeoff scatter + frontier
+    ax = fig.add_subplot(outer[0, 0])
+    panel(ax, "a", "Dispatch response time vs. fleet travel exposure (16 verified solver configurations)")
+    beam_pts = [r for r in pareto if r["policy"] == "beam"]
+    near_pts = [r for r in pareto if r["policy"] == "nearest"]
+    front = sorted([r for r in pareto if r["is_pareto"] == "True"], key=lambda r: float(r["latest_start_s"]))
+
+    ax.scatter([float(r["latest_start_s"]) for r in beam_pts],
+               [float(r["total_travel_m"]) for r in beam_pts],
+               s=62, color=BLUE, edgecolor=INK, linewidth=0.7, alpha=0.85, label="Beam Search sweep", zorder=4)
+    ax.scatter([float(r["latest_start_s"]) for r in near_pts],
+               [float(r["total_travel_m"]) for r in near_pts],
+               s=68, marker="^", color=ORANGE, edgecolor=INK, linewidth=0.7, alpha=0.9, label="Nearest baseline", zorder=5)
+    if front:
+        ax.plot([float(r["latest_start_s"]) for r in front],
+                [float(r["total_travel_m"]) for r in front],
+                color=TEAL, linewidth=2.2, linestyle="-", label="Non-dominated Pareto front", zorder=3)
+    # Highlight nominal recommended (k=8, bw=20)
+    nom = next((r for r in pareto if r["tag"] == "nominal_recommended"), None)
+    if nom:
+        nx, ny = float(nom["latest_start_s"]), float(nom["total_travel_m"])
+        ax.scatter([nx], [ny], s=140, marker="*", color=CORAL, edgecolor=INK, linewidth=0.9,
+                   label="Nominal plan (k=8, bw=20)", zorder=7)
+        ax.annotate(f"Nominal k=8 ({nx:.3f} s, {ny:.1f} m)", (nx, ny),
+                    xytext=(12, 10), textcoords="offset points", fontsize=8.5, fontweight="bold", color=CORAL,
+                    arrowprops=dict(arrowstyle="->", color=CORAL, lw=1.0))
+    base = next((r for r in pareto if r["tag"] == "nearest_baseline"), None)
+    if base:
+        bx, by = float(base["latest_start_s"]), float(base["total_travel_m"])
+        ax.annotate(f"Nearest baseline ({bx:.3f} s, {by:.1f} m)", (bx, by),
+                    xytext=(14, 8), textcoords="offset points", fontsize=8.5, fontweight="bold", color=GOLD,
+                    arrowprops=dict(arrowstyle="->", color=GOLD, lw=1.0))
+    ax.set_xlabel(r"Latest paired observation start $t_{\mathrm{last}}$ (s)")
+    ax.set_ylabel("Total fleet travel distance (m)")
+    ax.legend(loc="upper right", fontsize=8.5, frameon=True, facecolor="white", ncol=2)
+
+    # Bottom row: (b) Three-panel dark 3D digital twin keyframe triptych
+    sub = outer[1, 0].subgridspec(1, 3, wspace=0.06)
+    captures = directory / "replay_frames" / "browser_captures"
+    fallbacks = directory / "replay_frames"
+    triplets = [
+        ("b1", "Nominal cooperation (t = 3.093 s)", captures / "webgl_1_nominal_beam.png", fallbacks / "normal_coordination.png"),
+        ("b2", "V5 fault trigger (t = 5.000 s)", captures / "webgl_2_failure_V5_keep.png", fallbacks / "v5_fault_trigger.png"),
+        ("b3", "V5 recovery compare (t = 12.927 s)", captures / "webgl_3_failure_V5_reschedule.png", fallbacks / "v5_recovery_compare.png"),
+    ]
+    for col_i, (tag, subtitle, primary_img, fallback_img) in enumerate(triplets):
+        ax3 = fig.add_subplot(sub[0, col_i])
+        img_path = primary_img if primary_img.is_file() else fallback_img
+        if img_path.is_file():
+            with Image.open(img_path) as im:
+                # Crop subtle dark margins for tighter 3D showcase framing
+                w_px, h_px = im.size
+                box = (int(w_px * 0.14), int(h_px * 0.08), int(w_px * 0.86), int(h_px * 0.92))
+                ax3.imshow(im.crop(box))
+        ax3.set_title(f"({tag}) {subtitle}", fontsize=9.5, fontweight="bold", color=INK, pad=4)
+        ax3.set_xticks([])
+        ax3.set_yticks([])
+        for sp in ax3.spines.values():
+            sp.set_visible(True)
+            sp.set_color("#38BDF8")
+            sp.set_linewidth(1.0)
+    return fig
+
+
 def generate(root):
-    directory = root/"figures"
-    results = root/"results"
-    scripts = (framework,p1_geometry,precision,dispatch,p3_risk,p4_resilience,v5_timeline)
-    for row,draw in zip(FIGURE_MAP,scripts):
-        stem,_,_ = row
-        out = draw(results)
-        if stem=="fig06_p4_resilience":
-            out,index = out
-            write_csv(directory/"P4_PANEL_INDEX.csv",index)
-        save(out,directory,stem)
-    save(replay_frames(results,directory),directory,FIGURE_MAP[-1][0])
-    write_csv(directory/"FIGURE_SOURCES.csv",(
-        {"figure":name,"source":inputs,"purpose":description,"formats":"Vector PDF; PNG 320 dpi"}
-        for name,inputs,description in FIGURE_MAP
+    directory = root / "figures"
+    results = root / "results"
+    # Ensure replay_frames standalone figures exist before fig10_pareto_and_3d
+    replay_frames(results, directory)
+    scripts = (
+        ("fig01_framework", lambda: framework(results)),
+        ("fig02_p1_geometry", lambda: p1_geometry(results)),
+        ("fig03_p2_precision", lambda: precision(results)),
+        ("fig04_p2_paths", lambda: p2_paths(results)),
+        ("fig05_p2_dispatch", lambda: dispatch(results)),
+        ("fig06_p3_risk", lambda: p3_risk(results)),
+        ("fig07_p4_resilience", lambda: p4_resilience(results)),
+        ("fig08_v5_timeline", lambda: v5_timeline(results)),
+        ("fig09_global_sensitivity", lambda: global_sensitivity(results)),
+        ("fig10_pareto_and_3d", lambda: pareto_and_3d(results, directory)),
+    )
+    for stem, draw in scripts:
+        out = draw()
+        if stem == "fig07_p4_resilience":
+            out, index = out
+            write_csv(directory / "P4_PANEL_INDEX.csv", index)
+        save(out, directory, stem)
+    write_csv(directory / "FIGURE_SOURCES.csv", (
+        {"figure": name, "source": inputs, "purpose": description, "formats": "Vector PDF; PNG 320 dpi"}
+        for name, inputs, description in FIGURE_MAP
     ))
-    print("Rendered 8 analytical figure groups and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
+    print("Rendered 10 publication-grade analytical figures and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     cli = ArgumentParser(description=__doc__)
-    cli.add_argument("--out",type=Path,default=DEFAULT_OUTPUT)
+    cli.add_argument("--out", type=Path, default=DEFAULT_OUTPUT)
     generate(cli.parse_args().out)
 

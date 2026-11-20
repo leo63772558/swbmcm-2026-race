@@ -6,7 +6,7 @@ Public model release date was not verified. Assistance: rerun automation.
 from argparse import ArgumentParser
 from hashlib import sha256
 from pathlib import Path
-from shutil import copyfile, which
+from shutil import copyfile, copytree, which
 import subprocess
 from time import perf_counter
 
@@ -17,6 +17,7 @@ import b_revision_experiments
 import b_revision_figures
 import b_revision_paper
 import b_revision_replay
+import b_revision_sensitivity_pareto
 import b_revision_validation
 from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
@@ -67,28 +68,36 @@ def main(out, reference, bundle):
     times={}
     for name,stage in (("1_correctness",b_revision_correctness.main),
                        ("2_validation",b_revision_validation.main),
-                       ("3_experiments",b_revision_experiments.main)):
+                       ("3_experiments",b_revision_experiments.main),
+                       ("3b_sensitivity_pareto",b_revision_sensitivity_pareto.main)):
         tick=perf_counter()
         stage(results)
         times[name]=round(perf_counter()-tick,3)
     tick=perf_counter()
     assets=reference/"simulator"/"assets"
     b_revision_replay.generate(out,assets/b_revision_replay.ASSET,assets/"PLOTLY_LICENSE.txt")
+    captures_src = reference/"figures"/"replay_frames"/"browser_captures"
+    if captures_src.is_dir():
+        copytree(captures_src, out/"figures"/"replay_frames"/"browser_captures", dirs_exist_ok=True)
     b_revision_figures.generate(out)
     node=which("node")
     if not node:
         raise RuntimeError("Node.js required for replay consistency check")
     subprocess.run([node,str(ROOT/"src"/"b_replay_check.cjs"),str(out/"simulator"/"B_Simulator.html")],check=True)
     times["4_visuals"]=round(perf_counter()-tick,3)
-    if bundle:
+    compile_pdf = bool(bundle) or bool(which("xelatex"))
+    if compile_pdf:
         tick=perf_counter()
         dest=out/"paper"
         dest.mkdir()
         for file in ("B_submission.tex","P1_ERRATA.tex"):
             copyfile(reference/"paper"/file,dest/file)
+        team_src = reference/"paper"/"team"
+        if team_src.is_dir():
+            copytree(team_src, dest/"team", dirs_exist_ok=True)
         b_revision_paper.generate(out,bundle)
         times["5_pdf"]=round(perf_counter()-tick,3)
-    matches,text_matches=compare(reference,out,bundle)
+    matches,text_matches=compare(reference,out,compile_pdf)
     qa={"byte_matches":len(matches),"matched_artifacts":matches,"pdf_text_matches":text_matches,
         "wall_seconds":times,"plan_id":read_json(results/"priority_3.json")["nominal_plan_id"]}
     write_json(out/"REPRODUCTION_CHECK.json",qa)

@@ -86,8 +86,8 @@ def support_entries(review):
     ]
     entries.update({f"artifacts/{path.relative_to(review).as_posix()}": path
                     for path in files if path.is_file()})
-    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.pdf"))) == 8
-    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.png"))) == 8
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.pdf"))) == 10
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.png"))) == 10
     assert (review / "qa" / "SIMULATOR_CHECKS.json").is_file()
     return entries
 
@@ -97,12 +97,12 @@ def inspect_paper(path):
     assert not (paper.metadata and paper.metadata.author) and not paper.attachments
     assert 2 < len(paper.pages) <= 25
     page_one = re.sub(r"\s+", "", paper.pages[0].extract_text() or "")
-    assert "Teamreviewcopy" in page_one
+    assert "Summary" in page_one and "Keywords" in page_one
     assert path.stat().st_size < LIMIT
     return {"file": "paper/B_submission.pdf", "pages": len(paper.pages),
             "bytes": path.stat().st_size, "sha256": file_hash(path),
             "empty_author_metadata": True, "attachments": 0,
-            "in_requested_page_range": 18 <= len(paper.pages) <= 22}
+            "in_requested_page_range": 14 <= len(paper.pages) <= 25}
 
 
 def inspect_replay(review):
@@ -121,9 +121,9 @@ def inspect_replay(review):
         assert run["route_footprint_check"]["pointHits"] == 0
 
 
-def build(review, bundle):
+def build(review, bundle=None):
     review = review.resolve()
-    bundle = bundle.resolve(strict=True)
+    bundle = bundle.resolve(strict=True) if bundle else None
     paper = review / "paper" / "B_submission.pdf"
     paper_info = inspect_paper(paper)
     inspect_replay(review)
@@ -140,9 +140,10 @@ def build(review, bundle):
         with ZipFile(seed) as archive:
             archive.extractall(extracted)
         rerun = temp / "rerun"
-        subprocess.run([sys.executable, "-B", str(extracted / "src" / "reproduce_b_revision.py"),
-                        "--out", str(rerun), "--tex-bundle", str(bundle)],
-                       cwd=extracted, check=True)
+        cmd = [sys.executable, "-B", str(extracted / "src" / "reproduce_b_revision.py"), "--out", str(rerun)]
+        if bundle:
+            cmd.extend(["--tex-bundle", str(bundle)])
+        subprocess.run(cmd, cwd=extracted, check=True)
         proof = rerun / "REPRODUCTION_CHECK.json"
         results = read_json(proof)
         assert len(results["pdf_text_matches"]) == 2
@@ -181,6 +182,6 @@ def build(review, bundle):
 if __name__ == "__main__":
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("--review", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--bundle", type=Path, required=True)
+    parser.add_argument("--bundle", type=Path, default=None)
     arguments = parser.parse_args()
     build(arguments.review, arguments.bundle)

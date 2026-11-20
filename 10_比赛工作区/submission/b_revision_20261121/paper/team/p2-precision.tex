@@ -1,0 +1,6 @@
+\textit{[Team Drafting Blueprint --- Derive the bearing-intersection Jacobian and covariance in the team's own words referencing Table~\ref{tab:p21} and Figure~\ref{fig:p21}.]}
+\begin{itemize}
+\item \textbf{Linearized Jacobian:} Differentiate $\alpha_i = \operatorname{atan2}(y - y_i, x - x_i)$ with respect to $(x,y)$ to obtain $J$ and local covariance $\Sigma_{xy} = \sigma_\theta^2 (J^\top J)^{-1}$, yielding Eq.~\eqref{eq:p2-rms} \cite{bishop2010}.
+\item \textbf{Feasible optimum:} Under the 30 s arrival budget computed on the rounded-clearance visibility graph \cite{dijkstra1959,hart1968}, V3 (\BTravelFirst{} s) and V5 (\BTravelSecond{} s) achieve orthogonal crossing $\gamma=\BCrossing{}^\circ$, baseline $B=\BBaseLength{}$ m, and $\mathrm{RMS}_{\mathrm{local}}=\BFirstRMS{}$ m (verified by finite-difference covariance).
+\item \textbf{Degeneracy caveat:} Discuss blow-up as $|\sin\gamma|\to 0$ (collinear stations) and clarify local first-order scope vs. unbounded nonlinear Monte Carlo tails.
+\end{itemize}

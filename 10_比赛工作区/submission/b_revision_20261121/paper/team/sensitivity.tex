@@ -1,0 +1,6 @@
+\textit{[Team Drafting Blueprint --- Interpret global sensitivity, Pareto frontier, and 3D digital twin validation referencing Table~\ref{tab:sens}, Figure~\ref{fig:sens}, and Figure~\ref{fig:pareto3d}.]}
+\begin{itemize}
+\item \textbf{Global sensitivity ranking:} Pitch ceiling $\beta_{\max}$ (\BGlobalTopSwing{}\% swing), drift slope $b$ (10.42\%), and outage duration $\Delta t_{\mathrm{out}}$ (9.26\%) account for 83.28\% of total sensitivity; gimbal pan rate (2.88\%) outweighs ground speed (1.57\%) because short urban legs are slew-dominated.
+\item \textbf{Pareto tradeoff:} Across \BParetoConfigs{} verified solver configurations (\BParetoFrontCount{} non-dominated), discuss the tradeoff between $t_{\mathrm{last}}$ and total fleet travel exposure (nominal $k=8$ achieves \BBeamEight{} s vs. nearest baseline \BNearestEight{} s at lower travel).
+\item \textbf{3D digital twin verification:} Offline Chromium dual-mode verification (WebGL + Canvas 2.5D fallback) confirmed zero network requests, zero page errors, and 0/892 travel-segment and 0/4,503 stationary-point building collisions (Figure~\ref{fig:pareto3d}b).
+\end{itemize}

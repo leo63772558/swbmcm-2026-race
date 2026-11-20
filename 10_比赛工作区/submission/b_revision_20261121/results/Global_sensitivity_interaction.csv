@@ -1,0 +1,37 @@
+param_i,param_j,label_i,label_j,interaction_pct
+vehicle_speed,vehicle_speed,Vehicle speed v (m/s),Vehicle speed v (m/s),0.0
+vehicle_speed,pan_speed,Vehicle speed v (m/s),Gimbal pan rate w_pan (deg/s),0.19668
+vehicle_speed,pitch_ceiling,Vehicle speed v (m/s),Pitch ceiling beta_max (deg),0.0
+vehicle_speed,pos_error_slope,Vehicle speed v (m/s),Drift slope b (m/m),0.0
+vehicle_speed,pos_error_intercept,Vehicle speed v (m/s),Base pos. std a (m),0.0
+vehicle_speed,outage_duration,Vehicle speed v (m/s),Outage duration dt_out (s),0.19095
+pan_speed,vehicle_speed,Gimbal pan rate w_pan (deg/s),Vehicle speed v (m/s),0.19668
+pan_speed,pan_speed,Gimbal pan rate w_pan (deg/s),Gimbal pan rate w_pan (deg/s),0.0
+pan_speed,pitch_ceiling,Gimbal pan rate w_pan (deg/s),Pitch ceiling beta_max (deg),0.0
+pan_speed,pos_error_slope,Gimbal pan rate w_pan (deg/s),Drift slope b (m/m),0.0
+pan_speed,pos_error_intercept,Gimbal pan rate w_pan (deg/s),Base pos. std a (m),0.0
+pan_speed,outage_duration,Gimbal pan rate w_pan (deg/s),Outage duration dt_out (s),0.36022
+pitch_ceiling,vehicle_speed,Pitch ceiling beta_max (deg),Vehicle speed v (m/s),0.0
+pitch_ceiling,pan_speed,Pitch ceiling beta_max (deg),Gimbal pan rate w_pan (deg/s),0.0
+pitch_ceiling,pitch_ceiling,Pitch ceiling beta_max (deg),Pitch ceiling beta_max (deg),0.0
+pitch_ceiling,pos_error_slope,Pitch ceiling beta_max (deg),Drift slope b (m/m),0.0
+pitch_ceiling,pos_error_intercept,Pitch ceiling beta_max (deg),Base pos. std a (m),0.0
+pitch_ceiling,outage_duration,Pitch ceiling beta_max (deg),Outage duration dt_out (s),0.0
+pos_error_slope,vehicle_speed,Drift slope b (m/m),Vehicle speed v (m/s),0.0
+pos_error_slope,pan_speed,Drift slope b (m/m),Gimbal pan rate w_pan (deg/s),0.0
+pos_error_slope,pitch_ceiling,Drift slope b (m/m),Pitch ceiling beta_max (deg),0.0
+pos_error_slope,pos_error_slope,Drift slope b (m/m),Drift slope b (m/m),0.0
+pos_error_slope,pos_error_intercept,Drift slope b (m/m),Base pos. std a (m),0.23378
+pos_error_slope,outage_duration,Drift slope b (m/m),Outage duration dt_out (s),0.0
+pos_error_intercept,vehicle_speed,Base pos. std a (m),Vehicle speed v (m/s),0.0
+pos_error_intercept,pan_speed,Base pos. std a (m),Gimbal pan rate w_pan (deg/s),0.0
+pos_error_intercept,pitch_ceiling,Base pos. std a (m),Pitch ceiling beta_max (deg),0.0
+pos_error_intercept,pos_error_slope,Base pos. std a (m),Drift slope b (m/m),0.23378
+pos_error_intercept,pos_error_intercept,Base pos. std a (m),Base pos. std a (m),0.0
+pos_error_intercept,outage_duration,Base pos. std a (m),Outage duration dt_out (s),0.0
+outage_duration,vehicle_speed,Outage duration dt_out (s),Vehicle speed v (m/s),0.19095
+outage_duration,pan_speed,Outage duration dt_out (s),Gimbal pan rate w_pan (deg/s),0.36022
+outage_duration,pitch_ceiling,Outage duration dt_out (s),Pitch ceiling beta_max (deg),0.0
+outage_duration,pos_error_slope,Outage duration dt_out (s),Drift slope b (m/m),0.0
+outage_duration,pos_error_intercept,Outage duration dt_out (s),Base pos. std a (m),0.0
+outage_duration,outage_duration,Outage duration dt_out (s),Outage duration dt_out (s),0.0

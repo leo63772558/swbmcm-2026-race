@@ -1,21 +1,203 @@
-note: using only cached resource files
-note: Running TeX ...
-note: Rerunning TeX because "B_submission.aux" changed ...
-note: Running xdvipdfmx ...
-note: Writing `B_submission.log` (21.3603515625 KiB)
-note: Writing `B_submission.toc` (1.193359375 KiB)
-note: Writing `B_submission.out` (2.48046875 KiB)
-note: Writing `B_submission.pdf` (789.892578125 KiB)
-note: Writing `B_submission.aux` (9.396484375 KiB)
-Fontconfig error: Cannot load default config file: No such file: (null)
-warning: accessing absolute path `C:/WINDOWS/fonts\timesi.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\timesbd.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\times.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\timesbi.ttf`; build may not be reproducible in other environments
-warning: B_submission.tex:124: Underfull \hbox (badness 1728) in paragraph at lines 124--124
-warning: B_submission.tex:126: Underfull \hbox (badness 10000) in paragraph at lines 125--126
-warning: B_submission.tex:124: Underfull \hbox (badness 1728) in paragraph at lines 124--124
-warning: B_submission.tex:126: Underfull \hbox (badness 10000) in paragraph at lines 125--126
-warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
-warning: Couldn't open font map file "pdftex.map".
-warning: Couldn't open font map file "kanjix.map".
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(B_submission.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(E:\python\MLP\LaTex\tex/latex/amsmath\amstext.sty
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsgen.sty))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsbsy.sty)
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsopn.sty))
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amssymb.sty
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amsfonts.sty))
+(E:\python\MLP\LaTex\tex/latex/amscls\amsthm.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics\graphicx.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\graphics.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\trig.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\graphics.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+)) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
+(E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
+(E:\python\MLP\LaTex\tex/latex/float\float.sty)
+(E:\python\MLP\LaTex\tex/latex/enumitem\enumitem.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (B_submission.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(B_submission.out) (B_submission.out)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
+(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex)
+Underfull \hbox (badness 1975) in paragraph at lines 120--121
+[]\TU/TimesNewRoman(0)/m/n/12 deg, deg, m,
+[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex) [6]
+(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10])
+(team/v5.tex [11]) (team/sensitivity.tex [12]) [13] (team/limits.tex)
+(team/conclusion.tex) [14]
+Underfull \hbox (badness 4441) in paragraph at lines 346--347
+[]\TU/TimesNewRoman(0)/m/n/12 E. B. Wilson, “Probable inference, the law of suc
+cession, and statistical infer-
+
+Underfull \hbox (badness 3049) in paragraph at lines 346--347
+\TU/TimesNewRoman(0)/m/n/12 ence,” \TU/TimesNewRoman(0)/m/it/12 J. Amer. Statis
+t. Assoc.\TU/TimesNewRoman(0)/m/n/12 , vol. 22, no. 158, pp. 209–212, Jun. 1927
+, doi:
+[15] 
+AED: lastpage setting LastPage
+[16] (B_submission.aux) )
+(see the transcript file for additional information)
+Output written on B_submission.pdf (16 pages).
+Transcript written on B_submission.log.
+
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(B_submission.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(E:\python\MLP\LaTex\tex/latex/amsmath\amstext.sty
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsgen.sty))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsbsy.sty)
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsopn.sty))
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amssymb.sty
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amsfonts.sty))
+(E:\python\MLP\LaTex\tex/latex/amscls\amsthm.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics\graphicx.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\graphics.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\trig.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\graphics.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+)) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
+(E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
+(E:\python\MLP\LaTex\tex/latex/float\float.sty)
+(E:\python\MLP\LaTex\tex/latex/enumitem\enumitem.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (B_submission.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(B_submission.out) (B_submission.out)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
+(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex)
+Underfull \hbox (badness 1975) in paragraph at lines 120--121
+[]\TU/TimesNewRoman(0)/m/n/12 deg, deg, m,
+[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex) [6]
+(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10])
+(team/v5.tex [11]) (team/sensitivity.tex [12]) [13] (team/limits.tex)
+(team/conclusion.tex) [14]
+Underfull \hbox (badness 4441) in paragraph at lines 346--347
+[]\TU/TimesNewRoman(0)/m/n/12 E. B. Wilson, “Probable inference, the law of suc
+cession, and statistical infer-
+
+Underfull \hbox (badness 3049) in paragraph at lines 346--347
+\TU/TimesNewRoman(0)/m/n/12 ence,” \TU/TimesNewRoman(0)/m/it/12 J. Amer. Statis
+t. Assoc.\TU/TimesNewRoman(0)/m/n/12 , vol. 22, no. 158, pp. 209–212, Jun. 1927
+, doi:
+[15] 
+AED: lastpage setting LastPage
+[16] (B_submission.aux) )
+(see the transcript file for additional information)
+Output written on B_submission.pdf (16 pages).
+Transcript written on B_submission.log.

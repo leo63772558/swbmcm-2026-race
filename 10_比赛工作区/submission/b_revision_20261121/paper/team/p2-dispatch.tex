@@ -1,0 +1,5 @@
+\textit{[Team Drafting Blueprint --- Formulate the multi-alert dispatch model and explain the $k=3$ vs. $k=8$ mechanism referencing Table~\ref{tab:p22}, Figure~\ref{fig:p2paths}, and Figure~\ref{fig:p22}.]}
+\begin{itemize}
+\item \textbf{Mathematical program:} Define assignment of 5 vehicles to 6 alert slots (2 per alert $T_1,T_2,T_3$), enforcing one reused vehicle, sequential travel/slew/wait/observe/reset clocks, and Eq.~\eqref{eq:p2-dispatch} \cite{psaraftis1980,savelsbergh1995}.
+\item \textbf{Ranking-reversal mechanism:} Under identical arrival-sorted shortlists, $k=3$ rejects rank-8 (V1--T2) and rank-5 (V2--T3) stations, forcing V3 into T3$\to$T1 with 1.063 s wait ($t_{\mathrm{last}}=\BBeamThree{}$ s vs. nearest \BNearestThree{} s). Expanding to $k=8$ unlocks zero-wait V3 sequencing T1$\to$T3, cutting $t_{\mathrm{last}}$ to \BBeamEight{} s (0.690 s faster than nearest \BNearestEight{} s).
+\end{itemize}

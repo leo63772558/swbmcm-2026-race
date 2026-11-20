@@ -1,9 +1,9 @@
 {
-  "browser": "Headless Chromium 157.0.8103.79",
+  "browser": "Headless Chromium 156.0.8078.4",
   "standalone_file_only": true,
   "browser_context_offline": true,
-  "html_bytes": 3037401,
-  "html_sha256": "f7c698f56050d32246900041e29308ab75d51863dfe2623c16dfa9280c1db08a",
+  "html_bytes": 3079399,
+  "html_sha256": "a2e2bcdd39349a38410db074199f5ca4e401036267956bf56af14ce9c75429ae",
   "runs": [
     {
       "renderer": "webgl",
@@ -15,7 +15,7 @@
           "time_s": 3.0926272996101405,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.0509
+          "colored_pixel_fraction": 0.0569
         },
         {
           "label": "V5 fault",
@@ -24,7 +24,7 @@
           "time_s": 5,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.0509
+          "colored_pixel_fraction": 0.0569
         },
         {
           "label": "V5 recovery",
@@ -33,7 +33,7 @@
           "time_s": 12.927041371995326,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.0504
+          "colored_pixel_fraction": 0.0562
         }
       ],
       "camera_controls": [
@@ -62,7 +62,7 @@
           "time_s": 3.0926272996101405,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.0651
+          "colored_pixel_fraction": 0.341
         },
         {
           "label": "V5 fault",
@@ -71,7 +71,7 @@
           "time_s": 5,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.0649
+          "colored_pixel_fraction": 0.3405
         },
         {
           "label": "V5 recovery",
@@ -80,7 +80,7 @@
           "time_s": 12.927041371995326,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.064
+          "colored_pixel_fraction": 0.3405
         }
       ],
       "camera_controls": [

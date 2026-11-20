@@ -1,14 +1,119 @@
-note: using only cached resource files
-note: Running TeX ...
-note: Running xdvipdfmx ...
-note: Writing `P1_ERRATA.log` (16.1796875 KiB)
-note: Writing `P1_ERRATA.aux` (128 B)
-note: Not writing `P1_ERRATA.out`: it would be empty.
-note: Writing `P1_ERRATA.pdf` (79.0849609375 KiB)
-Fontconfig error: Cannot load default config file: No such file: (null)
-warning: accessing absolute path `C:/WINDOWS/fonts\timesi.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\timesbd.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\times.ttf`; build may not be reproducible in other environments
-warning: accessing absolute path `C:/WINDOWS/fonts\timesbi.ttf`; build may not be reproducible in other environments
-warning: Couldn't open font map file "pdftex.map".
-warning: Couldn't open font map file "kanjix.map".
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(P1_ERRATA.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (P1_ERRATA.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(P1_ERRATA.out) (P1_ERRATA.out) [1] (P1_ERRATA.aux) )
+Output written on P1_ERRATA.pdf (1 page).
+Transcript written on P1_ERRATA.log.
+
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(P1_ERRATA.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (P1_ERRATA.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(P1_ERRATA.out) (P1_ERRATA.out) [1] (P1_ERRATA.aux) )
+Output written on P1_ERRATA.pdf (1 page).
+Transcript written on P1_ERRATA.log.

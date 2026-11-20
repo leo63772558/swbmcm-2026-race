@@ -1,0 +1,5 @@
+\textit{[Team Drafting Blueprint --- Formalize the discrete-event disturbance model and 73-case summary referencing Figure~\ref{fig:p4}.]}
+\begin{itemize}
+\item \textbf{Event \& clock semantics:} Formalize disturbance trigger ($t=5$ s), absolute recovery time ($t_{\mathrm{rec}}=30$ s $\Rightarrow$ 25 s outage) vs. 30 s duration sensitivity ($t_{\mathrm{rec}}=35$ s), and cached-plan execution vs. active-task-only execution \cite{stentz1994,vantendeloo2018}.
+\item \textbf{Lexicographic evaluation:} Explain Eq.~\eqref{eq:p4-score} prioritizing completion fraction $\eta=k/N$ before minimizing $t_{\mathrm{last}}$, and summarize Keep vs. Reschedule across all \BCaseCount{} verified scenarios (full 73-row ledger archived in support ZIP \texttt{results/P4\_cases.csv}).
+\end{itemize}

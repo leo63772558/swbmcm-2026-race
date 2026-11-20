@@ -1,9 +1,11 @@
 figure,source,purpose,formats
-fig01_framework,P1_station.csv; P2_precision.csv; priority_3.json; P3_verification.json,Shared field input and data dependencies between the four questions,Vector PDF; PNG 320 dpi
-fig02_p1_geometry,P1_grid_map.json; P1_geometry.json; P1_pitch_checks.csv; Route_clearance_comparison.csv; Route_summary.json,"Grid evidence, shadow, exact-radius clearance, optimal arc, route changes and pitch sensitivity",Vector PDF; PNG 320 dpi
-fig03_p2_precision,P2_precision.csv; P2_precision_routes.json; B题题面参数.csv,Fixed-pair first-order RMS field and local position uncertainty,Vector PDF; PNG 320 dpi
-fig04_p2_dispatch,Executed_timeline.json; P2_main_plans.json; P2_trials.csv; P2_visit_phases.csv; P2_critical_chains.csv,"Shared-k schedule, vehicle trajectories and phase breakdown to the final paired start",Vector PDF; PNG 320 dpi
-fig05_p3_risk,P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv,First draws of the recorded seeded run; position ellipse; coverage checks and parameter boundary,Vector PDF; PNG 320 dpi
-fig06_p4_resilience,P4_cases.csv; Executed_timeline.json; priority_3.json,"All case IDs, censoring-aware timing contrast, lexicographic score and replay flow",Vector PDF; PNG 320 dpi
-fig07_v5_timeline,P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json,"Aligned V5 event clocks, cancellations, assignment changes and last paired starts",Vector PDF; PNG 320 dpi
-fig08_replay_frames,Executed_timeline.json; P2_main_plans.json; B题题面参数.csv,"3D projection of nominal observation, V5 failure and final-start recovery comparison",Vector PDF; PNG 320 dpi
+fig01_framework,P1_station.csv; P2_precision.csv; priority_3.json; P3_verification.json,Interdisciplinary architecture and verified metric handoffs across P1-P4,Vector PDF; PNG 320 dpi
+fig02_p1_geometry,P1_grid_map.json; P1_geometry.json; P1_pitch_checks.csv; Route_clearance_comparison.csv; Route_summary.json,"P1 observable field, building shadows, rounded Minkowski safety, route comparison and pitch sensitivity",Vector PDF; PNG 320 dpi
+fig03_p2_precision,P2_precision.csv; P2_precision_routes.json; B题题面参数.csv,P2(1) local first-order horizontal RMS contour field and 95% analytical error ellipse,Vector PDF; PNG 320 dpi
+fig04_p2_paths,Executed_timeline.json; P2_main_plans.json; P2_visit_phases.csv,P2(2) multi-vehicle path planning comparison for representative reused vehicles and 5-vehicle global map,Vector PDF; PNG 320 dpi
+fig05_p2_dispatch,Executed_timeline.json; P2_main_plans.json; P2_trials.csv; P2_visit_phases.csv; P2_critical_chains.csv,"P2(2) shared-k schedule Gantt, vehicle trajectories and k=3 vs k=8 ranking-reversal breakdown",Vector PDF; PNG 320 dpi
+fig06_p3_risk,P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv,"P3 Monte Carlo scatter, analytical ellipse, 66.837 m coverage threshold inset and (a,b) admissible domain",Vector PDF; PNG 320 dpi
+fig07_p4_resilience,P4_cases.csv; Executed_timeline.json; priority_3.json,"P4 73-scenario disturbance resilience matrix, dual-policy distributions and event-driven rescheduling flow",Vector PDF; PNG 320 dpi
+fig08_v5_timeline,P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json,V5 single-fault counterexample aligned dual-policy Gantt showing +1.893 s bottleneck shift,Vector PDF; PNG 320 dpi
+fig09_global_sensitivity,Global_sensitivity_oat.csv; Global_sensitivity_interaction.csv,"Global parameter sensitivity: OAT ranking, tornado swing, 6x6 interaction matrix and Pareto cumulative share",Vector PDF; PNG 320 dpi
+fig10_pareto_and_3d,Pareto_tradeoff.csv; Executed_timeline.json; browser_captures/webgl_*.png,Multi-objective Pareto tradeoff frontier and dark 3D digital twin three-stage keyframe triptych,Vector PDF; PNG 320 dpi

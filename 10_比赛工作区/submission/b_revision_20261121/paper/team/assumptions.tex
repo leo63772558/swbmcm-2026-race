@@ -1,0 +1,7 @@
+\textit{[Team Drafting Blueprint --- Author each assumption and its physical/mathematical justification in the team's own words.]}
+\begin{itemize}
+\item \textbf{A1 (Planar vehicle kinematics \& rounded clearance):} Vehicles move at constant $v=3.0$ m/s as disks of radius $r_v=1.5$ m; obstacle-free space is the complement of Minkowski-inflated rounded building footprints \cite{lozano1983}.
+\item \textbf{A2 (Rigid gimbal \& sequential phase coupling):} Vehicles slew only after stopping ($\omega_{\mathrm{pan}}=30^\circ$/s, $\omega_{\mathrm{tilt}}=15^\circ$/s), dwell jointly for $\tau_{\mathrm{obs}}=5.0$ s, and reset to zero before departing for a reused slot.
+\item \textbf{A3 (Closed-prism LOS occlusion):} A line-of-sight segment from camera height $h_c$ to target altitude $H$ is feasible iff it does not intersect any closed building prism $B_k$.
+\item \textbf{A4 (Independent Gaussian noise \& cached-plan semantics):} In P3, isotropic drift $\sigma(s)=a+bs$ is independent of gimbal errors; in P4, distinguish cached nominal instructions vs. link-restored replanning.
+\end{itemize}

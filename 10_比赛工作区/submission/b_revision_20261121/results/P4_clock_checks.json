@@ -1,0 +1,57 @@
+{
+  "clock_examples": [
+    {
+      "case": "fault_only",
+      "disturbance_s": 5.0,
+      "failure_s": 5.0,
+      "absolute_recovery_s": null,
+      "dispatch_allowed_from_s": 5.0,
+      "outage_duration_s": 0.0,
+      "horizon_s": 60.0,
+      "failed_vehicle": 5,
+      "new_target": null,
+      "outage_rule": "no_outage"
+    },
+    {
+      "case": "absolute_cap",
+      "disturbance_s": 5.0,
+      "failure_s": null,
+      "absolute_recovery_s": 30.0,
+      "dispatch_allowed_from_s": 30.0,
+      "outage_duration_s": 25.0,
+      "horizon_s": 60.0,
+      "failed_vehicle": null,
+      "new_target": null,
+      "outage_rule": "absolute"
+    },
+    {
+      "case": "duration_cap",
+      "disturbance_s": 5.0,
+      "failure_s": null,
+      "absolute_recovery_s": 35.0,
+      "dispatch_allowed_from_s": 35.0,
+      "outage_duration_s": 30.0,
+      "horizon_s": 60.0,
+      "failed_vehicle": null,
+      "new_target": null,
+      "outage_rule": "duration"
+    }
+  ],
+  "window_scores": [
+    [
+      2,
+      1.0,
+      59.99999999999999
+    ],
+    [
+      1,
+      0.5,
+      60.0
+    ],
+    [
+      1,
+      0.5,
+      60.0
+    ]
+  ]
+}

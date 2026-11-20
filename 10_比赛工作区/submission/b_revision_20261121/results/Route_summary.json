@@ -1,0 +1,8 @@
+{
+  "compared_routes": 2925,
+  "shorter_paths": 100,
+  "restored_endpoints": 5,
+  "maximum_saving_m": 0.03192622815850399,
+  "minimum_margin_m": 0.00044710363518452034,
+  "method": "Exact Euclidean segment feasibility; finite graph upper bounds for detours"
+}

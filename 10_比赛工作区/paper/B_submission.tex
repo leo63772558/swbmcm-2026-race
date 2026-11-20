@@ -1,0 +1,326 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[a4paper,left=26mm,right=26mm,top=28mm,bottom=26mm,headheight=16pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{xcolor}
+\definecolor{paperink}{HTML}{172D43}
+\captionsetup{font=normalsize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false}
+\captionsetup[table]{position=top,skip=8pt}
+\captionsetup[figure]{position=bottom,skip=8pt}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\raggedbottom
+
+\newcommand{\ProblemLetter}{B}
+\newcommand{\TeamNumber}{SWBMCM2613050}
+\newcommand{\PaperTitle}{Rapid UAV Localization via Coordinated Mobile Vehicles}
+\hypersetup{pdftitle={\PaperTitle},pdfauthor={}}
+\newcommand{\TeamPageHeader}{%
+  \fancyhf{}%
+  \fancyhead[L]{\color{paperink}Team\#\ProblemLetter\TeamNumber}%
+  \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+}
+\fancypagestyle{fancy}{\TeamPageHeader}
+\fancypagestyle{plain}{\TeamPageHeader}
+\renewcommand{\contentsname}{Content}
+\setcounter{tocdepth}{2}
+\graphicspath{{../figures/}}
+
+\begin{document}
+\pagestyle{fancy}
+\thispagestyle{empty}
+\begin{center}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcr@{}}
+  \toprule
+  Problem Chosen & 2026 ShuWei Cup & Team Control Number\\
+  \textbf{\ProblemLetter} & \textbf{Summary Sheet} & \textbf{\TeamNumber}\\
+  \bottomrule
+\end{tabular*}
+
+\vspace{1em}
+{\Large\bfseries\PaperTitle}
+\end{center}
+\section*{Summary}
+An observation and dispatch model was evaluated on the Problem B field. The shortest feasible horizontal observation range for T1 is 7.582 m. For T2, the selected stations give a first-order horizontal RMS error of 0.1436 m. The beam-search schedule starts its last observation at 11.03 s compared with 11.72 s under the nearest-arrival rule. The pointing error allowance is met up to about 66.8 m of travel. Across 28 selected disturbance cases, replanning improves 23, ties 4, and worsens 1 by the prescribed ranking.
+
+\noindent\textbf{Keywords:} Bearing-only localization; vehicle scheduling; uncertainty; rescheduling
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\section{Observation Region and Station Selection}
+
+Position is measured east and north from the southwest corner. A station is admissible when a vehicle disc fits within the field without entering a building, its finite camera-to-target segment misses every closed building prism, and the target elevation is within the gimbal limits. A slab intersection retains contact at a single parameter value, which makes tangency occluding [1].
+
+With the target above the camera, the upper elevation limit implies that the horizontal distance is at least the height difference divided by the tangent of the upper limit. A feasible point on that inner circle therefore attains the upper bound on inverse-range quality. A one-degree angular sweep identifies a reproducible representative among the tied sampled stations.
+
+The selected station is (77.516, 72.593) m. Its elevation is 80.0 degrees and its inverse-range quality is 0.13189 per metre. The plotted region is a one-metre raster, while the selected station uses continuous coordinates.
+
+\[r \ge (H-h)/\tan\beta_{\max},\qquad Q=1/r\]
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_geometry}
+
+\caption{T1 observability and the selected minimum-range station, with a local inset of the T2 bearing intersection.}
+
+\end{figure}
+
+\clearpage
+
+\section{Two-Station Localization and Scheduling}
+
+\subsection{Dual-Station Localization for T2}
+
+Let r1 and r2 be the horizontal sensor ranges, and let gamma be the smaller angle between the two bearings. The first-order error normal to each bearing is range times the angular error in radians. The two normal equations determine the horizontal displacement. Inverting their two-by-two coefficient matrix, then taking the trace of the propagated covariance, gives sigma squared times (r1 squared plus r2 squared) divided by sin squared gamma [2].
+
+The RMS metric is the square root of that trace. Baseline, ranges, and crossing angle obey the cosine rule. The metric diverges near parallel or antiparallel bearings. An observation boundary is a separate issue because a small station shift can invalidate visibility or travel.
+
+Vehicles V3 and V5 are assigned to (6.914, 68.385) m and (6.914, 76.615) m. Their travel times are 6.46 s and 15.37 s. The baseline is 8.229 m, and the crossing angle is 90.0 degrees.
+
+Both ranges meet the pitch-imposed lower bound and the sine factor attains one. The chosen feasible pair attains the lower bound for the specified first-order RMS criterion. This claim applies to the local metric and the nominal target position.
+
+\[\operatorname{RMS}\approx\frac{\sigma_\theta\sqrt{r_1^2+r_2^2}}{|\sin\gamma|}\]
+
+\subsection{Multi-Alert Vehicle Scheduling}
+
+Shortest routes on a waypoint graph use conservative rectangular expansions of the buildings by the disc radius. Expanded corners with a small clearance and the start and finish points form the graph. This makes each computed route feasible for the vehicle disc, while potentially excluding shorter rounded-corner paths [3].
+
+Each task selects two different vehicles and two distinct, nondegenerate stations. Driving, slewing, waiting for the partner, simultaneous observation, and reset occupy each vehicle in that order. The two gimbal axes can move together. Availability for the next drive is the end of the current task's reset.
+
+The search enumerates alert orders and retains a bounded beam of partial schedules per order. The best feasible schedule across two search budgets is carried forward to the disturbance study. The baseline visits alerts in input order and selects the pair minimizing the later driving arrival, using the same route, visibility, geometry and synchronization tests.
+
+Under shared arrival-based screening, both policies retain the eight earliest reachable stations per vehicle and alert at each state. Ties in arrival are broken by readiness, station coordinates, and path. Beam width is 20, and nearest assignment retains one continuation. Latest starts are 11.034 s and 11.724 s. With three candidates per vehicle, they are 13.069 s and 11.724 s. The ordering therefore depends on the screening budget. The timelines below depict the original feasible schedules used for the disturbance study.
+
+\[t_{\mathrm{start},j}=\max_{i\in A_j}t_{\mathrm{ready},i,j},\qquad\min\max_j t_{\mathrm{start},j}\]
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.30\textheight,keepaspectratio]{b_timeline}
+
+\caption{Paired per-vehicle timelines. The dashed line in each panel marks its last observation start.}
+
+\end{figure}
+
+\subsection{Nominal Driving Routes}
+
+The map links the timing sequence to the physical station choices. Filled markers show vehicle origins and open rings show selected observation stations. A repeated vehicle can travel on multiple segments of the same color. Building footprints are shaded. V3 starts its leg for T3 already at the assigned station, so this leg consumes slew time but no driving time.
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.30\textheight,keepaspectratio]{b_routes}
+
+\caption{Nominal paths for the five available vehicles. Paths use conservative obstacle clearance.}
+
+\end{figure}
+
+\clearpage
+
+\section{Horizontal Pointing Error}
+
+By rotational symmetry, put the target on the positive horizontal axis. The position error changes the bearing through atan2 of the lateral displacement and the perturbed longitudinal range. Here X and Y are the position-estimate errors along and across the nominal bearing. The two independent gimbal errors add as a normal variable. Their convolution with the position-induced angle is integrated over wrapped intervals about zero.
+
+Composite Simpson integration is applied to the standardized position variables. A normal CDF integrates the gimbal component conditional on those variables. A bisection search finds the relevant coverage crossing. An independent first-order approximation propagates the lateral position variance divided by squared range, plus the two gimbal variances [4].
+
+The nonlinear threshold is 66.837 m; the coarser integration gives 66.837 m and the linearized estimate gives 66.922 m. At 80 m, the admissible nonnegative parameters satisfy a + 80 b no greater than approximately 1.6367 m.
+
+The linearized variance shares near the threshold are 84.6\% for the vehicle position, 9.9\% for gimbal offset, and 5.5\% for gimbal control.
+
+\[\Delta\psi=\operatorname{wrap}\left(\operatorname{atan2}(-Y,r-X)+\epsilon_0+\epsilon_c\right)\]
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_coverage}
+
+\caption{Pointing coverage versus travel distance. Red points show the Monte Carlo checks with Wilson intervals.}
+
+\end{figure}
+
+\clearpage
+
+\subsection{Admissible Position-Error Parameters}
+
+For the fixed check distance, the permitted combinations of error intercept and growth coefficient form a triangle in the nonnegative parameter region. Its sloped edge collects the intercept–slope combinations that meet the target coverage at equality.
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_parameters}
+
+\caption{Admissible intercept and growth coefficient under the two-sided coverage requirement.}
+
+\end{figure}
+
+\clearpage
+
+\section{Rescheduling After Disturbances}
+
+At time zero both policies begin with the same nominal plan. In the fixed plan, a new alert remains unassigned and a scheduled observation involving a failed vehicle cannot start after failure. The surviving vehicles otherwise retain their nominal instructions. A replan first recovers positions by interpolation along the issued routes, carries forward valid observations already started, and removes the failed vehicle [5].
+
+The nominal itinerary is cached before the outage, and surviving vehicles follow its phase clock until recovery. The replan locks valid observations that started strictly before recovery. A vehicle still at the station for a canceled observation returns to its parked heading. With recovery time $r$, arrival time $a$, and nominal slew duration $d$, its extra reset time is $\min(\max(0,r-a),d)$. The plan ranks the number of observations started strictly before the window end first and the latest start second.
+
+The main outage interpretation uses an absolute recovery time. The longest duration in the accompanying prose is tested separately as a sensitivity case. Failure identities are enumerated. New-alert locations are representative discrete cases, and the resulting counts are not population probabilities.
+
+Replanning improves 23 cases, ties 4, and worsens 1. In failure\_V5, the fixed plan gives a completion ratio of 1.00 and a latest start of 11.03 s. Replanning gives 1.00 and 12.93 s. Canceling a viable assignment can waste prior positioning.
+
+\[\operatorname{lex\,max}\;(\eta,-t_{\rm last}),\qquad\eta=k/N\]
+
+\begin{figure}[!ht]
+
+\centering
+
+\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_disturbances}
+
+\caption{Completion and last-start times under both policies for representative disturbance cases.}
+
+\end{figure}
+
+\clearpage
+
+\subsection{Paired Scenario Results}
+
+The table reports the original paired cases. An additional full crossing of the recorded locations, failed vehicles, and recovery times yields 45 paired cases. Replanning starts all four observations in each crossed case, and keeping the plan starts 2 or 3. The accompanying score and timeline files contain the full crossing. These counts describe the tested configurations.
+
+\begin{table}[!ht]
+
+\centering
+
+\caption{Completion ratios and latest-start times in seconds}
+
+\begin{tabular*}{0.96\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+
+\toprule
+
+& \multicolumn{2}{c}{Keep Plan} & \multicolumn{2}{c}{Reschedule} \\
+
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+
+Scenario & $k/N$ & Time (s) & $k/N$ & Time (s) \\
+
+\midrule
+
+new 1 & 3/4 & 60.00* & 4/4 & 18.32 \\
+
+new 2 & 3/4 & 60.00* & 4/4 & 19.44 \\
+
+new 3 & 3/4 & 60.00* & 4/4 & 20.26 \\
+
+failure V1 & 2/3 & 60.00* & 3/3 & 13.40 \\
+
+failure V2 & 2/3 & 60.00* & 3/3 & 13.40 \\
+
+failure V3 & 2/3 & 60.00* & 3/3 & 13.40 \\
+
+failure V4 & 2/3 & 60.00* & 3/3 & 13.40 \\
+
+failure V5 & 3/3 & 11.03 & 3/3 & 12.93 \\
+
+outage interior & 3/3 & 11.03 & 3/3 & 11.03 \\
+
+outage upper time & 3/3 & 11.03 & 3/3 & 11.03 \\
+
+outage upper duration & 3/3 & 11.03 & 3/3 & 11.03 \\
+
+new failure V1 & 2/4 & 60.00* & 4/4 & 24.51 \\
+
+failure outage V1 & 2/3 & 60.00* & 3/3 & 35.91 \\
+
+all V1 & 2/4 & 60.00* & 4/4 & 36.15 \\
+
+new failure V2 & 2/4 & 60.00* & 4/4 & 20.57 \\
+
+failure outage V2 & 2/3 & 60.00* & 3/3 & 33.73 \\
+
+all V2 & 2/4 & 60.00* & 4/4 & 34.83 \\
+
+new failure V3 & 2/4 & 60.00* & 4/4 & 25.23 \\
+
+failure outage V3 & 2/3 & 60.00* & 3/3 & 34.12 \\
+
+all V3 & 2/4 & 60.00* & 4/4 & 36.46 \\
+
+new failure V4 & 2/4 & 60.00* & 4/4 & 21.09 \\
+
+failure outage V4 & 2/3 & 60.00* & 3/3 & 33.10 \\
+
+all V4 & 2/4 & 60.00* & 4/4 & 36.15 \\
+
+new failure V5 & 3/4 & 60.00* & 4/4 & 20.57 \\
+
+failure outage V5 & 3/3 & 11.03 & 3/3 & 11.03 \\
+
+all V5 & 3/4 & 60.00* & 4/4 & 32.00 \\
+
+new outage & 3/4 & 60.00* & 4/4 & 32.00 \\
+
+all duration sensitivity & 2/4 & 60.00* & 4/4 & 39.83 \\
+
+\bottomrule
+
+\end{tabular*}
+
+\par\smallskip\parbox{0.96\linewidth}{\raggedright * Evaluation-window score when at least one alert has not started.}
+
+\end{table}
+
+\clearpage
+
+\section{Validation and Limitations}
+
+The implementation checks station visibility, collision-free route segments, joint observation start, task duration, and nonoverlapping vehicle timelines. Replans are checked against the recovery time and failed vehicle identity. The search is deterministic. Auditable numerical outputs and the full scenario timelines are stored separately. A separate seeded Monte Carlo check evaluates exact bearing intersections and the wrapped pointing error. A wider beam can perform worse under partial-plan pruning, so the best previously found feasible schedule is retained.
+
+Across 100,000 draws, the exact-intersection RMS was 0.1439 m. Pointing coverage was 0.95016 at the threshold (Wilson interval 0.94879 to 0.95149) and 0.91688 at the specified 80 m check distance.
+
+The model treats targets as stationary, ignores interactions between moving vehicles as in the nominal timing assumptions, and uses finite station candidates. The scenario study is conditional on the stated continuation and cancellation rules. Further sensitivity checks should examine station discretization, clearance, the chosen outage interpretation, and sample coverage.
+
+\section{References}
+
+\begingroup\raggedright
+
+[1] Liang and Barsky. A New Concept and Method for Line Clipping. ACM Transactions on Graphics, 1984. doi:10.1145/357332.357333.
+
+[2] Bishop et al. Optimality Analysis of Sensor-Target Localization Geometries. Automatica, 2010. doi:10.1016/j.automatica.2009.12.003.
+
+[3] Dijkstra. A Note on Two Problems in Connexion with Graphs. Numerische Mathematik, 1959. doi:10.1007/BF01386390.
+
+[4] JCGM. Guide to the Expression of Uncertainty in Measurement, Section 5, 2008. doi:10.59161/JCGM100-2008E.
+
+[5] Pillac et al. A Review of Dynamic Vehicle Routing Problems. European Journal of Operational Research, 2013. doi:10.1016/j.ejor.2012.08.015.
+
+[6] OpenAI ChatGPT (Codex, GPT-6 series), used on 20 November 2026.
+
+\par\endgroup
+
+\clearpage
+
+\section{AI Tool Usage Report}
+
+Tool: OpenAI ChatGPT (Codex, GPT-6 series). Date of use: 20 November 2026.
+
+Prompt summary: use the supplied Problem B statement and transcribed parameters to develop and evaluate an end-to-end prototype and produce a reproducible English draft.
+
+Output and adoption in this draft: AI assistance was used for source transcription, model and solver design, coding and validation, chart generation, interpretation, and drafting. These contributions cover all sections and the associated code and figures [6].
+
+This revision uses AI assistance for plotting recorded outputs, typesetting, code performance refactoring, and consistency checks.
+
+Human revision status: this version records the AI-produced draft. Subsequent human verification, edits, or replacement analyses should be recorded in the AI-use log.
+
+\end{document}

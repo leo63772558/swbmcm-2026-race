@@ -1,0 +1,194 @@
+{
+  "paper": {
+    "file": "B_submission.pdf",
+    "page_count": 11,
+    "pages": [
+      {
+        "page": 1,
+        "text_characters": 593,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          128,
+          138,
+          1026,
+          927
+        ]
+      },
+      {
+        "page": 2,
+        "text_characters": 282,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          945
+        ]
+      },
+      {
+        "page": 3,
+        "text_characters": 1204,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          130,
+          64,
+          1025,
+          1376
+        ]
+      },
+      {
+        "page": 4,
+        "text_characters": 724,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          1282
+        ]
+      },
+      {
+        "page": 5,
+        "text_characters": 632,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          1206
+        ]
+      },
+      {
+        "page": 6,
+        "text_characters": 743,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1030,
+          1242
+        ]
+      },
+      {
+        "page": 7,
+        "text_characters": 754,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          1134
+        ]
+      },
+      {
+        "page": 8,
+        "text_characters": 720,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          1049
+        ]
+      },
+      {
+        "page": 9,
+        "text_characters": 807,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1025,
+          1376
+        ]
+      },
+      {
+        "page": 10,
+        "text_characters": 670,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1026,
+          850
+        ]
+      },
+      {
+        "page": 11,
+        "text_characters": 672,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-BoldMT",
+          "/IHAIZV+TimesNewRomanPSMT",
+          "/IXFAWU+TimesNewRomanPS-ItalicMT"
+        ],
+        "raster_bbox_px": [
+          132,
+          64,
+          1026,
+          625
+        ]
+      }
+    ]
+  },
+  "p1_errata": {
+    "file": "P1_ERRATA.pdf",
+    "page_count": 1,
+    "pages": [
+      {
+        "page": 1,
+        "text_characters": 1714,
+        "fonts": [
+          "/BZIVMZ+TimesNewRomanPS-ItalicMT",
+          "/IHAIZV+TimesNewRomanPS-BoldMT",
+          "/IXFAWU+TimesNewRomanPSMT"
+        ],
+        "raster_bbox_px": [
+          137,
+          138,
+          1022,
+          1557
+        ]
+      }
+    ]
+  },
+  "bound_numbers": 53
+}

@@ -1,0 +1,35 @@
+{
+  "nominal_plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab",
+  "shared_k": 8,
+  "P2_latest_starts_s": {
+    "beam": 11.034061764620652,
+    "nearest": 11.724421648941432
+  },
+  "P4_case_count": 73,
+  "V5_delay_s": 1.8929796073746736,
+  "V5_scores": {
+    "keep": {
+      "successes": 3,
+      "alerts": 3,
+      "completion_ratio": 1.0,
+      "latest_start_s": 11.034061764620652,
+      "starts": {
+        "T1": 3.0926272996101405,
+        "T2": 8.889889311994764,
+        "T3": 11.034061764620652
+      }
+    },
+    "reschedule": {
+      "successes": 3,
+      "alerts": 3,
+      "completion_ratio": 1.0,
+      "latest_start_s": 12.927041371995326,
+      "starts": {
+        "T1": 3.0926272996101405,
+        "T3": 12.89500503452297,
+        "T2": 12.927041371995326
+      }
+    }
+  },
+  "scope": "Finite candidate pool and beam incumbents; deterministic case grid."
+}

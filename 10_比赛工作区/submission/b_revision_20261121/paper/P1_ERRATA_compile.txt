@@ -1,0 +1,36 @@
+note: using only cached resource files
+note: Running TeX ...
+note: Running xdvipdfmx ...
+note: Writing `P1_ERRATA.log` (16.1796875 KiB)
+note: Writing `P1_ERRATA.aux` (128 B)
+note: Not writing `P1_ERRATA.out`: it would be empty.
+note: Writing `P1_ERRATA.pdf` (79.087890625 KiB)
+Fontconfig error: Cannot load default config file: No such file: (null)
+warning: accessing absolute path `C:/WINDOWS/fonts\timesi.ttf`; build may not be reproducible in other environments
+warning: accessing absolute path `C:/WINDOWS/fonts\timesbd.ttf`; build may not be reproducible in other environments
+warning: accessing absolute path `C:/WINDOWS/fonts\times.ttf`; build may not be reproducible in other environments
+warning: accessing absolute path `C:/WINDOWS/fonts\timesbi.ttf`; build may not be reproducible in other environments
+warning: Couldn't open font map file "pdftex.map".
+warning: Couldn't open font map file "kanjix.map".
+warning: open of input C:/WINDOWS/fonts\timesbd.ttf/rsrc failed
+caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf/rsrc` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesbd.ttf:0-0-GID failed
+caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf:0-0-GID` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesi.ttf/rsrc failed
+caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf/rsrc` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesi.ttf:0-0-GID failed
+caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf:0-0-GID` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesbd.ttf/rsrc failed
+caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf/rsrc` is forbidden
+warning: open of input C:/WINDOWS/fonts\times.ttf/rsrc failed
+caused by: access to the path `C:/WINDOWS/fonts\times.ttf/rsrc` is forbidden
+warning: open of input C:/WINDOWS/fonts\times.ttf:0-0-GID failed
+caused by: access to the path `C:/WINDOWS/fonts\times.ttf:0-0-GID` is forbidden
+warning: open of input C:/WINDOWS/fonts\times.ttf/rsrc failed
+caused by: access to the path `C:/WINDOWS/fonts\times.ttf/rsrc` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesbd.ttf:0-UCS32-Add failed
+caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf:0-UCS32-Add` is forbidden
+warning: open of input C:/WINDOWS/fonts\timesi.ttf:0-UCS32-Add failed
+caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf:0-UCS32-Add` is forbidden
+warning: open of input C:/WINDOWS/fonts\times.ttf:0-UCS32-Add failed
+caused by: access to the path `C:/WINDOWS/fonts\times.ttf:0-UCS32-Add` is forbidden

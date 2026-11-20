@@ -1,0 +1,395 @@
+[
+  {
+    "label": "v5_fault",
+    "case": "failure_V5",
+    "time_s": 5.0,
+    "snapshots": {
+      "keep": [
+        {
+          "vehicle": 1,
+          "phase": "slew",
+          "point": [
+            4,
+            20
+          ],
+          "pan": 24.700359138583323,
+          "tilt": 24.700359138583323,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "slew",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 77.88897449072022,
+          "tilt": 63.96420588539579,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "observe",
+          "point": [
+            12,
+            92
+          ],
+          "pan": -16.849419346711063,
+          "tilt": 29.53326578493662,
+          "alert": "T1",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "slew",
+          "point": [
+            84,
+            76
+          ],
+          "pan": -60.557280900008415,
+          "tilt": 24.309372729953505,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "failed",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        }
+      ],
+      "reschedule": [
+        {
+          "vehicle": 1,
+          "phase": "cancel_reset",
+          "point": [
+            4,
+            20
+          ],
+          "pan": 24.700359138583323,
+          "tilt": 24.700359138583323,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "cancel_reset",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 77.88897449072022,
+          "tilt": 63.96420588539579,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "observe",
+          "point": [
+            12,
+            92
+          ],
+          "pan": -16.849419346711063,
+          "tilt": 29.53326578493662,
+          "alert": "T1",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "cancel_reset",
+          "point": [
+            84,
+            76
+          ],
+          "pan": -60.557280900008415,
+          "tilt": 24.309372729953505,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "failed",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        }
+      ]
+    }
+  },
+  {
+    "label": "v5_between",
+    "case": "failure_V5",
+    "time_s": 11.98055156830799,
+    "snapshots": {
+      "keep": [
+        {
+          "vehicle": 1,
+          "phase": "observe",
+          "point": [
+            4,
+            20
+          ],
+          "pan": 82.37441610716942,
+          "tilt": 31.923425676651913,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "observe",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 158.96117654496885,
+          "tilt": 63.96420588539579,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "observe",
+          "point": [
+            12,
+            92
+          ],
+          "pan": -58.709768165378755,
+          "tilt": 29.918337630083002,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "observe",
+          "point": [
+            84,
+            76
+          ],
+          "pan": -177.25396025985134,
+          "tilt": 24.309372729953505,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "failed",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        }
+      ],
+      "reschedule": [
+        {
+          "vehicle": 1,
+          "phase": "wait_partner",
+          "point": [
+            4,
+            12
+          ],
+          "pan": 1.3284531600550848,
+          "tilt": 43.50010833742757,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "slew",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 131.52757255851947,
+          "tilt": 63.96420588539579,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "slew",
+          "point": [
+            11.028856829700262,
+            90.31879036337935
+          ],
+          "pan": -67.68904340468431,
+          "tilt": 61.63257978795615,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "slew",
+          "point": [
+            84,
+            76
+          ],
+          "pan": -148.85926614923125,
+          "tilt": 24.309372729953505,
+          "alert": "T2",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "failed",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        }
+      ]
+    }
+  },
+  {
+    "label": "combined_recovery",
+    "case": "all_V2",
+    "time_s": 30.0,
+    "snapshots": {
+      "keep": [
+        {
+          "vehicle": 1,
+          "phase": "idle",
+          "point": [
+            4,
+            20
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "failed",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "idle",
+          "point": [
+            12,
+            92
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "idle",
+          "point": [
+            84,
+            76
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "idle",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        }
+      ],
+      "reschedule": [
+        {
+          "vehicle": 1,
+          "phase": "travel",
+          "point": [
+            4.0,
+            20.0
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": "T4",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 2,
+          "phase": "failed",
+          "point": [
+            84,
+            4
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": null,
+          "blocked_by": null
+        },
+        {
+          "vehicle": 3,
+          "phase": "slew",
+          "point": [
+            12,
+            92
+          ],
+          "pan": -0.0,
+          "tilt": 0.0,
+          "alert": "T3",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 4,
+          "phase": "slew",
+          "point": [
+            84,
+            76
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": "T4",
+          "blocked_by": null
+        },
+        {
+          "vehicle": 5,
+          "phase": "travel",
+          "point": [
+            50.36194650963152,
+            89.791030085232
+          ],
+          "pan": 0.0,
+          "tilt": 0.0,
+          "alert": "T3",
+          "blocked_by": null
+        }
+      ]
+    }
+  }
+]

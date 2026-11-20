@@ -1,0 +1,21 @@
+{
+  "archived_distance_m": 66.83717727661133,
+  "independent_crossing_m": 66.83725842856802,
+  "linearized_distance_m": 66.92229923908131,
+  "sigma_at_crossing_m": 1.6367451685713605,
+  "bracket_m": [
+    66.83715842856802,
+    66.83735842856802
+  ],
+  "quadrature_node_crossing_m": {
+    "96": 66.83725842856802,
+    "192": 66.83725842856802
+  },
+  "monotone_scan_points": 484,
+  "tail_start_m": 240.0,
+  "tail_probability_upper_bound": 0.8765168902004593,
+  "omitted_standard_normal_tail_by_union_bound": 3.047941209664238e-23,
+  "mc_samples_per_probe": 2000000,
+  "mc_seed": 261305031,
+  "note": "Deterministic quadrature bracket and scan; the team supplies the continuous proof."
+}

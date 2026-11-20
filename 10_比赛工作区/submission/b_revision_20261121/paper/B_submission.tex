@@ -1,0 +1,231 @@
+% AI-assisted typesetting and data binding by ChatGPT (Codex, GPT-6.2 Sol),
+% OpenAI, 2026-11-21. Public model release date not verified.
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[a4paper,left=24mm,right=24mm,top=25mm,bottom=23mm,headheight=16pt]{geometry}
+\usepackage{amsmath,graphicx,booktabs,xcolor,fancyhdr,lastpage,caption}
+\usepackage[hidelinks]{hyperref}
+\definecolor{paperink}{HTML}{182C40}
+\definecolor{quiet}{HTML}{455D71}
+\renewcommand{\contentsname}{Content}
+\setcounter{tocdepth}{1}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt}
+\setlength{\intextsep}{9pt}
+\setlength{\textfloatsep}{10pt}
+\captionsetup{font=normalsize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
+\graphicspath{{../figures/}}
+\newcommand{\TeamID}{SWBMCM2613050}
+\newcommand{\PaperTitle}{Rapid UAV Localization via Coordinated Mobile Vehicles}
+\hypersetup{pdftitle={\PaperTitle},pdfauthor={},pdfsubject={Technical review edition for the team}}
+\newcommand{\ReviewHead}{%
+  \fancyhf{}\fancyhead[L]{\color{paperink}Team\#\TeamID}%
+  \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
+  \renewcommand{\headrulewidth}{0.4pt}}
+\fancypagestyle{fancy}{\ReviewHead}
+\fancypagestyle{plain}{\ReviewHead}
+\newcommand{\TeamText}[2]{%
+  \IfFileExists{team/#1.tex}{\input{team/#1.tex}}{%
+    \par{\color{quiet}\itshape Team text pending (#1). #2}\par}}
+\newcommand{\ReviewFigure}[3]{%
+  \begin{figure}[!ht]\centering
+  \includegraphics[width=\linewidth,height=#2,keepaspectratio]{#1}
+  \caption{#3}\end{figure}}
+\newcommand{\RecordedEquation}[1]{\begin{equation}\text{#1}\end{equation}}
+\input{B_review_metrics.tex}
+\raggedbottom
+\begin{document}
+\pagestyle{fancy}
+\thispagestyle{empty}
+\begin{center}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcr@{}}
+\toprule Problem Chosen & 2026 ShuWei Cup & Team Control Number\\
+\textbf{B} & \textbf{Summary Sheet} & \textbf{\TeamID}\\
+\bottomrule
+\end{tabular*}
+\vspace{13mm}
+
+{\Large\bfseries\color{paperink}\PaperTitle\par}
+\vspace{4mm}
+{\itshape Team review copy}
+\end{center}
+\section*{Summary}
+\TeamText{summary}{State the four questions, the team methods and the supported findings in the team's own words.}
+\begin{table}[!ht]
+\centering
+\caption{Verified values for the summary review.}
+\begin{tabular}{@{}p{0.53\linewidth}r@{}}
+\toprule
+Quantity & Value\\
+\midrule
+T1 minimum horizontal range & \BMinRange{} m\\
+T1 pointing elevation and quality & \BMaxPitch{}° and \BQuality{} m\textsuperscript{−1}\\
+T2 local first-order horizontal RMS & \BFirstRMS{} m\\
+Nominal last start, shared shortlist & \BBeamEight{} / \BNearestEight{} s\\
+P3 reproduced travel threshold & \BTravelThreshold{} m\\
+V5-only case, replanning delay & \BVFiveDelay{} s\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Keywords:} line of sight, bearing intersection, vehicle dispatch, recovery
+\clearpage
+\tableofcontents
+\clearpage
+
+\section{Problem Scope and Data Flow}
+\noindent Technical evidence workbook for the team's independent derivations and interpretation.
+The official dimensions and vehicle phases come from Problem B \cite{problem}.
+This edition binds displayed results to the accompanying evidence tables.
+The archived prototype and this technical edition used AI assistance \cite{archivedai,currentai}.
+
+\TeamText{scope}{Explain the four questions and identify the team's exact assumptions and solution methods.}
+
+\ReviewFigure{framework.pdf}{105mm}
+{Main data flow. The nominal dispatch plan is frozen before any disturbance is applied.}
+
+\subsection*{Notation}
+\begin{tabular}{@{}lp{0.7\linewidth}@{}}
+\toprule
+Symbol & Definition\\
+\midrule
+\textit{p}, \textit{T} & Ground station and target coordinates\\
+\textit{r}, \textit{H}, \textit{h} & Horizontal range, target height and camera height (m)\\
+\textit{Q}, \textit{β} & Inverse-range quality (m\textsuperscript{−1}) and elevation (°)\\
+\textit{γ}, \textit{σ}\textsubscript{θ} & Bearing crossing angle and bearing-error standard deviation\\
+\textit{t}\textsubscript{ready}, \textit{t}\textsubscript{start} & End of pointing and start of joint observation (s)\\
+\textit{s}, \textit{η} & Vehicle travel distance (m) and fraction of alerts started\\
+\bottomrule
+\end{tabular}
+\clearpage
+
+\section{T1 Observable Region}
+\TeamText{p1}{Derive the observation set, boundary rules, attainment and readiness criterion. Check the separate P1 errata before writing.}
+
+\RecordedEquation{Q = 1 / r,\quad r ≥ (H − h) / tan β\textsubscript{max}.}
+
+\begin{tabular}{@{}p{0.48\linewidth}l@{}}
+\toprule
+Verification item & Recorded value\\
+\midrule
+Readiness witness station & (\BStationX{}, \BStationY{}) m\\
+Station azimuth about T1 & \BReadyAngle{}°\\
+Travel and camera readiness & \BArrivalTime{} s and \BReadyTime{} s\\
+Travel-only witness time & \BAltArrival{} s\\
+Arc azimuth, unwrapped & \BArcStart{}° to \BArcEnd{}°\\
+Feasible arc length & \BArcLength{} m\\
+Area estimate, 0.1 m sample grid & \BGridArea{} m\textsuperscript{2}\\
+\bottomrule
+\end{tabular}
+
+\ReviewFigure{p1_observability.pdf}{116mm}{Vehicle-center observation region and the T1 boundary witnesses.}
+\clearpage
+
+\section{T2 Local Bearing Intersection}
+\TeamText{p2-precision}{Derive the local covariance and the conditions for equality. Discuss angular degeneracy and deterministic station feasibility.}
+
+\RecordedEquation{RMS\textsubscript{local} = σ\textsubscript{θ}\,√(r\textsubscript{1}\textsuperscript{2} + r\textsubscript{2}\textsuperscript{2}) / |sin γ|.}
+
+\begin{table}[!ht]\centering
+\caption{Checks for the recorded T2 pair.}
+\begin{tabular}{@{}lr@{}}
+\toprule Crossing angle & \BCrossing{}°\\
+Baseline & \BBaseLength{} m\\
+V3 and V5 travel times & \BTravelFirst{} s and \BTravelSecond{} s\\
+Local first-order horizontal RMS & \BFirstRMS{} m\\
+\bottomrule\end{tabular}\end{table}
+
+\ReviewFigure{t2_geometry.pdf}{116mm}{Horizontal intersection and collision-checked approach routes.}
+\clearpage
+
+\section{Nominal Multi-Alert Dispatch}
+\TeamText{p2-dispatch}{Describe the independent solver, vehicle reuse, the nearest baseline and the shared station screen. Explain the two recorded critical chains and the scope of the comparison.}
+
+\RecordedEquation{t\textsubscript{start,j} = max(t\textsubscript{ready,1,j}, t\textsubscript{ready,2,j}).}
+
+\begin{table}[!ht]\centering
+\caption{Last start in seconds under matched station screens.}
+\begin{tabular}{@{}crr@{}}
+\toprule Shortlist size & Beam incumbent & Nearest assignment\\
+\midrule
+3 & \BBeamThree & \BNearestThree\\
+8 & \BBeamEight & \BNearestEight\\
+\bottomrule
+\end{tabular}\end{table}
+
+\ReviewFigure{p2_timeline.pdf}{115mm}{Both policies use the same station and path feasibility. Bars show executed vehicle phases.}
+\clearpage
+
+\section{Pointing Uncertainty}
+\TeamText{p3}{Derive the wrapped probability, the continuous maximality argument and the 80 m parameter region. Explain the three error sources and the interval experiment.}
+
+\RecordedEquation{P(|Δψ| ≤ 5°) ≥ 0.95,\quad σ(s) = a + bs.}
+
+\ReviewFigure{p3_threshold.pdf}{107mm}{Conditional numerical verification and Monte Carlo classifications on both sides of the crossing.}
+\begin{table}[!ht]\centering
+\caption{Probability checks at the fixed target distance.}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Independent crossing & \BIntegratedCrossing{} m\\
+Quadrature bracket & \BBracketLow{} to \BBracketHigh{} m\\
+Position error standard deviation at crossing & \BSigmaCrossing{} m\\
+Remote tail probability bound & \BFarBound\\
+\bottomrule
+\end{tabular}\end{table}
+\clearpage
+
+\section{Disturbance Replay}
+\TeamText{p4}{Derive the event and decision model and justify what cached instructions mean. Distinguish the absolute recovery time and outage duration in both interpretations.}
+
+\RecordedEquation{η = k / N,\quad score = (η, −t\textsubscript{last})\quad (lexicographic order).}
+
+\ReviewFigure{p4_scenario_matrix.pdf}{113mm}
+{Paired completion counts on the crossed recovery grid. The full catalogue has \BCaseCount{} case IDs.}
+
+\clearpage
+
+\section{V5 Failure Case}
+\TeamText{v5}{Explain the locked T1 start and the recorded cancellation resets. Use the per-vehicle records to explain the new bottleneck.}
+
+\ReviewFigure{p4_v5_timeline.pdf}{112mm}
+{Actual phases under both policies. Last starts are \BKeepLast{} s and \BReplanLast{} s.}
+
+\ReviewFigure{keyframes/v5_between.pdf}{67mm}
+{A simulated snapshot between the two last-start times.}
+\clearpage
+
+\section{Sensitivity Analysis}
+\TeamText{sensitivity}{Explain the effect of changing pitch, the route clearance model, shortlist size and recovery assumptions.}
+\begin{table}[!ht]\centering
+\caption{Selected diagnostics for the sensitivity review.}
+\begin{tabular}{@{}p{0.68\linewidth}r@{}}
+\toprule
+Pitch ceiling from 80° to 79°, relative quality loss & \BPitchLoss\%\\
+Route instances audited & \BRouteCount\\
+Shorter safe paths & \BShortenedCount\\
+Additional admissible vehicle-station routes & \BRestoredCount\\
+Maximum route shortening & \BSavingsMax{} m\\
+\bottomrule
+\end{tabular}\end{table}
+
+\section{Strengths and Weaknesses}
+\TeamText{limits}{Assess the strengths and the remaining finite-search, geometric and scenario limitations against independent team evidence.}
+
+\section{Conclusion}
+\TeamText{conclusion}{Write a conclusion that addresses all four questions and supports each claim with the team's own results.}
+\clearpage
+
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{9}
+\bibitem{problem} ShuWei Cup Organizing Committee. \emph{Problem B: Rapid UAV Localization via Coordinated Mobile Vehicles}. 2026.
+\bibitem{archivedai} ChatGPT (Codex), GPT-6 series, OpenAI, used 20 November 2026.
+\bibitem{currentai} ChatGPT (Codex), GPT-6.2 Sol, OpenAI, used 21 November 2026.
+\end{thebibliography}
+
+\section*{AI Usage Disclosure}
+\addcontentsline{toc}{section}{AI Usage Disclosure}
+The prior research prototype records AI assistance in model and solver design, numerical work, interpretation, figures and draft text. It is archived as review evidence. This edition used AI assistance in engineering implementation and validation, replay, visualisation, numeric data binding, typesetting and packaging checks. Team authorship, independent derivations and decisions about what to adopt are pending. The additional usage record is maintained with the handoff.
+\end{document}

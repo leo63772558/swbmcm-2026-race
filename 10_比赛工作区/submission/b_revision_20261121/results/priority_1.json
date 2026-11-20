@@ -1,0 +1,12 @@
+{
+  "contact_checks": {
+    "body_contact": "allowed",
+    "los_contact": "blocked",
+    "three_dimensional_fixtures": 5,
+    "aabb_false_rejection_xy": [
+      80.2,
+      72.2
+    ]
+  },
+  "clock_checks": 3
+}

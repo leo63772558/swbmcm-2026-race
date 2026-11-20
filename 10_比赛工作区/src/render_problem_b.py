@@ -1,11 +1,13 @@
-"""Generate an English draft and vector figures. AI-assisted (OpenAI Codex)."""
+"""Render the existing Problem B draft and figures. AI-assisted (OpenAI Codex, GPT-6 series)."""
 
 import csv
 import json
 from collections import Counter
 from pathlib import Path
+import subprocess
 from xml.sax.saxutils import escape
 
+from PIL import Image as RasterImage
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
@@ -21,6 +23,8 @@ from plot_problem_b import (
 
 
 FIGURES, PAPER, RESULTS = (ROOT / name for name in ("figures", "paper", "results"))
+FIGURE_DPI = 300
+WINDOW_NOTE = "* Evaluation-window score when at least one alert has not started."
 INK = colors.HexColor("#172D43")
 TEAL = colors.HexColor("#136C74")
 RED = colors.HexColor("#B24933")
@@ -61,16 +65,26 @@ def fmt(value, digits=2):
     return f"{float(value):.{digits}f}"
 
 
+def display_score(record):
+    started = int(record["successes"])
+    total = int(record["alerts"])
+    marker = "*" if started < total else ""
+    return f"{started}/{total}", fmt(record["latest_start_s"]) + marker
+
+
 def sections(p1, p2, timings, p3, p4, audit, visits):
     latest = {
         policy: max(float(row["start"]) for row in timings if row["policy"] == policy)
         for policy in ("beam", "nearest")
     }
-    outcomes = {}
+    records = {}
     for row in p4:
-        outcomes.setdefault(row["scenario"], {})[row["policy"]] = (
-            float(row["completion_ratio"]), -float(row["latest_start_s"])
-        )
+        records.setdefault(row["scenario"], {})[row["policy"]] = row
+    outcomes = {
+        name: {policy: (float(row["completion_ratio"]), -float(row["latest_start_s"]))
+               for policy, row in pair.items()}
+        for name, pair in records.items()
+    }
     counts = Counter(
         "better" if v["reschedule"] > v["keep"] else "worse" if v["reschedule"] < v["keep"] else "tied"
         for v in outcomes.values()
@@ -240,15 +254,16 @@ def sections(p1, p2, timings, p3, p4, audit, visits):
             "Output and adoption in this draft: AI assistance was used for source transcription, model "
             "and solver design, coding and validation, chart generation, interpretation, and drafting. "
             "These contributions cover all sections and the associated code and figures [6].",
+            "This revision uses AI assistance for plotting recorded outputs, typesetting, "
+            "code performance refactoring, and consistency checks.",
             "Human revision status: this version records the AI-produced draft. Subsequent human "
             "verification, edits, or replacement analyses should be recorded in the AI-use log.",
         ], None, None),
     ]
-    scenario_rows = [("Scenario", "Keep ratio", "Keep time", "Replan ratio", "Replan time")]
+    scenario_rows = [("Scenario", "Keep k/N", "Keep time", "Replan k/N", "Replan time")]
     scenario_rows.extend(
-        (name.replace("_", " "), fmt(scores["keep"][0]), fmt(-scores["keep"][1]),
-         fmt(scores["reschedule"][0]), fmt(-scores["reschedule"][1]))
-        for name, scores in outcomes.items()
+        (name.replace("_", " "), *display_score(pair["keep"]), *display_score(pair["reschedule"]))
+        for name, pair in records.items()
     )
     return summary, body, scenario_rows
 
@@ -263,11 +278,31 @@ def write_tex(summary, body, scenario_rows):
     clean = src[:boundary].replace("[FILL: Paper Title]", "Rapid UAV Localization via Coordinated Mobile Vehicles")
     clean = clean.replace("[FILL: Summary]", tex_escape(summary))
     clean = clean.replace("[FILL: Keywords]", "Bearing-only localization; vehicle scheduling; uncertainty; rescheduling")
+    clean = clean.replace(
+        r"\section*{Summary}",
+        r"\noindent\textbf{Internal Working Draft}" + "\n\n" + r"\section*{Summary}",
+    )
+    clean = clean.replace(r"\setcounter{tocdepth}{1}", r"\setcounter{tocdepth}{2}")
+    clean = clean.replace(r"Team\#\TeamNumber", r"Team\#\ProblemLetter\TeamNumber")
     output = [clean.rstrip()]
-    for index, (title, paragraphs, figure, caption) in enumerate(body):
-        if index and title != "References":
+    page_starts = {
+        "Dual-Station Localization for T2", "Horizontal Pointing Error",
+        "Admissible Position-Error Parameters",
+        "Rescheduling After Disturbances", "Paired Scenario Results",
+        "Validation and Limitations", "AI Tool Usage Report",
+    }
+    subsections = {
+        "Dual-Station Localization for T2", "Multi-Alert Vehicle Scheduling",
+        "Nominal Driving Routes", "Admissible Position-Error Parameters",
+        "Paired Scenario Results",
+    }
+    for title, paragraphs, figure, caption in body:
+        if title in page_starts:
             output.append(r"\clearpage")
-        output.append(r"\section{" + title + "}")
+        if title == "Dual-Station Localization for T2":
+            output.append(r"\section{Two-Station Localization and Scheduling}")
+        heading = r"\subsection" if title in subsections else r"\section"
+        output.append(heading + "{" + title + "}")
         if title == "References":
             output.extend([r"\begingroup\raggedright",
                            *(tex_escape(text) for text in paragraphs), r"\par\endgroup"])
@@ -279,33 +314,44 @@ def write_tex(summary, body, scenario_rows):
             output.extend([
                 r"\begin{table}[!ht]", r"\centering",
                 r"\caption{Completion ratios and latest-start times in seconds}",
-                r"\begin{tabular}{@{}lrrrr@{}}", r"\toprule",
-                " & ".join(scenario_rows[0]) + r" \\", r"\midrule",
+                r"\begin{tabular*}{0.96\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}", r"\toprule",
+                r"& \multicolumn{2}{c}{Keep Plan} & \multicolumn{2}{c}{Reschedule} \\",
+                r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}",
+                r"Scenario & $k/N$ & Time (s) & $k/N$ & Time (s) \\", r"\midrule",
                 *(" & ".join(tex_escape(value) for value in row) + r" \\" for row in scenario_rows[1:]),
-                r"\bottomrule", r"\end{tabular}", r"\end{table}",
+                r"\bottomrule", r"\end{tabular*}",
+                r"\par\smallskip\parbox{0.96\linewidth}{\raggedright " + WINDOW_NOTE + "}",
+                r"\end{table}",
             ])
         if figure:
+            height = "0.30" if figure in {"b_timeline", "b_routes"} else "0.38"
             output.extend([r"\begin{figure}[!ht]", r"\centering",
-                           r"\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{" + figure + "}",
+                           rf"\includegraphics[width=0.94\linewidth,height={height}\textheight,keepaspectratio]{{{figure}}}",
                            r"\caption{" + tex_escape(caption) + "}", r"\end{figure}"])
     output.append(r"\end{document}")
     (PAPER / "B_prototype.tex").write_text("\n\n".join(output) + "\n", encoding="utf-8")
 
 
-def vector_pdf_to_drawing(path, max_width):
-    from io import BytesIO
-    from pypdf import PdfReader
-    import subprocess
-    from tempfile import TemporaryDirectory
-
-    page = PdfReader(path).pages[0]
-    width, height = float(page.mediabox.width), float(page.mediabox.height)
-    with TemporaryDirectory() as temporary:
-        prefix = str(Path(temporary) / "figure")
-        subprocess.run(["pdftoppm", "-f", "1", "-singlefile", "-r", "220",
-                        "-png", str(path), prefix], check=True, capture_output=True)
-        pixels = BytesIO(Path(prefix + ".png").read_bytes())
-    return Image(pixels, width=min(width, max_width), height=height * min(width, max_width) / width)
+def export_figure_previews(figure_names):
+    tile_width, tile_height, gap = 900, 650, 22
+    rows = (len(figure_names) + 1) // 2
+    overview = RasterImage.new(
+        "RGB", (tile_width * 2 + gap * 3, tile_height * rows + gap * (rows + 1)), "#DBE5ED",
+    )
+    for index, name in enumerate(figure_names):
+        path = FIGURES / name
+        subprocess.run(
+            ["pdftoppm", "-f", "1", "-singlefile", "-r", str(FIGURE_DPI), "-png",
+             str(path.with_suffix(".pdf")), str(path)],
+            check=True, capture_output=True,
+        )
+        with RasterImage.open(path.with_suffix(".png")) as figure:
+            figure.thumbnail((tile_width - 20, tile_height - 20), RasterImage.Resampling.LANCZOS)
+            tile = RasterImage.new("RGB", (tile_width, tile_height), "white")
+            tile.paste(figure, ((tile_width - figure.width) // 2, (tile_height - figure.height) // 2))
+            row, col = divmod(index, 2)
+            overview.paste(tile, (gap + col * (tile_width + gap), gap + row * (tile_height + gap)))
+    overview.save(FIGURES / "B_figure_overview.png")
 
 
 def write_preview(summary, body, scenario_rows):
@@ -346,20 +392,18 @@ def write_preview(summary, body, scenario_rows):
                 ("LINEBELOW", (0, -1), (-1, -1), .6, INK),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F4F8FA")]),
             ]))
-            story.extend([Paragraph("Table 1. Completion ratios and latest-start times in seconds.", normal), table])
+            story.extend([Paragraph("Table 1. Completion ratios and latest-start times in seconds.", normal),
+                          table, Paragraph(WINDOW_NOTE, normal)])
         if figure:
             figure_number += 1
-            drawing = vector_pdf_to_drawing(FIGURES / (figure + ".pdf"), 405)
-            if drawing.drawHeight > 245:
-                drawing.drawWidth *= 245 / drawing.drawHeight
-                drawing.drawHeight = 245
+            drawing = Image(str(FIGURES / (figure + ".png")), width=405, height=245, kind="proportional")
             story.extend([drawing, Paragraph(f"Figure {figure_number}. {escape(caption)}", normal)])
 
     def page_header(pdf, doc):
         if doc.page == 1:
             return
         pdf.setFont("BodyTimes", 12)
-        pdf.drawString(73, A4[1] - 50, "Team#SWBMCM2613050")
+        pdf.drawString(73, A4[1] - 50, "Team#BSWBMCM2613050")
         pdf.drawRightString(A4[0] - 73, A4[1] - 50, f"Page {doc.page} of {len(body) + 2}")
         pdf.setStrokeColor(INK)
         pdf.line(73, A4[1] - 55, A4[0] - 73, A4[1] - 55)
@@ -375,14 +419,25 @@ def write_preview(summary, body, scenario_rows):
 
 
 def main():
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(description="Render the Problem B internal prototype.")
+    parser.add_argument("--tex-only", action="store_true", help="Regenerate the editable TeX without rebuilding figures")
+    args = parser.parse_args()
+    p1, p2, p3 = (read(name)[0] for name in ("B_P1.csv", "B_P2_localization.csv", "B_P3.csv"))
+    timings, p4 = (read(name) for name in ("B_P2_schedules.csv", "B_P4.csv"))
+    audit = read("B_validation.csv")
+    route_data = json.loads((RESULTS / "B_timelines.json").read_text(encoding="utf-8"))
+    summary, body, scenario_rows = sections(p1, p2, timings, p3, p4, audit, route_data["nominal"])
+    write_tex(summary, body, scenario_rows)
+    if args.tex_only:
+        return
+
     FIGURES.mkdir(exist_ok=True)
     font_dir = Path("C:/Windows/Fonts")
     pdfmetrics.registerFont(TTFont("BodyTimes", str(font_dir / "times.ttf")))
     pdfmetrics.registerFont(TTFont("TitleTimes", str(font_dir / "timesbd.ttf")))
-    p1, p2, p3 = (read(name)[0] for name in ("B_P1.csv", "B_P2_localization.csv", "B_P3.csv"))
-    timings, coverage, p4 = (read(name) for name in ("B_P2_schedules.csv", "B_P3_coverage.csv", "B_P4.csv"))
-    audit = read("B_validation.csv")
-    route_data = json.loads((RESULTS / "B_timelines.json").read_text(encoding="utf-8"))
+    coverage = read("B_P3_coverage.csv")
     draw_map(p1, p2)
     draw_timeline(timings)
     draw_routes(route_data["nominal"])
@@ -393,8 +448,7 @@ def main():
     draw_coverage(coverage, float(p3["path_cap_m"]), cover_audit)
     draw_parameter_region(p3)
     draw_disturbances(p4)
-    summary, body, scenario_rows = sections(p1, p2, timings, p3, p4, audit, route_data["nominal"])
-    write_tex(summary, body, scenario_rows)
+    export_figure_previews([figure for _, _, figure, _ in body if figure])
     write_preview(summary, body, scenario_rows)
 
 

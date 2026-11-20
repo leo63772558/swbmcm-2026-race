@@ -1,0 +1,8 @@
+figure,source,purpose,formats
+p1_observability,P1_grid_map.json; P1_geometry.json; official parameters,"Show the observable region, boundary arc and selected readiness witness.",PDF; PNG 300 dpi
+t2_geometry,P2_precision.csv; P2_precision_routes.json; official parameters,"Show both approach routes, the right-angle intersection and the local covariance scale.",PDF; PNG 300 dpi
+p3_threshold,P3_curve.csv; P3_MC.csv; P3_bracket.csv; P3_verification.json,Show the deterministic threshold and classifications of the two separate sides.,PDF; PNG 300 dpi
+p4_scenario_matrix,P4_cases.csv; P4_archived_comparison.csv,Separate completion changes from time changes and show the crossed recovery grid.,PDF; PNG 300 dpi
+p2_timeline,P2_main_plans.json; P2_visit_phases.csv; Executed_timeline.json,Compare the common-k schedules by vehicle and phase.,PDF; PNG 300 dpi
+p4_v5_timeline,P4_V5_event_comparison.csv; Executed_timeline.json,"Expose cancellation resets, changed pairings and the V5 delay.",PDF; PNG 300 dpi
+framework,MODEL_DEPENDENCY_MAP.md; P2_main_plans.json; priority_3.json,Identify the shared geometry and frozen plan that feed disturbance replay.,PDF; PNG 300 dpi

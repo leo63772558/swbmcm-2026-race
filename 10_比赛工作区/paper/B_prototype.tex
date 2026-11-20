@@ -24,14 +24,14 @@
 \hypersetup{pdftitle={\PaperTitle},pdfauthor={}}
 \newcommand{\TeamPageHeader}{%
   \fancyhf{}%
-  \fancyhead[L]{\color{paperink}Team\#\TeamNumber}%
+  \fancyhead[L]{\color{paperink}Team\#\ProblemLetter\TeamNumber}%
   \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
   \renewcommand{\headrulewidth}{0.4pt}%
 }
 \fancypagestyle{fancy}{\TeamPageHeader}
 \fancypagestyle{plain}{\TeamPageHeader}
 \renewcommand{\contentsname}{Content}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \graphicspath{{../figures/}}
 
 \begin{document}
@@ -48,6 +48,8 @@
 \vspace{1em}
 {\Large\bfseries\PaperTitle}
 \end{center}
+\noindent\textbf{Internal Working Draft}
+
 \section*{Summary}
 An observation and dispatch prototype was evaluated on the Problem B field. The shortest feasible horizontal observation range for T1 is 7.582 m. For T2, the selected stations give a first-order horizontal RMS error of 0.1436 m. The beam-search schedule starts its last observation at 11.03 s compared with 11.72 s under the nearest-arrival rule. The pointing error allowance is met up to about 66.8 m of travel. Across 28 selected disturbance cases, replanning improves 23, ties 4, and worsens 1 by the prescribed ranking.
 
@@ -79,7 +81,9 @@ The selected station is (77.516, 72.593) m. Its elevation is 80.0 degrees and it
 
 \clearpage
 
-\section{Dual-Station Localization for T2}
+\section{Two-Station Localization and Scheduling}
+
+\subsection{Dual-Station Localization for T2}
 
 Let r1 and r2 be the horizontal sensor ranges, and let gamma be the smaller angle between the two bearings. The first-order error normal to each bearing is range times the angular error in radians. The two normal equations determine the horizontal displacement. Inverting their two-by-two coefficient matrix, then taking the trace of the propagated covariance, gives sigma squared times (r1 squared plus r2 squared) divided by sin squared gamma [2].
 
@@ -91,9 +95,7 @@ Both ranges meet the pitch-imposed lower bound and the sine factor attains one. 
 
 \[\operatorname{RMS}\approx\frac{\sigma_\theta\sqrt{r_1^2+r_2^2}}{|\sin\gamma|}\]
 
-\clearpage
-
-\section{Multi-Alert Vehicle Scheduling}
+\subsection{Multi-Alert Vehicle Scheduling}
 
 Shortest routes on a waypoint graph use conservative rectangular expansions of the buildings by the disc radius. Expanded corners with a small clearance and the start and finish points form the graph. This makes each computed route feasible for the vehicle disc, while potentially excluding shorter rounded-corner paths [3].
 
@@ -109,15 +111,13 @@ The last start is 11.03 s for beam search and 11.72 s for nearest assignment, a 
 
 \centering
 
-\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_timeline}
+\includegraphics[width=0.94\linewidth,height=0.30\textheight,keepaspectratio]{b_timeline}
 
 \caption{Paired per-vehicle timelines. The dashed line in each panel marks its last observation start.}
 
 \end{figure}
 
-\clearpage
-
-\section{Nominal Driving Routes}
+\subsection{Nominal Driving Routes}
 
 The map links the timing sequence to the physical station choices. Filled markers show vehicle origins and open rings show selected observation stations. A repeated vehicle can travel on multiple segments of the same color. Building footprints are shaded. V3 starts its leg for T3 already at the assigned station, so this leg consumes slew time but no driving time.
 
@@ -125,7 +125,7 @@ The map links the timing sequence to the physical station choices. Filled marker
 
 \centering
 
-\includegraphics[width=0.94\linewidth,height=0.38\textheight,keepaspectratio]{b_routes}
+\includegraphics[width=0.94\linewidth,height=0.30\textheight,keepaspectratio]{b_routes}
 
 \caption{Nominal paths for the five available vehicles. Paths use conservative obstacle clearance.}
 
@@ -157,7 +157,7 @@ The linearized variance shares near the threshold are 84.6\% for the vehicle pos
 
 \clearpage
 
-\section{Admissible Position-Error Parameters}
+\subsection{Admissible Position-Error Parameters}
 
 For the fixed check distance, the permitted combinations of error intercept and growth coefficient form a triangle in the nonnegative parameter region. Its sloped edge collects the intercept–slope combinations that meet the target coverage at equality.
 
@@ -197,7 +197,7 @@ Replanning improves 23 cases, ties 4, and worsens 1. In failure\_V5, the fixed p
 
 \clearpage
 
-\section{Paired Scenario Results}
+\subsection{Paired Scenario Results}
 
 For each row, the completion fraction counts alert starts within the evaluation window. The last-start column follows the specified horizon convention when an alert is unfinished.
 
@@ -207,73 +207,79 @@ For each row, the completion fraction counts alert starts within the evaluation 
 
 \caption{Completion ratios and latest-start times in seconds}
 
-\begin{tabular}{@{}lrrrr@{}}
+\begin{tabular*}{0.96\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
 
 \toprule
 
-Scenario & Keep ratio & Keep time & Replan ratio & Replan time \\
+& \multicolumn{2}{c}{Keep Plan} & \multicolumn{2}{c}{Reschedule} \\
+
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+
+Scenario & $k/N$ & Time (s) & $k/N$ & Time (s) \\
 
 \midrule
 
-new 1 & 0.75 & 60.00 & 1.00 & 18.32 \\
+new 1 & 3/4 & 60.00* & 4/4 & 18.32 \\
 
-new 2 & 0.75 & 60.00 & 1.00 & 19.44 \\
+new 2 & 3/4 & 60.00* & 4/4 & 19.44 \\
 
-new 3 & 0.75 & 60.00 & 1.00 & 20.26 \\
+new 3 & 3/4 & 60.00* & 4/4 & 20.26 \\
 
-failure V1 & 0.67 & 60.00 & 1.00 & 13.40 \\
+failure V1 & 2/3 & 60.00* & 3/3 & 13.40 \\
 
-failure V2 & 0.67 & 60.00 & 1.00 & 13.40 \\
+failure V2 & 2/3 & 60.00* & 3/3 & 13.40 \\
 
-failure V3 & 0.67 & 60.00 & 1.00 & 13.40 \\
+failure V3 & 2/3 & 60.00* & 3/3 & 13.40 \\
 
-failure V4 & 0.67 & 60.00 & 1.00 & 13.40 \\
+failure V4 & 2/3 & 60.00* & 3/3 & 13.40 \\
 
-failure V5 & 1.00 & 11.03 & 1.00 & 12.93 \\
+failure V5 & 3/3 & 11.03 & 3/3 & 12.93 \\
 
-outage interior & 1.00 & 11.03 & 1.00 & 11.03 \\
+outage interior & 3/3 & 11.03 & 3/3 & 11.03 \\
 
-outage upper time & 1.00 & 11.03 & 1.00 & 11.03 \\
+outage upper time & 3/3 & 11.03 & 3/3 & 11.03 \\
 
-outage upper duration & 1.00 & 11.03 & 1.00 & 11.03 \\
+outage upper duration & 3/3 & 11.03 & 3/3 & 11.03 \\
 
-new failure V1 & 0.50 & 60.00 & 1.00 & 24.51 \\
+new failure V1 & 2/4 & 60.00* & 4/4 & 24.51 \\
 
-failure outage V1 & 0.67 & 60.00 & 1.00 & 35.91 \\
+failure outage V1 & 2/3 & 60.00* & 3/3 & 35.91 \\
 
-all V1 & 0.50 & 60.00 & 1.00 & 36.15 \\
+all V1 & 2/4 & 60.00* & 4/4 & 36.15 \\
 
-new failure V2 & 0.50 & 60.00 & 1.00 & 20.57 \\
+new failure V2 & 2/4 & 60.00* & 4/4 & 20.57 \\
 
-failure outage V2 & 0.67 & 60.00 & 1.00 & 33.73 \\
+failure outage V2 & 2/3 & 60.00* & 3/3 & 33.73 \\
 
-all V2 & 0.50 & 60.00 & 1.00 & 34.83 \\
+all V2 & 2/4 & 60.00* & 4/4 & 34.83 \\
 
-new failure V3 & 0.50 & 60.00 & 1.00 & 25.23 \\
+new failure V3 & 2/4 & 60.00* & 4/4 & 25.23 \\
 
-failure outage V3 & 0.67 & 60.00 & 1.00 & 34.12 \\
+failure outage V3 & 2/3 & 60.00* & 3/3 & 34.12 \\
 
-all V3 & 0.50 & 60.00 & 1.00 & 36.46 \\
+all V3 & 2/4 & 60.00* & 4/4 & 36.46 \\
 
-new failure V4 & 0.50 & 60.00 & 1.00 & 21.09 \\
+new failure V4 & 2/4 & 60.00* & 4/4 & 21.09 \\
 
-failure outage V4 & 0.67 & 60.00 & 1.00 & 33.10 \\
+failure outage V4 & 2/3 & 60.00* & 3/3 & 33.10 \\
 
-all V4 & 0.50 & 60.00 & 1.00 & 36.15 \\
+all V4 & 2/4 & 60.00* & 4/4 & 36.15 \\
 
-new failure V5 & 0.75 & 60.00 & 1.00 & 20.57 \\
+new failure V5 & 3/4 & 60.00* & 4/4 & 20.57 \\
 
-failure outage V5 & 1.00 & 11.03 & 1.00 & 11.03 \\
+failure outage V5 & 3/3 & 11.03 & 3/3 & 11.03 \\
 
-all V5 & 0.75 & 60.00 & 1.00 & 32.00 \\
+all V5 & 3/4 & 60.00* & 4/4 & 32.00 \\
 
-new outage & 0.75 & 60.00 & 1.00 & 32.00 \\
+new outage & 3/4 & 60.00* & 4/4 & 32.00 \\
 
-all duration sensitivity & 0.50 & 60.00 & 1.00 & 39.83 \\
+all duration sensitivity & 2/4 & 60.00* & 4/4 & 39.83 \\
 
 \bottomrule
 
-\end{tabular}
+\end{tabular*}
+
+\par\smallskip\parbox{0.96\linewidth}{\raggedright * Evaluation-window score when at least one alert has not started.}
 
 \end{table}
 
@@ -314,6 +320,8 @@ Tool: OpenAI ChatGPT (Codex, GPT-6 series). Date of use: 20 November 2026.
 Prompt summary: use the supplied Problem B statement and transcribed parameters to develop and evaluate an end-to-end prototype and produce a reproducible English draft.
 
 Output and adoption in this draft: AI assistance was used for source transcription, model and solver design, coding and validation, chart generation, interpretation, and drafting. These contributions cover all sections and the associated code and figures [6].
+
+This revision uses AI assistance for plotting recorded outputs, typesetting, code performance refactoring, and consistency checks.
 
 Human revision status: this version records the AI-produced draft. Subsequent human verification, edits, or replacement analyses should be recorded in the AI-use log.
 

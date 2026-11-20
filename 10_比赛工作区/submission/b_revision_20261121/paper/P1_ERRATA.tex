@@ -1,0 +1,41 @@
+% AI-assisted evidence typesetting by ChatGPT (Codex, GPT-6.2 Sol), 2026-11-21.
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[margin=25mm]{geometry}
+\usepackage{booktabs,xcolor}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Correction Sheet for the T1 Technical Note},pdfauthor={}}
+\input{B_review_metrics.tex}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\begin{document}
+{\Large\bfseries Correction Sheet for the T1 Technical Note\par}
+\textit{Team review copy for the ten-page p1.pdf}
+
+\subsection*{Page 2, A4 and Page 3, Constraints}
+The vehicle disk may touch a footprint or field wall without entering its interior or crossing the field limit. The camera-to-target line segment must miss each closed prism. Touching a face, edge or vertex therefore fails the LOS check. The visibility condition is open in the camera plane. Intersecting it with closed body and elevation conditions gives no general guarantee of closedness. Check the endpoints using both tests.
+
+\subsection*{Page 4, Boundary Coordinates}
+The retained radius is \BMinRange{} m. The connected nominal arc crosses the azimuth wrap and spans \BArcStart{}° to \BArcEnd{}° in unwrapped coordinates. Arc length is \BArcLength{} m. The endpoints pass the closed body condition and the separate finite-segment LOS check. Building B2 should be expanded by a Euclidean disk for the body boundary.
+
+\subsection*{Page 5, Table 3 and Page 6, Fastest Readiness}
+Insert the wrap at 360° when separating the positive and negative pan slopes. Compare both endpoints of the old middle interval. The table below contains feasible grid witnesses for V4, with matching lower and upper brackets in the data files.
+\begin{center}
+\begin{tabular}{@{}llrr@{}}
+\toprule From (°) & To (°) & Witness angle (°) & Ready (s)\\
+\midrule
+\BFromA & \BToA & \BAtA & \BBranchBestA\\
+\BFromB & \BToB & \BAtB & \BBranchBestB\\
+\BFromC & \BToC & \BAtC & \BBranchBestC\\
+\BFromD & \BToD & \BAtD & \BBranchBestD\\
+\bottomrule
+\end{tabular}
+\end{center}
+The witness at (\BStationX{}, \BStationY{}) is ready in \BReadyTime{} s. For the travel-only tie criterion the best checked witness arrives in \BAltArrival{} s. The record supplies a continuous lower-bound gap for the selected readiness criterion, rather than a uniqueness proof.
+
+\subsection*{Page 9, Elevation Sensitivity}
+Reducing the cap from 80° to 79° reduces the quality at the attained elevation limit by \BPitchLoss\%. The direction of change for 80° to 60° is also a tightening. Remove the unsupported per-degree rule and exponential description. The \BGridArea{} m\textsuperscript{2} value is a grid estimate.
+
+\textit{Evidence: P1 geometry, readiness branches, pitch checks and area tables in the review package.}
+\end{document}

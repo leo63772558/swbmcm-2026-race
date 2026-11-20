@@ -1,8 +1,12 @@
-"""Reproduce Problem B results. AI-assisted implementation (OpenAI Codex)."""
+"""Reproduce Problem B results.
+
+Implementation and performance refactoring assisted by OpenAI Codex (GPT-6 series).
+"""
 
 import csv
 import json
 from dataclasses import asdict, dataclass
+from functools import cache
 from itertools import combinations, permutations
 from math import atan2, degrees, dist, exp, isfinite, pi, radians, sin, sqrt
 from statistics import NormalDist
@@ -45,15 +49,32 @@ def solve_p1():
     }
 
 
+@cache
+def _station_bearing(point, goal):
+    return radians(angles(point, goal)[0])
+
+
+@cache
+def _station_slew_time(point, goal):
+    return slew_time(point, goal)
+
+
+def _crossing_angle(difference):
+    return abs((degrees(difference) + 180) % 360 - 180)
+
+
 def accuracy(first, second, goal):
-    first_bearing, second_bearing = (radians(angles(point, goal)[0]) for point in (first, second))
+    target_point = tuple(goal)
+    first_bearing = _station_bearing(tuple(first), target_point)
+    second_bearing = _station_bearing(tuple(second), target_point)
     difference = second_bearing - first_bearing
-    gamma = abs((degrees(difference) + 180) % 360 - 180)
-    if abs(sin(difference)) < 1e-8:
+    gamma = _crossing_angle(difference)
+    sine = abs(sin(difference))
+    if sine < 1e-8:
         return float("inf"), gamma
     sigma = radians(number("p2_1", "bearing", "error_std"))
     distances = (dist(point, goal[:2]) for point in (first, second))
-    rms = sigma * sqrt(sum(radius**2 for radius in distances)) / abs(sin(difference))
+    rms = sigma * sqrt(sum(radius**2 for radius in distances)) / sine
     return rms, gamma
 
 
@@ -91,7 +112,7 @@ def station_options(home, goal, limit):
         distance, path = route(home_position, point)
         if isfinite(distance):
             arrival = available + distance / SPEED
-            ready = arrival + slew_time(point, goal)
+            ready = arrival + _station_slew_time(point, goal)
             options.append((arrival, ready, point, path))
     return sorted(options, key=lambda row: (row[1], row[0], row[2]))[:limit]
 
@@ -108,15 +129,16 @@ def dispatch(states, alert, goal, station_limit, *, nearest=False):
             first_options = sorted(first_options)[:station_limit]
             second_options = sorted(second_options)[:station_limit]
         for arr_a, ready_a, point_a, path_a in first_options:
+            first_bearing = _station_bearing(point_a, goal)
             for arr_b, ready_b, point_b, path_b in second_options:
-                _, gamma = accuracy(point_a, point_b, goal)
+                gamma = _crossing_angle(_station_bearing(point_b, goal) - first_bearing)
                 if point_a == point_b or not 1e-6 < gamma < 180 - 1e-6:
                     continue
                 start = max(ready_a, ready_b)
                 end = start + OBSERVE
                 visits = tuple(
                     Visit(index, alert, point, path, states[index][1], arr, ready, start, end,
-                          end + slew_time(point, goal))
+                          end + _station_slew_time(point, goal))
                     for index, point, path, arr, ready in (
                         (a, point_a, path_a, arr_a, ready_a), (b, point_b, path_b, arr_b, ready_b)
                     )
@@ -278,11 +300,12 @@ def scenarios():
     yield "all_duration_sensitivity", alerts[1], 1, d + duration
 
 
-def solve_p4(plan):
+def solve_p4(plan, *, cases=None):
     d = number("p4", "disturbance", "occurrence_time")
     horizon = number("p4", "evaluation", "window_end")
+    cases = scenarios() if cases is None else cases
     outcomes, timelines = [], {}
-    for name, new_alert, failed, recovery in scenarios():
+    for name, new_alert, failed, recovery in cases:
         goals = dict(TARGETS)
         if new_alert is not None:
             goals["T4"] = new_alert
@@ -339,6 +362,7 @@ def write_csv(name, rows):
 
 
 def main():
+    RESULTS.mkdir(exist_ok=True)
     p1 = solve_p1()
     p2 = solve_p2_localization()
     nominal = min(

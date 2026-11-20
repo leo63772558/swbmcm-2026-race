@@ -1,0 +1,9 @@
+case,recovery_s,outage_duration_s,interpretation,locked,successes,completion_ratio,latest_start_s
+outage_upper_time,30.0,25.0,cached,T1|T2|T3,3,1.0,11.034061764620652
+outage_upper_time,30.0,25.0,ongoing_only,T1|T2,3,1.0,33.72718017815587
+failure_outage_V2,30.0,25.0,cached,T1|T2,3,1.0,33.72718017815587
+failure_outage_V2,30.0,25.0,ongoing_only,T1|T2,3,1.0,33.72718017815587
+all_V2,30.0,25.0,cached,T1|T2,4,1.0,34.82608023439357
+all_V2,30.0,25.0,ongoing_only,T1|T2,4,1.0,34.82608023439357
+all_duration_sensitivity,35.0,30.0,cached,T1|T2,4,1.0,39.82608023439357
+all_duration_sensitivity,35.0,30.0,ongoing_only,T1|T2,4,1.0,39.82608023439357

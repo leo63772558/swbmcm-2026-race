@@ -1,0 +1,70 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage[a4paper,left=26mm,right=26mm,top=28mm,bottom=26mm,headheight=16pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\ProblemLetter}{B}
+\newcommand{\TeamNumber}{SWBMCM2613050}
+\newcommand{\PaperTitle}{[FILL: Paper Title]}
+\newcommand{\TeamPageHeader}{%
+  \fancyhf{}%
+  \fancyhead[L]{Team\#\TeamNumber}%
+  \fancyhead[R]{Page \thepage\ of \pageref*{LastPage}}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+}
+\fancypagestyle{fancy}{\TeamPageHeader}
+\fancypagestyle{plain}{\TeamPageHeader}
+\renewcommand{\contentsname}{Content}
+\setcounter{tocdepth}{1}
+\graphicspath{{../figures/}}
+
+\begin{document}
+\pagestyle{fancy}
+\thispagestyle{empty}
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+  Problem Chosen & 2026 ShuWei Cup & Team Control Number \\
+  \ProblemLetter & Summary Sheet & \TeamNumber
+\end{tabular}
+
+\vspace{1em}
+{\Large\bfseries\PaperTitle}
+\end{center}
+\section*{Summary}
+[FILL: Summary]
+
+\noindent\textbf{Keywords:} [FILL: Keywords]
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\section{Problem Analysis}
+\section{Assumptions and Notation}
+\section{Single-Target Observation Region}
+\section{Two-Station Localization and Multi-Alert Scheduling}
+\section{Horizontal Pointing Uncertainty}
+\section{Rescheduling Under Disturbances}
+\section{Validation and Sensitivity Analysis}
+\section{Conclusions}
+
+% Add a bibliography in order of first citation once the team has selected
+% its references. Add the required AI Tool Usage Report after the main text
+% or after References, following the official regulations.
+\end{document}
+Name         Length
+----         ------
+times.ttf   1190952
+timesbd.ttf 1170312
+timesbi.ttf  904428
+timesi.ttf   963084
+

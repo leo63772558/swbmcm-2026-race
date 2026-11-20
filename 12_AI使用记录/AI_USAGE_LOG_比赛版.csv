@@ -8,3 +8,4 @@ ChatGPT（Codex）,GPT-6,OpenAI,2026-11-20,开赛准备度审查,读取 AGENTS.m
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","赛题参数录入及复核","继续把题面图表参数逐项录入结构化表","逐页核对 PDF 后录入题面输入和来源，保留 P4 双时间口径","待队员复核","待复核","10_比赛工作区/data/B题题面参数.csv","Codex（应队员请求）"
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","排版框架准备","按 B 题和既定 LaTeX 路线推进","创建空白 LaTeX 骨架并检查编译环境","待队员确认","待复核","10_比赛工作区/paper/main.tex","Codex（应队员请求）"
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","端到端原型与稿件","按题面执行 B 题四问并实现可复现结果、图表、英文稿","AI 生成建模与求解代码、数值、验证、图表和英文稿","本工作稿使用 AI 原型","未复核","src/problem_b_geometry.py、src/solve_problem_b.py、src/render_problem_b.py、paper/B_prototype.tex","Codex（应队员请求）"
+"ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","验证与交接归档","继续复核数值、图表和全部交付物直到能交接","扩大调度搜索、独立数值复核、制作论文工作稿和源码包","工作稿已采用","待队员复核","paper/B_prototype.tex、results/B_validation.csv、submission","Codex（应队员请求）"

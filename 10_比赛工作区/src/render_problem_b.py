@@ -12,7 +12,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from problem_b_geometry import BUILDINGS, ROOT, TARGETS, VEHICLES, visible
 
@@ -21,6 +21,31 @@ FIGURES, PAPER, RESULTS = (ROOT / name for name in ("figures", "paper", "results
 INK = colors.HexColor("#172D43")
 TEAL = colors.HexColor("#136C74")
 RED = colors.HexColor("#B24933")
+EQUATIONS = {
+    "Observation Region and Station Selection": (
+        "r ≥ (H − h) / tan βmax,     Q = 1/r",
+        r"r \ge (H-h)/\tan\beta_{\max},\qquad Q=1/r",
+    ),
+    "Dual-Station Localization for T2": (
+        "RMS ≈ σθ √(r₁² + r₂²) / |sin γ|",
+        r"\operatorname{RMS}\approx"
+        r"\frac{\sigma_\theta\sqrt{r_1^2+r_2^2}}{|\sin\gamma|}",
+    ),
+    "Multi-Alert Vehicle Scheduling": (
+        "tstart = max(tready,1, tready,2),     objective = min max tstart",
+        r"t_{\mathrm{start},j}=\max_{i\in A_j}t_{\mathrm{ready},i,j},\qquad"
+        r"\min\max_j t_{\mathrm{start},j}",
+    ),
+    "Horizontal Pointing Error": (
+        "Δψ = wrap(atan2(−Y, r − X) + ε₀ + εc)",
+        r"\Delta\psi=\operatorname{wrap}\left(\operatorname{atan2}(-Y,r-X)"
+        r"+\epsilon_0+\epsilon_c\right)",
+    ),
+    "Rescheduling After Disturbances": (
+        "η = k/N; maximize η, then minimize tlast",
+        r"\operatorname{lex\,max}\;(\eta,-t_{\rm last}),\qquad\eta=k/N",
+    ),
+}
 
 
 def read(name):
@@ -173,7 +198,7 @@ def draw_disturbances(rows):
     return names
 
 
-def sections(p1, p2, timings, p3, p4, cases):
+def sections(p1, p2, timings, p3, p4, cases, audit):
     latest = {
         policy: max(float(row["start"]) for row in timings if row["policy"] == policy)
         for policy in ("beam", "nearest")
@@ -187,7 +212,17 @@ def sections(p1, p2, timings, p3, p4, cases):
         "better" if v["reschedule"] > v["keep"] else "worse" if v["reschedule"] < v["keep"] else "tied"
         for v in outcomes.values()
     )
-    v5 = outcomes["failure_V5"]
+    mc_rms, mc_threshold, mc_check = audit[:3]
+    adverse = next(((name, pair) for name, pair in outcomes.items()
+                    if pair["reschedule"] < pair["keep"]), None)
+    adverse_text = (
+        f"In {adverse[0]}, the fixed plan gives a completion ratio of "
+        f"{fmt(adverse[1]['keep'][0])} and a latest start of {fmt(-adverse[1]['keep'][1])} s. "
+        f"Replanning gives {fmt(adverse[1]['reschedule'][0])} and "
+        f"{fmt(-adverse[1]['reschedule'][1])} s. Canceling a viable assignment can waste prior positioning."
+        if adverse else
+        "A replan can still worsen performance outside the selected test cases if it cancels viable assignments."
+    )
     summary = (
         f"An observation and dispatch prototype was evaluated on the Problem B field. The shortest "
         f"feasible horizontal observation range for T1 is {fmt(p1['range_m'], 3)} m. For T2, the "
@@ -241,6 +276,7 @@ def sections(p1, p2, timings, p3, p4, cases):
             "in that order. The two gimbal axes can move together. Availability for the next drive is the "
             "end of the current task's reset.",
             "The search enumerates alert orders and retains a bounded beam of partial schedules per order. "
+            "The best feasible schedule across two search budgets is carried forward to the disturbance study. "
             "The baseline visits alerts in input order and selects the pair minimizing the later driving "
             "arrival, using the same route, visibility, geometry and synchronization tests.",
             f"The last start is {fmt(latest['beam'])} s for beam search and {fmt(latest['nearest'])} s "
@@ -250,7 +286,8 @@ def sections(p1, p2, timings, p3, p4, cases):
         ("Horizontal Pointing Error", [
             "By rotational symmetry, put the target on the positive horizontal axis. The position error "
             "changes the bearing through atan2 of the lateral displacement and the perturbed longitudinal "
-            "range. The two independent gimbal errors add as a normal variable. Their convolution with the "
+            "range. Here X and Y are the position-estimate errors along and across the nominal bearing. "
+            "The two independent gimbal errors add as a normal variable. Their convolution with the "
             "position-induced angle is integrated over wrapped intervals about zero.",
             "Composite Simpson integration is applied to the standardized position variables. A "
             "normal CDF integrates the gimbal component conditional on those variables. A bisection search "
@@ -281,17 +318,24 @@ def sections(p1, p2, timings, p3, p4, cases):
             "New-alert locations are representative discrete cases, and the resulting counts are not "
             "population probabilities.",
             f"Replanning improves {counts['better']} cases, ties {counts['tied']}, and worsens "
-            f"{counts['worse']}. When V5 fails by itself, completion stays at "
-            f"{fmt(v5['keep'][0]*100,0)}%, while the latest start moves from "
-            f"{fmt(-v5['keep'][1])} s to {fmt(-v5['reschedule'][1])} s: the replan can waste work "
-            "by cancelling a viable pre-positioning action. An operational fallback could retain any "
-            "surviving original plan when it scores better.",
+            f"{counts['worse']}. " + adverse_text,
         ], "b_disturbances", "Completion ratios across selected cases, in order: " + ", ".join(cases) + "."),
+        ("Paired Scenario Results", [
+            "For each row, the completion fraction counts alert starts within the evaluation window. "
+            "The last-start column follows the specified horizon convention when an alert is unfinished.",
+        ], None, None),
         ("Validation, Limitations, and References", [
             "The implementation checks station visibility, collision-free route segments, joint observation "
             "start, task duration, and nonoverlapping vehicle timelines. Replans are checked against the "
             "recovery time and failed vehicle identity. The search is deterministic. Auditable numerical "
-            "outputs and the full scenario timelines are stored separately.",
+            "outputs and the full scenario timelines are stored separately. A separate seeded Monte Carlo "
+            "check evaluates exact bearing intersections and the wrapped pointing error. A wider beam can "
+            "perform worse under partial-plan pruning, so the best previously found feasible schedule is retained.",
+            f"Across {int(mc_rms['samples']):,} draws, the exact-intersection RMS was "
+            f"{fmt(mc_rms['estimate'],4)} m. Pointing coverage was {fmt(mc_threshold['estimate'],5)} at "
+            f"the threshold (Wilson interval {fmt(mc_threshold['lower'],5)} to "
+            f"{fmt(mc_threshold['upper'],5)}) and {fmt(mc_check['estimate'],5)} at the specified "
+            f"{fmt(p3['parameter_check_distance_m'],0)} m check distance.",
             "The model treats targets as stationary, ignores interactions between moving vehicles as in the "
             "nominal timing assumptions, and uses finite station candidates. The scenario study is conditional "
             "on the stated continuation and cancellation rules. Further sensitivity checks should examine "
@@ -319,14 +363,20 @@ def sections(p1, p2, timings, p3, p4, cases):
             "verification, edits, or replacement analyses should be recorded in the AI-use log.",
         ], None, None),
     ]
-    return summary, body
+    scenario_rows = [("Scenario", "Keep ratio", "Keep time", "Replan ratio", "Replan time")]
+    scenario_rows.extend(
+        (name.replace("_", " "), fmt(scores["keep"][0]), fmt(-scores["keep"][1]),
+         fmt(scores["reschedule"][0]), fmt(-scores["reschedule"][1]))
+        for name, scores in outcomes.items()
+    )
+    return summary, body, scenario_rows
 
 
 def tex_escape(value):
     return "".join({"&": r"\&", "%": r"\%", "_": r"\_", "#": r"\#"}.get(c, c) for c in value)
 
 
-def write_tex(summary, body):
+def write_tex(summary, body, scenario_rows):
     src = (PAPER / "main.tex").read_text(encoding="utf-8")
     boundary = src.index(r"\section{Problem Analysis}")
     clean = src[:boundary].replace("[FILL: Paper Title]", "Rapid UAV Localization via Coordinated Mobile Vehicles")
@@ -335,6 +385,17 @@ def write_tex(summary, body):
     output = [clean.rstrip()]
     for title, paragraphs, figure, caption in body:
         output.extend([r"\section{" + title + "}", *(tex_escape(p) for p in paragraphs)])
+        if title in EQUATIONS:
+            output.append(r"\[" + EQUATIONS[title][1] + r"\]")
+        if title == "Paired Scenario Results":
+            output.extend([
+                r"\begin{table}[htbp]", r"\centering",
+                r"\caption{Completion ratios and latest-start times in seconds}",
+                r"\begin{tabular}{@{}lrrrr@{}}", r"\toprule",
+                " & ".join(scenario_rows[0]) + r" \\", r"\midrule",
+                *(" & ".join(tex_escape(value) for value in row) + r" \\" for row in scenario_rows[1:]),
+                r"\bottomrule", r"\end{tabular}", r"\end{table}",
+            ])
         if figure:
             output.extend([r"\begin{figure}[htbp]", r"\centering",
                            r"\includegraphics[width=0.8\linewidth]{" + figure + "}",
@@ -353,13 +414,13 @@ def vector_pdf_to_drawing(path, max_width):
     width, height = float(page.mediabox.width), float(page.mediabox.height)
     with TemporaryDirectory() as temporary:
         prefix = str(Path(temporary) / "figure")
-        subprocess.run(["pdftoppm", "-f", "1", "-singlefile", "-r", "190",
+        subprocess.run(["pdftoppm", "-f", "1", "-singlefile", "-r", "220",
                         "-png", str(path), prefix], check=True, capture_output=True)
         pixels = BytesIO(Path(prefix + ".png").read_bytes())
     return Image(pixels, width=min(width, max_width), height=height * min(width, max_width) / width)
 
 
-def write_preview(summary, body):
+def write_preview(summary, body, scenario_rows):
     font_dir = Path("C:/Windows/Fonts")
     pdfmetrics.registerFont(TTFont("BodyTimes", str(font_dir / "times.ttf")))
     pdfmetrics.registerFont(TTFont("TitleTimes", str(font_dir / "timesbd.ttf")))
@@ -367,6 +428,8 @@ def write_preview(summary, body):
     heading = ParagraphStyle("heading", parent=normal, fontName="TitleTimes",
                              fontSize=16, leading=20, spaceAfter=14, textColor=INK)
     center = ParagraphStyle("center", parent=heading, alignment=TA_CENTER)
+    displayed_math = ParagraphStyle("equation", parent=normal, alignment=TA_CENTER,
+                                    textColor=TEAL, spaceAfter=12)
     document = SimpleDocTemplate(str(PAPER / "B_prototype_preview.pdf"), pagesize=A4,
                                  rightMargin=73, leftMargin=73, topMargin=78, bottomMargin=66,
                                  title="Rapid UAV Localization via Coordinated Mobile Vehicles",
@@ -379,15 +442,33 @@ def write_preview(summary, body):
              Paragraph("Content", heading)]
     for number, (title, *_) in enumerate(body, 1):
         story.append(Paragraph(f"{number}. {title} &nbsp; {number + 2}", normal))
+    figure_number = 0
     for number, (title, paragraphs, figure, caption) in enumerate(body, 1):
         story.extend([PageBreak(), Paragraph(f"{number}. {title}", heading)])
         story.extend(Paragraph(escape(p), normal) for p in paragraphs)
+        if title in EQUATIONS:
+            story.append(Paragraph(escape(EQUATIONS[title][0]), displayed_math))
+        if title == "Paired Scenario Results":
+            table = Table(scenario_rows, colWidths=[158, 69, 69, 73, 73], rowHeights=17)
+            table.setStyle(TableStyle([
+                ("FONTNAME", (0, 0), (-1, -1), "BodyTimes"),
+                ("FONTNAME", (0, 0), (-1, 0), "TitleTimes"),
+                ("FONTSIZE", (0, 0), (-1, -1), 12),
+                ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("LINEABOVE", (0, 0), (-1, 0), .6, INK),
+                ("LINEBELOW", (0, 0), (-1, 0), .5, INK),
+                ("LINEBELOW", (0, -1), (-1, -1), .6, INK),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F4F8FA")]),
+            ]))
+            story.extend([Paragraph("Table 1. Completion ratios and latest-start times in seconds.", normal), table])
         if figure:
+            figure_number += 1
             drawing = vector_pdf_to_drawing(FIGURES / (figure + ".pdf"), 405)
-            if drawing.drawHeight > 203:
-                drawing.drawWidth *= 203 / drawing.drawHeight
-                drawing.drawHeight = 203
-            story.extend([drawing, Paragraph(escape(caption), normal)])
+            if drawing.drawHeight > 245:
+                drawing.drawWidth *= 245 / drawing.drawHeight
+                drawing.drawHeight = 245
+            story.extend([drawing, Paragraph(f"Figure {figure_number}. {escape(caption)}", normal)])
 
     def page_header(pdf, doc):
         if doc.page == 1:
@@ -416,9 +497,9 @@ def main():
     draw_timeline(timings)
     draw_coverage(coverage)
     cases = draw_disturbances(p4)
-    summary, body = sections(p1, p2, timings, p3, p4, cases)
-    write_tex(summary, body)
-    write_preview(summary, body)
+    summary, body, scenario_rows = sections(p1, p2, timings, p3, p4, cases, read("B_validation.csv"))
+    write_tex(summary, body, scenario_rows)
+    write_preview(summary, body, scenario_rows)
 
 
 if __name__ == "__main__":

@@ -341,7 +341,11 @@ def write_csv(name, rows):
 def main():
     p1 = solve_p1()
     p2 = solve_p2_localization()
-    nominal = solve_schedule(INITIAL, TARGETS)
+    nominal = min(
+        (solve_schedule(INITIAL, TARGETS, beam_width=width, stations=stations)
+         for width, stations in ((5, 3), (20, 8))),
+        key=lambda plan: (-len(plan), max((visit.start for visit in plan), default=float("inf"))),
+    )
     baseline = solve_schedule(INITIAL, TARGETS, nearest=True, beam_width=1)
     for schedule in (nominal, baseline):
         assert len(schedule) == 2 * len(TARGETS)

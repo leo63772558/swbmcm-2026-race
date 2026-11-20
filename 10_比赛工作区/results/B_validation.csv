@@ -1,0 +1,8 @@
+test,setting,estimate,comparison,lower,upper,samples
+P2 RMS exact intersection,selected pair,0.14393544799654245,0.1436233579232133,,,100000
+P3 wrapped Monte Carlo,threshold,0.95016,0.95,0.9487938605226576,0.9514915553838217,100000
+P3 wrapped Monte Carlo,parameter check,0.91688,0.95,0.9151529163020837,0.9185750563811692,100000
+P2 schedule budget,"beam=5, stations=3",11.496124879328136,,,,
+P2 schedule budget,"beam=12, stations=6",11.496124879328136,,,,
+P2 schedule budget,"beam=20, stations=8",11.034061764620652,,,,
+P2 schedule budget,"beam=40, stations=12",12.915072998039859,,,,

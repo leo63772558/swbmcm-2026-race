@@ -4,16 +4,27 @@
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \usepackage[a4paper,left=24mm,right=24mm,top=25mm,bottom=23mm,headheight=16pt]{geometry}
-\usepackage{amsmath,graphicx,booktabs,xcolor,fancyhdr,lastpage,caption}
+\usepackage{amsmath,graphicx,booktabs,xcolor,fancyhdr,lastpage,caption,float,longtable}
 \usepackage[hidelinks]{hyperref}
 \definecolor{paperink}{HTML}{182C40}
 \definecolor{quiet}{HTML}{455D71}
 \renewcommand{\contentsname}{Content}
 \setcounter{tocdepth}{1}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{7pt}
+\setlength{\parskip}{6pt}
 \setlength{\intextsep}{9pt}
-\setlength{\textfloatsep}{10pt}
+\setlength{\textfloatsep}{11pt}
+\setlength{\floatsep}{11pt}
+\renewcommand{\topfraction}{.88}
+\renewcommand{\bottomfraction}{.78}
+\renewcommand{\textfraction}{.11}
+\renewcommand{\floatpagefraction}{.68}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{\z@}
+  {-3ex plus -.6ex minus -.2ex}{1ex plus .2ex}{\normalfont\normalsize\bfseries}}
+\renewcommand{\subsection}{\@startsection{subsection}{2}{\z@}
+  {-2ex plus -.5ex minus -.2ex}{.7ex plus .2ex}{\normalfont\normalsize\bfseries}}
+\makeatother
 \captionsetup{font=normalsize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false}
 \captionsetup[table]{position=top}
 \captionsetup[figure]{position=bottom}
@@ -29,11 +40,15 @@
 \fancypagestyle{plain}{\ReviewHead}
 \newcommand{\TeamText}[2]{%
   \IfFileExists{team/#1.tex}{\input{team/#1.tex}}{%
-    \par{\color{quiet}\itshape Team text pending (#1). #2}\par}}
-\newcommand{\ReviewFigure}[3]{%
-  \begin{figure}[!ht]\centering
+    \par\noindent{\color{quiet}\itshape Author input pending. #2}\par}}
+\newcommand{\ReviewFigure}[4]{%
+  \begin{figure}[H]\centering
   \includegraphics[width=\linewidth,height=#2,keepaspectratio]{#1}
-  \caption{#3}\end{figure}}
+  \caption{#3}\label{#4}\end{figure}}
+\newcommand{\EvidenceSection}[1]{%
+  \par\penalty-200\vskip 4\baselineskip
+  \penalty10000\vskip -4\baselineskip
+  \subsection*{#1}}
 \newcommand{\RecordedEquation}[1]{\begin{equation}\text{#1}\end{equation}}
 \input{B_review_metrics.tex}
 \raggedbottom
@@ -48,13 +63,13 @@
 \end{tabular*}
 \vspace{13mm}
 
-{\Large\bfseries\color{paperink}\PaperTitle\par}
+{\bfseries\color{paperink}\PaperTitle\par}
 \vspace{4mm}
 {\itshape Team review copy}
 \end{center}
 \section*{Summary}
 \TeamText{summary}{State the four questions, the team methods and the supported findings in the team's own words.}
-\begin{table}[!ht]
+\begin{table}[H]
 \centering
 \caption{Verified values for the summary review.}
 \begin{tabular}{@{}p{0.53\linewidth}r@{}}
@@ -65,7 +80,7 @@ T1 minimum horizontal range & \BMinRange{} m\\
 T1 pointing elevation and quality & \BMaxPitch{}° and \BQuality{} m\textsuperscript{−1}\\
 T2 local first-order horizontal RMS & \BFirstRMS{} m\\
 Nominal last start, shared shortlist & \BBeamEight{} / \BNearestEight{} s\\
-P3 reproduced travel threshold & \BTravelThreshold{} m\\
+P3 independently checked travel threshold & \BIntegratedCrossing{} m\\
 V5-only case, replanning delay & \BVFiveDelay{} s\\
 \bottomrule
 \end{tabular}
@@ -76,37 +91,57 @@ V5-only case, replanning delay & \BVFiveDelay{} s\\
 \tableofcontents
 \clearpage
 
-\section{Problem Scope and Data Flow}
+\section{Introduction and Problem Restatement}
 \noindent Technical evidence workbook for the team's independent derivations and interpretation.
 The official dimensions and vehicle phases come from Problem B \cite{problem}.
 This edition binds displayed results to the accompanying evidence tables.
 The archived prototype and this technical edition used AI assistance \cite{archivedai,currentai}.
 
-\TeamText{scope}{Explain the four questions and identify the team's exact assumptions and solution methods.}
+\TeamText{scope}{Explain the setting and restate the deliverable for each of the four problems in your own words.}
 
-\ReviewFigure{framework.pdf}{105mm}
-{Main data flow. The nominal dispatch plan is frozen before any disturbance is applied.}
+\section{Assumptions and Notation}
+\TeamText{assumptions}{State and justify each modeling assumption. Separate provisions of the problem from team choices. Confirm the evidence-only symbols and the dispatch and recourse variables in the project notation register.}
 
-\subsection*{Notation}
-\begin{tabular}{@{}lp{0.7\linewidth}@{}}
+\begin{table}[H]
+\centering
+\caption{Notation approved in the project register.}
+\label{tab:notation}
+\begin{tabular}{@{}p{.24\linewidth}p{.52\linewidth}p{.17\linewidth}@{}}
 \toprule
-Symbol & Definition\\
+Symbol & Meaning & Unit\\
 \midrule
-\textit{p}, \textit{T} & Ground station and target coordinates\\
-\textit{r}, \textit{H}, \textit{h} & Horizontal range, target height and camera height (m)\\
-\textit{Q}, \textit{β} & Inverse-range quality (m\textsuperscript{−1}) and elevation (°)\\
-\textit{γ}, \textit{σ}\textsubscript{θ} & Bearing crossing angle and bearing-error standard deviation\\
-\textit{t}\textsubscript{ready}, \textit{t}\textsubscript{start} & End of pointing and start of joint observation (s)\\
-\textit{s}, \textit{η} & Vehicle travel distance (m) and fraction of alerts started\\
+\textit{O}, \textit{B}\textsubscript{\textit{k}} & Dispatch center and building \textit{k} & --\\
+\textit{H}\textsubscript{\textit{k}}, \textit{h}\textsubscript{\textit{c}}, \textit{r}\textsubscript{\textit{v}} & Building height, camera height and vehicle radius & m\\
+\textit{V}\textsubscript{\textit{i}}, (\textit{x}\textsubscript{\textit{i}}, \textit{y}\textsubscript{\textit{i}}) & Vehicle \textit{i} and its ground position & --, m\\
+\textit{T}, \textit{T}' & Target position and horizontal projection & m\\
+\textit{R}, \textit{H} & Target range from the center and target height & m\\
+\textit{θ}, \textit{α}\textsubscript{\textit{i}} & Alert bearing and vehicle-to-target bearing & °\\
+\textit{r}\textsubscript{\textit{i}}, \textit{β}\textsubscript{\textit{i}} & Horizontal station-to-target range and elevation & m, \mbox{°}\\
+\textit{Q}, \textit{B}, \textit{γ} & Inverse-range quality, baseline and crossing angle & m\textsuperscript{−1}, m, \mbox{°}\\
+\textit{t}\textsubscript{\textit{i}}\textsuperscript{dep}, \textit{t}\textsubscript{\textit{i}}\textsuperscript{arr}, \textit{t}\textsubscript{\textit{i}}\textsuperscript{slew} & Vehicle departure, arrival and completed pointing & s\\
+\textit{t}\textsubscript{\textit{i}}\textsuperscript{obs}, \textit{t}\textsubscript{\textit{a}}\textsuperscript{start} & Vehicle observation and joint start of alert \textit{a} & s\\
+\textit{τ}\textsubscript{obs}, \textit{τ}\textsubscript{slew}(Δ) & Joint observation duration and pointing duration & s\\
+\textit{σ}\textsubscript{loc}, \textit{σ}\textsubscript{ψ}, Δ\textit{ψ} & Position and bearing uncertainty and wrapped bearing error & m, \mbox{°}, \mbox{°}\\
+\textit{η}, \textit{t}\textsubscript{last}, \textit{N}, \textit{k} & Completion fraction, latest start, requested alerts and successfully started alerts & --, s, count, count\\
 \bottomrule
 \end{tabular}
-\clearpage
+\end{table}
+
+\section{Cross-Problem Framework}
+\TeamText{framework}{Explain the dependency from geometry to localization and dispatch, then from the nominal plan to disturbance replay. State which evidence is reused at each stage.}
+
+\ReviewFigure{fig01_framework.pdf}{112mm}
+{Main data flow. The nominal dispatch plan is frozen before any disturbance is applied.}
+{fig:framework}
 
 \section{T1 Observable Region}
 \TeamText{p1}{Derive the observation set, boundary rules, attainment and readiness criterion. Check the separate P1 errata before writing.}
 
-\RecordedEquation{Q = 1 / r,\quad r ≥ (H − h) / tan β\textsubscript{max}.}
+\RecordedEquation{Q = 1 / r,\quad r ≥ (H − h\textsubscript{c}) / tan β\textsubscript{max}.}
 
+\begin{table}[H]
+\centering
+\caption{Recorded T1 station and feasibility checks.}
 \begin{tabular}{@{}p{0.48\linewidth}l@{}}
 \toprule
 Verification item & Recorded value\\
@@ -120,16 +155,18 @@ Feasible arc length & \BArcLength{} m\\
 Area estimate, 0.1 m sample grid & \BGridArea{} m\textsuperscript{2}\\
 \bottomrule
 \end{tabular}
+\end{table}
 
-\ReviewFigure{p1_observability.pdf}{116mm}{Vehicle-center observation region and the T1 boundary witnesses.}
-\clearpage
+\ReviewFigure{fig02_p1_geometry.pdf}{156mm}
+{Vehicle-center observation region, boundary witnesses, route comparisons and elevation sensitivity.}
+{fig:p1}
 
 \section{T2 Local Bearing Intersection}
 \TeamText{p2-precision}{Derive the local covariance and the conditions for equality. Discuss angular degeneracy and deterministic station feasibility.}
 
 \RecordedEquation{RMS\textsubscript{local} = σ\textsubscript{θ}\,√(r\textsubscript{1}\textsuperscript{2} + r\textsubscript{2}\textsuperscript{2}) / |sin γ|.}
 
-\begin{table}[!ht]\centering
+\begin{table}[H]\centering
 \caption{Checks for the recorded T2 pair.}
 \begin{tabular}{@{}lr@{}}
 \toprule Crossing angle & \BCrossing{}°\\
@@ -138,15 +175,16 @@ V3 and V5 travel times & \BTravelFirst{} s and \BTravelSecond{} s\\
 Local first-order horizontal RMS & \BFirstRMS{} m\\
 \bottomrule\end{tabular}\end{table}
 
-\ReviewFigure{t2_geometry.pdf}{116mm}{Horizontal intersection and collision-checked approach routes.}
-\clearpage
+\ReviewFigure{fig03_p2_precision.pdf}{140mm}
+{Horizontal intersection and collision-checked approach routes. The spatial error diagnostic uses the recorded station pair.}
+{fig:p21}
 
 \section{Nominal Multi-Alert Dispatch}
-\TeamText{p2-dispatch}{Describe the independent solver, vehicle reuse, the nearest baseline and the shared station screen. Explain the two recorded critical chains and the scope of the comparison.}
+\TeamText{p2-dispatch}{Describe the independent solver, vehicle reuse, the nearest baseline and the shared station screen. Explain the two recorded critical chains and the scope of the comparison. Define the shortlist size as a local symbol distinct from the count of started alerts.}
 
-\RecordedEquation{t\textsubscript{start,j} = max(t\textsubscript{ready,1,j}, t\textsubscript{ready,2,j}).}
+\RecordedEquation{t\textsubscript{a}\textsuperscript{start} = max(t\textsubscript{i₁}\textsuperscript{slew}, t\textsubscript{i₂}\textsuperscript{slew}).}
 
-\begin{table}[!ht]\centering
+\begin{table}[H]\centering
 \caption{Last start in seconds under matched station screens.}
 \begin{tabular}{@{}crr@{}}
 \toprule Shortlist size & Beam incumbent & Nearest assignment\\
@@ -156,50 +194,68 @@ Local first-order horizontal RMS & \BFirstRMS{} m\\
 \bottomrule
 \end{tabular}\end{table}
 
-\ReviewFigure{p2_timeline.pdf}{115mm}{Both policies use the same station and path feasibility. Bars show executed vehicle phases.}
-\clearpage
+\ReviewFigure{fig04_p2_dispatch.pdf}{156mm}
+{Nominal approach paths, executed vehicle phases and critical-chain durations from the matched station screens.}
+{fig:p22}
 
 \section{Pointing Uncertainty}
 \TeamText{p3}{Derive the wrapped probability, the continuous maximality argument and the 80 m parameter region. Explain the three error sources and the interval experiment.}
 
 \RecordedEquation{P(|Δψ| ≤ 5°) ≥ 0.95,\quad σ(s) = a + bs.}
 
-\ReviewFigure{p3_threshold.pdf}{107mm}{Conditional numerical verification and Monte Carlo classifications on both sides of the crossing.}
-\begin{table}[!ht]\centering
+\ReviewFigure{fig05_p3_risk.pdf}{156mm}
+{Position-error diagnostic, coverage near the numerical crossing and the checked parameter boundary.}
+{fig:p3}
+\begin{table}[H]\centering
 \caption{Probability checks at the fixed target distance.}
 \begin{tabular}{@{}lr@{}}
 \toprule
+Archived crossing (rounded) & \BTravelThreshold{} m\\
 Independent crossing & \BIntegratedCrossing{} m\\
 Quadrature bracket & \BBracketLow{} to \BBracketHigh{} m\\
 Position error standard deviation at crossing & \BSigmaCrossing{} m\\
 Remote tail probability bound & \BFarBound\\
 \bottomrule
 \end{tabular}\end{table}
-\clearpage
+
+\begin{table}[H]\centering
+\caption{Recorded Monte Carlo probes and simultaneous confidence intervals.}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Travel (m) & Samples & Estimate & Simultaneous \BMCConfidence\% interval\\
+\midrule
+\BMCBeforeDistance & \BMCBeforeSamples & \BMCBeforeEstimate & [\BMCBeforeLow, \BMCBeforeHigh]\\
+\BMCAfterDistance & \BMCAfterSamples & \BMCAfterEstimate & [\BMCAfterLow, \BMCAfterHigh]\\
+\BMCLimitDistance & \BMCLimitSamples & \BMCLimitEstimate & [\BMCLimitLow, \BMCLimitHigh]\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Disturbance Replay}
 \TeamText{p4}{Derive the event and decision model and justify what cached instructions mean. Distinguish the absolute recovery time and outage duration in both interpretations.}
 
 \RecordedEquation{η = k / N,\quad score = (η, −t\textsubscript{last})\quad (lexicographic order).}
 
-\ReviewFigure{p4_scenario_matrix.pdf}{113mm}
-{Paired completion counts on the crossed recovery grid. The full catalogue has \BCaseCount{} case IDs.}
+\ReviewFigure{fig06_p4_resilience.pdf}{156mm}
+{Paired completion, time and score comparison for the \BCaseCount{} recorded cases, with the replay and dispatch sequence.}
+{fig:p4}
 
-\clearpage
 
 \section{V5 Failure Case}
 \TeamText{v5}{Explain the locked T1 start and the recorded cancellation resets. Use the per-vehicle records to explain the new bottleneck.}
 
-\ReviewFigure{p4_v5_timeline.pdf}{112mm}
-{Actual phases under both policies. Last starts are \BKeepLast{} s and \BReplanLast{} s.}
+\ReviewFigure{fig07_v5_timeline.pdf}{156mm}
+{Recorded phase intervals under both policies. Last starts are \BKeepLast{} s and \BReplanLast{} s.}
+{fig:v5}
 
-\ReviewFigure{keyframes/v5_between.pdf}{67mm}
-{A simulated snapshot between the two last-start times.}
-\clearpage
+\section{Replay Keyframes}
+\ReviewFigure{fig08_replay_frames.pdf}{130mm}
+{Replay states at nominal joint observation, at the vehicle failure and at the later last joint-observation start under the two policies.}
+{fig:frames}
 
-\section{Sensitivity Analysis}
+\section{Sensitivity and Robustness Analysis}
 \TeamText{sensitivity}{Explain the effect of changing pitch, the route clearance model, shortlist size and recovery assumptions.}
-\begin{table}[!ht]\centering
+\begin{table}[H]\centering
 \caption{Selected diagnostics for the sensitivity review.}
 \begin{tabular}{@{}p{0.68\linewidth}r@{}}
 \toprule
@@ -216,7 +272,6 @@ Maximum route shortening & \BSavingsMax{} m\\
 
 \section{Conclusion}
 \TeamText{conclusion}{Write a conclusion that addresses all four questions and supports each claim with the team's own results.}
-\clearpage
 
 \addcontentsline{toc}{section}{References}
 \begin{thebibliography}{9}
@@ -227,5 +282,11 @@ Maximum route shortening & \BSavingsMax{} m\\
 
 \section*{AI Usage Disclosure}
 \addcontentsline{toc}{section}{AI Usage Disclosure}
-The prior research prototype records AI assistance in model and solver design, numerical work, interpretation, figures and draft text. It is archived as review evidence. This edition used AI assistance in engineering implementation and validation, replay, visualisation, numeric data binding, typesetting and packaging checks. Team authorship, independent derivations and decisions about what to adopt are pending. The additional usage record is maintained with the handoff.
+The prior research prototype records AI assistance in model and solver design, numerical work, interpretation, figures and draft text. It is archived as review evidence. This edition used AI assistance in engineering implementation and validation, replay, visualisation, numeric data binding, typesetting, candidate source lookup and packaging checks. Team authorship, independent derivations and decisions about what to adopt are pending. The additional usage record is maintained with the handoff.
+
+\appendix
+\section*{Recorded Evidence Tables}
+\addcontentsline{toc}{section}{Recorded Evidence Tables}
+\noindent Values are displayed at the precision indicated. The supporting CSVs retain the source precision.
+{\setlength{\tabcolsep}{4pt}\input{B_review_tables.tex}}
 \end{document}

@@ -1,0 +1,103 @@
+{
+  "browser": "Headless Chromium 157.0.8103.79",
+  "standalone_file_only": true,
+  "browser_context_offline": true,
+  "html_bytes": 3037401,
+  "html_sha256": "f7c698f56050d32246900041e29308ab75d51863dfe2623c16dfa9280c1db08a",
+  "runs": [
+    {
+      "renderer": "webgl",
+      "screenshots": [
+        {
+          "label": "Nominal observation",
+          "case": "nominal",
+          "policy": "beam",
+          "time_s": 3.0926272996101405,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.0509
+        },
+        {
+          "label": "V5 fault",
+          "case": "failure_V5",
+          "policy": "keep",
+          "time_s": 5,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.0509
+        },
+        {
+          "label": "V5 recovery",
+          "case": "failure_V5",
+          "policy": "reschedule",
+          "time_s": 12.927041371995326,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.0504
+        }
+      ],
+      "camera_controls": [
+        "top",
+        "follow",
+        "iso"
+      ],
+      "event_marker_count": 10,
+      "remote_requests": 0,
+      "page_errors": 0,
+      "forced_context_loss_fallback": true,
+      "route_footprint_check": {
+        "segments": 892,
+        "buildingHits": 0,
+        "vehiclePoints": 4503,
+        "pointHits": 0
+      }
+    },
+    {
+      "renderer": "canvas",
+      "screenshots": [
+        {
+          "label": "Nominal observation",
+          "case": "nominal",
+          "policy": "beam",
+          "time_s": 3.0926272996101405,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.0651
+        },
+        {
+          "label": "V5 fault",
+          "case": "failure_V5",
+          "policy": "keep",
+          "time_s": 5,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.0649
+        },
+        {
+          "label": "V5 recovery",
+          "case": "failure_V5",
+          "policy": "reschedule",
+          "time_s": 12.927041371995326,
+          "width_px": 1800,
+          "height_px": 1250,
+          "colored_pixel_fraction": 0.064
+        }
+      ],
+      "camera_controls": [
+        "top",
+        "follow",
+        "iso"
+      ],
+      "event_marker_count": 10,
+      "remote_requests": 0,
+      "page_errors": 0,
+      "forced_context_loss_fallback": false,
+      "route_footprint_check": {
+        "segments": 892,
+        "buildingHits": 0,
+        "vehiclePoints": 4503,
+        "pointHits": 0
+      }
+    }
+  ]
+}

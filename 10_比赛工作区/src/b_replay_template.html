@@ -30,23 +30,34 @@ outline:3px solid #e69f00;outline-offset:2px}
 .card{background:#fff;min-width:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .cardhead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 h2{margin:0;font-size:16px;letter-spacing:-.01em}.hint{font-size:12px;color:var(--muted)}
-#scene{width:100%;height:clamp(350px,56vh,620px);background:#fff}
+#field{position:relative;width:100%;height:clamp(460px,65vh,720px);background:#fff}
+#plot3d,#canvasScene{position:absolute;inset:0;width:100%;height:100%}
+.views,.bookmarks{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.views button,.bookmarks button{font-size:12px;padding:.36rem .58rem;min-height:31px}
+.views button[aria-pressed="true"]{background:#e0f1ef;color:#075c55;border-color:#086f66}
+.views select{font-size:12px;padding:.32rem .45rem;min-height:31px}
+.bookmarks{padding:8px 13px;border-bottom:1px solid var(--line)}
+.field-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;padding:8px 13px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.event-status[data-active="true"]{color:#962425;font-weight:650}
 .legend{display:flex;gap:13px;flex-wrap:wrap;font-size:12px;padding:9px 13px;line-height:1.3;color:var(--muted)}
 .legend span i{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:2px}
+.legend .line{width:19px;height:0;border-radius:0;border-top:2px solid;vertical-align:middle}
+.legend .dash{border-top-style:dashed}.legend .dot{border-top-style:dotted}
 .timelines{padding:10px 14px 12px}.policy{margin:5px 0 15px}.policy h3{margin:6px 0 5px;font-size:13px;display:flex;justify-content:space-between;gap:6px}
 .lanes{display:grid;grid-template-columns:23px 1fr;row-gap:5px;column-gap:5px;font-size:11px}
 .track{position:relative;height:16px;background:#f1f5f8}
 .track .bar{position:absolute;top:0;bottom:0;border-right:1px solid #ffffffad;overflow:hidden;white-space:nowrap}
 .track .pin{position:absolute;top:-1px;bottom:-1px;width:1px;background:#0b2437;z-index:3}
+.track .event-pin{position:absolute;top:-2px;bottom:-2px;border-left:2px dashed #a42c34;z-index:2}
 .ticks{grid-column:2;display:flex;justify-content:space-between;color:var(--muted);font-variant-numeric:tabular-nums}
 .phase-list{margin:0;padding:0 13px 12px;list-style:none}
 .phase-list li{border-top:1px solid var(--line);padding:7px 0;display:flex;justify-content:space-between;gap:8px;font-size:12px}
 .phase-list strong{font-size:13px}.phase-list small{font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
-footer{padding:14px 0 0}.error{color:#a0322a;padding:10px 14px}
-@media(max-width:900px){.board{grid-template-columns:1fr}.cardhead{padding:10px 13px}#scene{height:390px}}
+footer{padding:14px 0 0}
+@media(max-width:900px){.board{grid-template-columns:1fr}.cardhead{padding:10px 13px}#field{height:clamp(320px,62vh,560px)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
-<script src="assets/plotly-gl3d.min.js"></script>
+<script id="plotly-runtime">__PLOTLY__</script>
 </head>
 <body>
 <header>
@@ -68,12 +79,25 @@ footer{padding:14px 0 0}.error{color:#a0322a;padding:10px 14px}
   <article class="card">
     <div class="cardhead">
       <h2>Field and sight lines</h2>
-      <label><input id="los" type="checkbox" checked> Show LOS probes</label>
+      <label><input id="los" type="checkbox" checked> Show sight lines</label>
+      <div class="views" role="group" aria-label="Camera view">
+        <button type="button" id="iso" aria-pressed="true">45° view</button>
+        <button type="button" id="top" aria-pressed="false">Top view</button>
+        <button type="button" id="follow" aria-pressed="false">Follow vehicle</button>
+        <label class="hint">Vehicle <select id="tracked" aria-label="Vehicle to follow"></select></label>
+      </div>
     </div>
-    <div id="scene" aria-label="3D reconstruction of buildings, vehicles and stationary targets"></div>
-    <div class="legend"><span><i style="background:#086f66"></i>Clear segment</span>
-      <span><i style="background:#a52c40"></i>Building contact</span>
-      <span><i style="background:#243c54"></i>Gimbal direction</span>
+    <div id="bookmarks" class="bookmarks" role="group" aria-label="Replay bookmarks"></div>
+    <div id="field" aria-label="Reconstruction of buildings, vehicles and stationary targets">
+      <div id="plot3d" aria-label="WebGL 3D view" hidden></div>
+      <canvas id="canvasScene" role="img" aria-label="Isometric field view"></canvas>
+    </div>
+    <div class="field-status"><span id="renderer" class="hint"></span><span id="branch" class="event-status"></span></div>
+    <div class="legend" id="routes"></div>
+    <div class="legend"><span><i class="line" style="color:#086f66"></i>Clear sight line</span>
+      <span><i class="line dash" style="color:#a52c40"></i>Occluded sight line</span>
+      <span><i class="line dot" style="color:#57647b"></i>Other policy route</span>
+      <span><i class="line" style="color:#243c54"></i>Gimbal direction</span>
       <span><i style="background:#7d6588"></i>Alert target</span></div>
   </article>
   <article class="card">

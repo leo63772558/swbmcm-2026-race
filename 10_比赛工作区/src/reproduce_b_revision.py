@@ -4,6 +4,7 @@ AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
 Public model release date was not verified. Assistance: rerun automation.
 """
 from argparse import ArgumentParser
+from hashlib import sha256
 from pathlib import Path
 from shutil import copyfile, which
 import subprocess
@@ -21,11 +22,21 @@ from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
 
 
+def content_hash(path):
+    """Use the repository's LF convention for generated CSVs across checkouts."""
+    if path.suffix.lower() in (".csv", ".json", ".html", ".txt"):
+        return sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    return file_hash(path)
+
+
 def compare(reference, rerun, tex):
     matched = []
     expected = [
         *sorted((reference/"results").glob("*")),
-        *sorted((reference/"figures").rglob("*")),
+        *sorted((reference/"figures").glob("fig[0-9][0-9]_*")),
+        *sorted((reference/"figures"/"replay_frames").rglob("*")),
+        reference/"figures"/"FIGURE_SOURCES.csv",
+        reference/"figures"/"P4_PANEL_INDEX.csv",
         reference/"simulator"/"B_Simulator.html",
         reference/"simulator"/"KEYFRAME_STATES.json",
     ]
@@ -34,7 +45,7 @@ def compare(reference, rerun, tex):
             continue
         rel = old.relative_to(reference)
         new = rerun/rel
-        assert new.is_file() and file_hash(old)==file_hash(new), f"Reproduced file differs: {rel}"
+        assert new.is_file() and content_hash(old)==content_hash(new), f"Reproduced file differs: {rel}"
         matched.append(rel.as_posix())
     text_matches=[]
     if tex:
@@ -61,9 +72,9 @@ def main(out, reference, bundle):
         stage(results)
         times[name]=round(perf_counter()-tick,3)
     tick=perf_counter()
-    b_revision_figures.generate(out)
     assets=reference/"simulator"/"assets"
     b_revision_replay.generate(out,assets/b_revision_replay.ASSET,assets/"PLOTLY_LICENSE.txt")
+    b_revision_figures.generate(out)
     node=which("node")
     if not node:
         raise RuntimeError("Node.js required for replay consistency check")

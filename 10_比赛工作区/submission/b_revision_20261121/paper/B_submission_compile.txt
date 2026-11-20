@@ -2,39 +2,20 @@ note: using only cached resource files
 note: Running TeX ...
 note: Rerunning TeX because "B_submission.aux" changed ...
 note: Running xdvipdfmx ...
-note: Writing `B_submission.aux` (4.0322265625 KiB)
-note: Writing `B_submission.out` (1.7412109375 KiB)
-note: Writing `B_submission.pdf` (817.0673828125 KiB)
-note: Writing `B_submission.toc` (892 B)
-note: Writing `B_submission.log` (20.3037109375 KiB)
+note: Writing `B_submission.log` (21.3603515625 KiB)
+note: Writing `B_submission.toc` (1.193359375 KiB)
+note: Writing `B_submission.out` (2.48046875 KiB)
+note: Writing `B_submission.pdf` (789.892578125 KiB)
+note: Writing `B_submission.aux` (9.396484375 KiB)
 Fontconfig error: Cannot load default config file: No such file: (null)
 warning: accessing absolute path `C:/WINDOWS/fonts\timesi.ttf`; build may not be reproducible in other environments
 warning: accessing absolute path `C:/WINDOWS/fonts\timesbd.ttf`; build may not be reproducible in other environments
 warning: accessing absolute path `C:/WINDOWS/fonts\times.ttf`; build may not be reproducible in other environments
 warning: accessing absolute path `C:/WINDOWS/fonts\timesbi.ttf`; build may not be reproducible in other environments
+warning: B_submission.tex:124: Underfull \hbox (badness 1728) in paragraph at lines 124--124
+warning: B_submission.tex:126: Underfull \hbox (badness 10000) in paragraph at lines 125--126
+warning: B_submission.tex:124: Underfull \hbox (badness 1728) in paragraph at lines 124--124
+warning: B_submission.tex:126: Underfull \hbox (badness 10000) in paragraph at lines 125--126
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
 warning: Couldn't open font map file "pdftex.map".
 warning: Couldn't open font map file "kanjix.map".
-warning: open of input C:/WINDOWS/fonts\times.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\times.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\times.ttf:0-0-GID failed
-caused by: access to the path `C:/WINDOWS/fonts\times.ttf:0-0-GID` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesbd.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesbd.ttf:0-0-GID failed
-caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf:0-0-GID` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesbd.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesi.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesi.ttf:0-0-GID failed
-caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf:0-0-GID` is forbidden
-warning: open of input C:/WINDOWS/fonts\times.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\times.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesbd.ttf/rsrc failed
-caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf/rsrc` is forbidden
-warning: open of input C:/WINDOWS/fonts\times.ttf:0-UCS32-Add failed
-caused by: access to the path `C:/WINDOWS/fonts\times.ttf:0-UCS32-Add` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesbd.ttf:0-UCS32-Add failed
-caused by: access to the path `C:/WINDOWS/fonts\timesbd.ttf:0-UCS32-Add` is forbidden
-warning: open of input C:/WINDOWS/fonts\timesi.ttf:0-UCS32-Add failed
-caused by: access to the path `C:/WINDOWS/fonts\timesi.ttf:0-UCS32-Add` is forbidden

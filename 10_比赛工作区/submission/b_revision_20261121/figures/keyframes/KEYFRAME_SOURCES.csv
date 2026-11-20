@@ -1,4 +1,0 @@
-file,case,simulation_time_s,data,render
-v5_fault,failure_V5,5.0,Executed_timeline.json,"Python 3D projection, PDF and PNG at 300 dpi"
-v5_between,failure_V5,11.98055156830799,Executed_timeline.json,"Python 3D projection, PDF and PNG at 300 dpi"
-combined_recovery,all_V2,30.0,Executed_timeline.json,"Python 3D projection, PDF and PNG at 300 dpi"

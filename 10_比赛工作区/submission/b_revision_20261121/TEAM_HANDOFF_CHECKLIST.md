@@ -4,17 +4,17 @@
 
 | 签收项 | 交接稿位置 | 具体待完成证据 | 可对照的文件 | 签收 |
 |---|---|---|---|---|
-| 总体建模 | p.1 Summary、p.3 Scope and Data Flow | 独立列出题设、队员建模过程和模型选择依据。队员用自己的文字写摘要、关键词和正文 | `paper/B_submission.tex` 的 `summary` 与 `scope` 插口；框架图 | [ ] |
-| P1 观测域 | p.4，公式 (1) | 独立定义车盘、闭棱柱视线与俯仰约束。分别证明等号归属、可行见证、最优半径与弧端可纳入。若主张唯一最快，应补比数值界更强的连续证明 | `paper/P1_ERRATA.pdf`；`P1_arc.csv`、`P1_ready_branches.csv`、`P1_station.csv` | [ ] |
-| P1 路由与敏感性 | p.4、p.10 | 说明欧氏净距与保守矩形的区别，逐段检查车体。明确一般图绕路是可行上界，栅格面积与连通分量属于数值估计。核对 80°→79° 下降的分母 | `Route_clearance_comparison.csv`、`P1_pitch_checks.csv`、`P1_area.csv`、`P1_sensitivity.csv` | [ ] |
-| P2(1) 站对 | p.5，公式 (2) | 独立推导角度雅可比、坐标协方差和下界取等。校对两车 ≤30 s、两条有限 LOS、直角、二维 RMS 单位和接近 0°/180° 的退化 | `P2_precision.csv`、`P2_precision_routes.json` | [ ] |
-| P2(2) 指派 | p.6，公式 (3) | 独立完成算法设计与求解，写出两策略同一到达筛选与复用时序。核对 k=3 和 k=8 改变站位可用性与关键链的证据，声明有限候选和束宽下的可行解范围 | `P2_trials.csv`、`P2_station_ranks.csv`、`P2_visit_phases.csv`、`P2_critical_chains.csv` | [ ] |
-| P3 阈值 | p.7，公式 (4) | 独立推导包角误差和全域连续最大性，论证为什么高里程无二次可行段。独立完成 80 m 的非负参数范围与误差源解释。界点与两侧抽样结果分别报告 | `P3_bracket.csv`、`P3_MC.csv`、`P3_ablation.csv`、`P3_parameters.csv` | [ ] |
-| P4 信息与时钟 | p.8，公式 (5) | 独立说明 t=5 扰动、绝对恢复、历时与 60 s 末端。核对完好车辆缓存全计划以及仅继续当前任务两支，明确搭档失效、动作取消和已开测锁定 | `P4_clock_checks.json`、`P4_cases.csv`、`P4_instruction_sensitivity.csv` | [ ] |
-| P4 V5 机理 | p.9 V5 Failure Case | 独立解释 T1 锁定、V1/V2/V4 回正和重新指派、T2 变为最后开测的链，复算 3/3 与 1.893 s | `P4_V5_event_comparison.csv`、`Executed_timeline.json`、对应甘特图与关键帧 | [ ] |
-| 实验与结论 | p.10 Sensitivity / Strengths and Weaknesses / Conclusion | 由队员解释正负对照与结果边界，明确 73 个场景编号含 11 组重叠。逐条将结论指向自主结果记录 | `NUMBER_PROVENANCE.csv`、`FIGURE_SOURCES.csv`、`VERIFY_REPORT.md` | [ ] |
-| 披露与引用 | p.3、p.11 References / AI Usage Disclosure | 对照历史原型及新台账，逐项注明真实采纳和人工修改，正文相应位置标注。补经队员核实的工具完整版本信息和原义准确的正式参考文献 | `AI_USAGE_LOG.csv`、官方 AI 规定第 1–8 条 | [ ] |
-| 编译与提交 | 全文、三份独立文件 | 运行同版脚本，删除交接用 Team text pending 提示前先补独立作品，重跑 PDF QA。确认签名件签全，核查队伍页时间及上传回执 | `REPRODUCE.md`、`RELEASE_ACCEPTANCE.json`、官方提交流程 | [ ] |
+| 总体建模 | Summary、Introduction、Assumptions、Cross-Problem Framework | 独立列出题设、假设、选择依据与跨问接口。自写摘要、关键词和正文。核对统一符号表里的角度约定、单位、下标和时间零点 | `paper/B_submission.tex`；Fig. 1 | [ ] |
+| P1 观测域 | P1 Geometry | 独立定义车盘、闭棱柱视线与俯仰约束。证明等号归属、可行见证、最优半径及弧端归属。若主张唯一最快，须独立证明 | `paper/P1_ERRATA.pdf`；`P1_arc.csv`、`P1_ready_branches.csv`、`P1_station.csv` | [ ] |
+| P1 路由与敏感性 | P1、Sensitivity Analysis | 校核圆角与保守矩形的 100/5 对照，明确图上绕路是可行上界、面积和连通性属于数值估计。复算 80°→79° 的变化分母 | `Route_clearance_comparison.csv`、`P1_pitch_checks.csv`、Fig. 2 | [ ] |
+| P2(1) 站对 | P2 Localization | 独立推导角度雅可比、坐标协方差和下界取等。核对双车 30 s、两条有限视线、二维 RMS、椭圆适用范围与退化角 | `P2_precision.csv`、`P2_precision_routes.json`、Fig. 3 | [ ] |
+| P2(2) 指派 | P2 Scheduling | 独立设计算法及复用时序。对照排名反转证据核对 k=3 与 k=8 的站位可用性和关键链，说明搜索范围 | `P2_trials.csv`、`P2_station_ranks.csv`、`P2_visit_phases.csv`、`P2_critical_chains.csv`、Fig. 4 | [ ] |
+| P3 阈值 | P3 Error Propagation | 独立推导包角误差和连续最大性，检查高里程无二次可行段需要的条件，完成 80 m 参数范围与误差源解释。分列积分夹逼与三组抽样的用途 | `P3_bracket.csv`、`P3_MC.csv`、`P3_ablation.csv`、`P3_parameters.csv`、Fig. 5 | [ ] |
+| P4 信息与时钟 | P4 Rescheduling | 独立说明扰动、绝对恢复、历时与末端。核对缓存全计划和仅当前任务两支，明确失效、动作取消、已开测锁定的含义 | `P4_clock_checks.json`、`P4_cases.csv`、`P4_instruction_sensitivity.csv`、Fig. 6 | [ ] |
+| P4 V5 机理 | V5 Failure Case | 独立解释 T1 锁定、V1/V2/V4 取消回正和重指派、T2 成为末次开测，复算 3/3 与时间差 | `P4_V5_event_comparison.csv`、`Executed_timeline.json`、Fig. 7–8 | [ ] |
+| 实验与结论 | Sensitivity Analysis、Strengths and Weaknesses、Conclusion | 由队员解释正负对照、重复场景和外推边界。逐条核对结论与自主结果，完成英文润色及相互复核 | `NUMBER_PROVENANCE.csv`、`FIGURE_SOURCES.csv`、`VERIFY_REPORT.md` | [ ] |
+| 披露与引用 | References、AI Usage Disclosure | 核对历史原型和本轮台账，逐处记录真实采纳与人工修改。核阅候选文献原文，只将实际引用过的文献按出现顺序纳入 References | `paper/` 的文献索引、`AI_USAGE_LOG.csv`、官方 AI 规定第 1–8 条 | [ ] |
+| 编译与提交 | 全文、三份独立文件 | 补齐独立作品后替换交接稿的 Author input pending 提示，使用同版脚本重跑 PDF QA。确认签名件签全并核查上传回执 | `REPRODUCE.md`、`RELEASE_ACCEPTANCE.json`、官方提交流程 | [ ] |
 
 ## 核对用数据摘录
 

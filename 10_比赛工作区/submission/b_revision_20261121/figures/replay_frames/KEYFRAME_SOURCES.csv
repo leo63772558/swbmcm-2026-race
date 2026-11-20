@@ -1,0 +1,5 @@
+figure,case,policy,time_s,source,projection,formats
+normal_coordination,nominal,Beam,3.0926272996101405,Executed_timeline.json; P2_main_plans.json; B题题面参数.csv,Orthographic 3D-to-page,Vector PDF; PNG 320 dpi
+v5_fault_trigger,failure_V5,Reschedule branch,5.0,Executed_timeline.json; P2_main_plans.json; B题题面参数.csv,Orthographic 3D-to-page,Vector PDF; PNG 320 dpi
+v5_recovery_compare,failure_V5,Keep,12.927041371995326,Executed_timeline.json; P2_main_plans.json; B题题面参数.csv,Orthographic 3D-to-page,Vector PDF; PNG 320 dpi
+v5_recovery_compare,failure_V5,Reschedule,12.927041371995326,Executed_timeline.json; P2_main_plans.json; B题题面参数.csv,Orthographic 3D-to-page,Vector PDF; PNG 320 dpi

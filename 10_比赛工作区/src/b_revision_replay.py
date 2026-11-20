@@ -1,4 +1,4 @@
-"""Build the offline Plotly simulator and publication-resolution event frames.
+"""Build self-contained offline WebGL/Canvas replay from the verified intervals.
 
 AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
 Public model release date was not verified. Assistance: replay and graphics.
@@ -8,20 +8,25 @@ from hashlib import sha1
 import json
 from pathlib import Path
 import shutil
-import subprocess
-
-from reportlab.lib.colors import HexColor
 
 import b_revision_events as events
 import problem_b_geometry as model
-from b_revision_data import DEFAULT_OUTPUT, digest, read_json, write_csv, write_json
-from b_revision_figures import PHASES, VEHICLE_COLORS, heading, new_canvas, path_line, setup_fonts
-from plot_problem_b import GRID, MUTED, NAVY, TEAL, RUST, WASH, dot, label, rectangle, segment
+from b_revision_data import DEFAULT_OUTPUT, digest, read_json, write_json
 
 
 ASSET = "plotly-gl3d.min.js"
 PLOTLY_SHA1 = "ae36dd5df5923c6ca1714ac6d4a36a7ea7fe0aad"
 HERE = Path(__file__).resolve().parent
+
+
+PHASES = {
+    "travel": ("Travel", "#0072B2"), "slew": ("Slew", "#E69F00"),
+    "wait_partner": ("Wait for pair", "#B6C4CF"), "observe": ("Observe", "#007F63"),
+    "reset": ("Reset", "#7866A1"), "cancel_reset": ("Cancellation reset", "#CB5F27"),
+    "missed_pair": ("Missed pair", "#E0A0AE"), "failed": ("Unavailable", "#D9DDE3"),
+    "idle": ("Idle", "#F3F5F7"),
+}
+VEHICLE_COLORS = ("#0072B2", "#D55E00", "#007E65", "#7C56A0", "#8A6300")
 
 
 def hit_building(start, target):
@@ -82,94 +87,6 @@ def confirmed_payload(results):
                     "buildings":model.BUILDINGS,"vehicles":model.VEHICLES}}
 
 
-def travelled(interval, time):
-    path=interval["path"]
-    length=model.SPEED*(min(time,interval["end_s"])-interval["start_s"])
-    pts=[path[0]]
-    for a,b in zip(path,path[1:]):
-        from math import dist
-        leg=dist(a,b)
-        if leg>length:
-            pts.append(model.route_position((a,b),length))
-            break
-        pts.append(b)
-        length-=leg
-    return pts
-
-
-def scene(pdf, x, y, case, policy, t, states):
-    scale=1.48
-    p=lambda xw,yw,z:(x+scale*(.73*xw+.68*yw),y+scale*(-.29*xw+.31*yw+.86*z+29))
-    rectangle(pdf,x-8,y-11,232,185,WASH)
-    for tick in range(0,int(model.WIDTH)+1,25):
-        segment(pdf,p(tick,0,0),p(tick,model.DEPTH,0),GRID,.55)
-    for tick in range(0,int(model.DEPTH)+1,25):
-        segment(pdf,p(0,tick,0),p(model.WIDTH,tick,0),GRID,.55)
-    path_line(pdf,[p(0,0,0),p(model.WIDTH,0,0),p(model.WIDTH,model.DEPTH,0),
-                   p(0,model.DEPTH,0)],MUTED,.85,closed=True)
-    for e in case["policies"][policy]:
-        if e["phase"]=="travel" and t>=e["start_s"]:
-            path_line(pdf,(p(*q,.02) for q in travelled(e,t)),HexColor(VEHICLE_COLORS[e["vehicle"]-1]),1.3)
-    scene_buildings=sorted(enumerate(model.BUILDINGS,1),key=lambda a:-sum(a[1][2:4])+sum(a[1][:2]))
-    for i,(x0,x1,y0,y1,h) in scene_buildings:
-        path_line(pdf,[p(x0,y0,0),p(x1,y0,0),p(x1,y0,h),p(x0,y0,h)],MUTED,.4,
-                  closed=True,fill=HexColor("#BBC9D4"))
-        path_line(pdf,[p(x1,y0,0),p(x1,y1,0),p(x1,y1,h),p(x1,y0,h)],MUTED,.4,
-                  closed=True,fill=HexColor("#8DA3B4"))
-        path_line(pdf,[p(x0,y0,h),p(x1,y0,h),p(x1,y1,h),p(x0,y1,h)],MUTED,.4,
-                  closed=True,fill=HexColor("#E1E8EE"))
-        xx,yy=p((x0+x1)/2,(y0+y1)/2,h)
-        label(pdf,xx,yy-2,f"B{i}",size=8.9,align="center")
-    for target,goal in case["targets"].items():
-        if target=="T4" and t<case["disturbance_s"]:
-            continue
-        xx,yy=p(*goal)
-        segment(pdf,p(*goal[:2],0),(xx,yy),HexColor("#A4A5B6"),.6,(2,2))
-        dot(pdf,(xx,yy),HexColor("#715383"),radius=3)
-        label(pdf,xx+5,yy+3,target,size=9,bold=True)
-    for v in states:
-        name=f"V{v['vehicle']}"
-        camera=(*v["point"],model.HEIGHT)
-        xx,yy=p(*camera)
-        color=RUST if v["phase"]=="failed" else HexColor(VEHICLE_COLORS[v["vehicle"]-1])
-        if v["alert"]:
-            goal=case["targets"][v["alert"]]
-            segment(pdf,p(*camera),p(*goal),RUST if v["blocked_by"] else TEAL,.75,(3,2))
-        if v["phase"]=="failed":
-            segment(pdf,(xx-3,yy-3),(xx+3,yy+3),RUST,1.7)
-            segment(pdf,(xx-3,yy+3),(xx+3,yy-3),RUST,1.7)
-        else:
-            dot(pdf,(xx,yy),color,radius=3,hollow=True)
-        label(pdf,xx+4,yy-8,name,size=8.5,bold=True,color=color)
-
-
-def keyframe_figures(root,payload):
-    directory=root/"figures"/"keyframes"
-    directory.mkdir(parents=True,exist_ok=True)
-    setup_fonts()
-    sources=[]
-    for k in payload["keyframes"]:
-        label_text,id,t=k["label"],k["case"],k["time_s"]
-        case=payload["cases"][id]
-        pdf=new_canvas(directory,label_text,252,width=506)
-        heading(pdf,17,230,("V5 disturbance replay" if id=="failure_V5" else "Combined disturbance"),
-                f"Simulation time {t:.3f} s. Field scale and phase state from the event log.")
-        for index,(policy,states) in enumerate(k["snapshots"].items()):
-            x=18+index*248
-            s=case["scores"][policy]
-            n=sum(start<=t for start in s["starts"].values())
-            scene(pdf,x,24,case,policy,t,states)
-            label(pdf,x,190,f'{payload["policy_labels"][policy]}   {n}/{s["alerts"]} started',size=11,bold=True)
-        label(pdf,17,8,"Dashed green: clear LOS probe. Dashed red: building contact. Cross: failure.",
-              size=10.5,color=MUTED)
-        pdf.save()
-        subprocess.run(["pdftoppm","-singlefile","-png","-r","300",str(directory/(label_text+".pdf")),
-                        str(directory/label_text)],check=True)
-        sources.append({"file":label_text,"case":id,"simulation_time_s":t,
-                        "data":"Executed_timeline.json","render":"Python 3D projection, PDF and PNG at 300 dpi"})
-    write_csv(directory/"KEYFRAME_SOURCES.csv",sources)
-
-
 def generate(out,plotly_path,license_path):
     browser=out/"simulator"
     assets=browser/"assets"
@@ -186,12 +103,13 @@ def generate(out,plotly_path,license_path):
     payload=confirmed_payload(out/"results")
     write_json(browser/"KEYFRAME_STATES.json",payload["keyframes"])
     template=(HERE/"b_replay_template.html").read_text(encoding="utf-8")
-    logic=(HERE/"b_replay.js").read_text(encoding="utf-8")
-    assert "</script" not in logic.lower()
+    logic="\n".join((HERE/name).read_text(encoding="utf-8") for name in
+                    ("b_replay_render.js","b_replay.js"))
+    runtime=source.decode("utf-8")
+    assert "</script" not in logic.lower() and "</script" not in runtime.lower()
     compact=json.dumps(payload,ensure_ascii=True,separators=(",",":"),allow_nan=False).replace("<","\\u003c")
-    html=template.replace("__DATA__",compact).replace("__LOGIC__",logic)
-    (browser/"B_Simulator.html").write_text(html,encoding="utf-8")
-    keyframe_figures(out,payload)
+    html=template.replace("__DATA__",compact).replace("__LOGIC__",logic).replace("__PLOTLY__",runtime)
+    (browser/"B_Simulator.html").write_text(html,encoding="utf-8",newline="\n")
     write_json(out/"results"/"priority_4.json",{"interactive_cases":len(payload["cases"]),
                  "keyframes":len(payload["keyframes"]),"plan_id":payload["plan_id"],
                  "pinned_plotly_git_blob":PLOTLY_SHA1})

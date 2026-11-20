@@ -10,7 +10,7 @@ let currentPolicy = "keep";
 let time = data.cases[selected].disturbance_s;
 let playing = false;
 let lastDraw = 0;
-let drawInProgress = false;
+let drawInProgress = null;
 let drawPending = false;
 
 function fmt(x, places = 2) { return Number(x).toFixed(places); }
@@ -75,86 +75,6 @@ function hitBuilding(a, b) {
   }
   return null;
 }
-function traceXY(points, opts) {
-  return { type: "scatter3d", x: points.map(q => q && q[0]), y: points.map(q => q && q[1]),
-    z: points.map(q => q && q[2]), showlegend: false, ...opts };
-}
-function cube(box, i) {
-  const [x0, x1, y0, y1, h] = box;
-  return { type: "mesh3d", name: "B" + (i + 1), flatshading: true,
-    x: [x0,x1,x1,x0,x0,x1,x1,x0], y: [y0,y0,y1,y1,y0,y0,y1,y1], z: [0,0,0,0,h,h,h,h],
-    i:[0,0,4,4,0,0,1,1,2,2,3,3], j:[1,2,5,6,1,5,2,6,3,7,0,4], k:[2,3,6,7,5,4,6,5,7,6,4,7],
-    color: "#93a7b5", opacity: .92, hovertemplate: "B" + (i + 1) + " • " + h + " m<extra></extra>",
-    lighting: { ambient: .74, diffuse: .8, specular: .13, roughness: .8 },
-    lightposition: { x: 100, y: -50, z: 150 }, showlegend: false };
-}
-function traversedPoints(events, at) {
-  const points = [];
-  for (const event of events) {
-    if (event.phase !== "travel" || at < event.start_s) continue;
-    let remain = data.field.speed * (Math.min(at, event.end_s) - event.start_s);
-    let a = event.path[0];
-    points.push([...a,.18]);
-    for (const b of event.path.slice(1)) {
-      const d = Math.hypot(b[0]-a[0], b[1]-a[1]);
-      if (d > remain) {
-        points.push([...positionPath([a,b], remain), .18]);
-        break;
-      }
-      points.push([...b,.18]);
-      remain -= d;
-      a = b;
-    }
-    points.push(null);
-  }
-  return points;
-}
-function buildTraces(record, states) {
-  const { buildings, width, depth, camera_m } = data.field;
-  const traces = buildings.map(cube);
-  traces.push(traceXY([[0,0,0],[width,0,0],[width,depth,0],[0,depth,0],[0,0,0]],
-    { mode:"lines", line:{ color:"#476474", width:4 }, hoverinfo:"skip" }));
-  traces.push(traceXY(buildings.map(([a,b,c,d,h]) => [(a+b)/2,(c+d)/2,h+.9]),
-    { mode:"text", text:buildings.map((_,i) => "B"+(i+1)), textfont:{color:"#1c3043",size:12}, hoverinfo:"skip" }));
-  for (const [alert, point] of Object.entries(record.targets)) {
-    if (alert === "T4" && time < record.disturbance_s) continue;
-    const start = record.scores[currentPolicy].starts[alert];
-    const done = start !== undefined && start <= time && start < data.field.horizon;
-    traces.push(traceXY([[point[0],point[1],0],point],
-      { mode:"lines", line:{ color:"#a58cae", width:1, dash:"dot" }, hoverinfo:"skip" }));
-    traces.push(traceXY([point], { mode:"markers+text", text: [alert], textposition:"top center",
-      textfont:{size:13,color:"#392a43"}, marker:{size:7, color:done?"#08745e":"#80618a", symbol:"diamond"},
-      hovertemplate: alert+" • "+point[2]+" m<extra></extra>" }));
-  }
-  for (const state of states) {
-    const color = data.vehicle_colors[state.vehicle-1];
-    const name = "V" + state.vehicle;
-    const related = record.policies[currentPolicy].filter(e => e.vehicle === state.vehicle);
-    traces.push(traceXY(traversedPoints(related,time),
-      { mode:"lines", line:{color,width:5}, hoverinfo:"skip" }));
-    const failed = state.phase === "failed";
-    traces.push(traceXY([[...state.point,.4]],
-      { mode:"markers+text", text:[name], textposition:"top center", textfont:{size:13,color:"#142b3a"},
-        marker:{size:6, color:failed?"#a52c40":color, symbol:failed?"x":"circle"},
-        hovertemplate: name+" • "+data.phases[state.phase][0]+"<extra></extra>" }));
-    if (failed || !state.alert) continue;
-    const camera = [...state.point,camera_m];
-    const az = state.pan * Math.PI / 180, el = state.tilt * Math.PI / 180;
-    const projected = [camera[0]+5*Math.cos(el)*Math.cos(az),
-      camera[1]+5*Math.cos(el)*Math.sin(az),camera[2]+5*Math.sin(el)];
-    traces.push(traceXY([camera,projected],
-      { mode:"lines", line:{color:"#263e53",width:4}, hoverinfo:"skip" }));
-    if ($("los").checked) {
-      const target = record.targets[state.alert];
-      if (!target || (state.alert==="T4" && time<record.disturbance_s)) continue;
-      const blocked = hitBuilding(camera,target);
-      traces.push(traceXY([camera,target],{mode:"lines",
-        line:{width:3, color:blocked?"#a52c40":"#086f66",dash:"dash"},name:name+" → "+state.alert,
-        hovertemplate:name+" → "+state.alert+" • "+(blocked ? blocked+" contact" : "clear")+"<extra></extra>"}));
-    }
-  }
-  return traces;
-}
 function titleCase(s) { return s.replaceAll("_"," ").replace(/^\w/, x => x.toUpperCase()); }
 function node(tag, text, className = "") {
   const el = document.createElement(tag);
@@ -206,6 +126,12 @@ function makeTimelines() {
         bar.style.cssText="left:"+left+"%;width:"+width+"%;background:"+data.phases[e.phase][1];
         track.append(bar);
       }
+      if (record.disturbance_s !== null && record.disturbance_s <= end) {
+        const pin=node("div",undefined,"event-pin");
+        pin.style.left=record.disturbance_s/end*100+"%";
+        pin.title="Disturbance at "+fmt(record.disturbance_s,3)+" s";
+        track.append(pin);
+      }
       const cursor=node("div",undefined,"pin");
       cursor.dataset.range=end;
       track.append(cursor);
@@ -234,34 +160,43 @@ function updateStates(states) {
   }
   $("viewPolicy").textContent=data.policy_labels[currentPolicy];
 }
-async function draw() {
-  if (drawInProgress) {drawPending=true; return;}
-  drawInProgress=true;
+async function drawOnce() {
   const record=data.cases[selected], states=stateFor(selected,currentPolicy,time);
+  const frame=frameGeometry(record,states);
   $("clock").textContent=fmt(time,3)+" s";
   $("time").value=time;
   document.querySelectorAll(".pin").forEach(p =>
     p.style.left=Math.min(100,time*100/Number(p.dataset.range))+"%");
   makeScore(record);
   updateStates(states);
+  const afterEvent=record.disturbance_s !== null && time >= record.disturbance_s;
+  $("branch").dataset.active=String(afterEvent);
+  const eventLabel=record.failed_vehicle ? "V"+record.failed_vehicle+" failure" :
+    record.new_target ? "New target" : "Communication outage";
+  $("branch").textContent=afterEvent ?
+    eventLabel+" at "+fmt(record.disturbance_s,3)+" s"+
+      (frame.branch.length ? " · other policy paths dotted" : "") : "";
+  const rendered = {time:String(time),case:selected,policy:currentPolicy,drawnCamera:cameraMode};
   try {
-    await Plotly.react("scene",buildTraces(record,states),{
-      showlegend:false, margin:{l:0,r:0,b:0,t:14}, paper_bgcolor:"#ffffff", uirevision:"fixed-camera",
-      scene:{
-        xaxis:{ title:"East (m)",range:[0,data.field.width],backgroundcolor:"#f5f8fb",showbackground:true },
-        yaxis:{ title:"North (m)",range:[0,data.field.depth],backgroundcolor:"#f5f8fb",showbackground:true },
-        zaxis:{ title:"Height (m)",range:[0,data.field.height],backgroundcolor:"#f5f8fb",showbackground:true },
-        aspectmode:"data", camera:{eye:{x:1.48,y:-1.68,z:1.16},up:{x:0,y:0,z:1}},
-      }}, {responsive:true,displaylogo:false,modeBarButtonsToRemove:["toImage"]});
+    await renderField(frame);
+    Object.assign($("field").dataset,rendered);
     window.BReplayRendered=true;
   } catch (e) {
     playing=false;
-    $("scene").replaceChildren(node("p","The 3D view requires WebGL. Timeline and vehicle states remain available.","error"));
+    $("renderer").textContent="The browser could not initialize field rendering.";
     console.error(e);
-  } finally {
-    drawInProgress=false;
-    if (drawPending) { drawPending=false; draw(); }
   }
+}
+function draw() {
+  drawPending=true;
+  if (!drawInProgress) {
+    drawInProgress=(async () => {
+      try {
+        while (drawPending) { drawPending=false; await drawOnce(); }
+      } finally { drawInProgress=null; }
+    })();
+  }
+  return drawInProgress;
 }
 function setTime(t) {
   time=Math.max(0,Math.min(data.field.horizon,t));
@@ -272,6 +207,8 @@ function setTime(t) {
   return draw();
 }
 function setCase(id, policy, t) {
+  playing=false;
+  $("play").textContent="Play";
   selected=id; $("case").value=id;
   const p=$("policy"); p.replaceChildren();
   for (const name of Object.keys(data.cases[id].policies)) {
@@ -280,6 +217,13 @@ function setCase(id, policy, t) {
   currentPolicy=policy || p.options[0].value; p.value=currentPolicy;
   makeTimelines();
   return setTime(t===undefined ? 0 : t);
+}
+function setCamera(mode) {
+  cameraMode=mode;
+  cameraRevision++;
+  for (const view of ["iso","top","follow"]) $(view).setAttribute("aria-pressed",String(mode===view));
+  $("field").dataset.camera=mode;
+  return draw();
 }
 function playStep(frameTime) {
   if (!playing) return;
@@ -294,6 +238,29 @@ for (const id of scenarioNames) {
   const title=id==="nominal"?"Nominal comparison":id==="failure_V5"?"V5 failure":titleCase(id);
   const opt=node("option",title); opt.value=id; $("case").append(opt);
 }
+for (let i=0;i<data.field.vehicles.length;i++) {
+  const label="V"+(i+1);
+  const opt=node("option",label);
+  opt.value=i+1;
+  $("tracked").append(opt);
+  const span=node("span"), chip=node("i");
+  chip.style.backgroundColor=data.vehicle_colors[i];
+  span.append(chip,document.createTextNode(label));
+  $("routes").append(span);
+}
+const v5 = data.cases.failure_V5;
+const bookmarks = [
+  ["Nominal observation","nominal","beam",Math.min(...Object.values(data.cases.nominal.scores.beam.starts))],
+  ["V5 fault","failure_V5","keep",v5.disturbance_s],
+  ["V5 recovery","failure_V5","reschedule",v5.scores.reschedule.latest_start_s]
+];
+for (const [title,id,policy,at] of bookmarks) {
+  const button=node("button",title);
+  button.type="button";
+  button.title=fmt(at,3)+" s";
+  button.addEventListener("click",()=>setCase(id,policy,at));
+  $("bookmarks").append(button);
+}
 for (const [label,color] of Object.values(data.phases)) {
   if (label==="Idle") continue;
   const span=node("span");
@@ -301,6 +268,8 @@ for (const [label,color] of Object.values(data.phases)) {
   span.append(chip,document.createTextNode(label)); $("phases").append(span);
 }
 $("case").addEventListener("change",e=>setCase(e.target.value));
+for (const mode of ["iso","top","follow"]) $(mode).addEventListener("click",()=>setCamera(mode));
+$("tracked").addEventListener("change",()=>setCamera("follow"));
 $("policy").addEventListener("change",e=>{currentPolicy=e.target.value;draw();});
 $("time").addEventListener("input",e=>setTime(Number(e.target.value)));
 $("los").addEventListener("change",draw);
@@ -317,10 +286,25 @@ $("event").addEventListener("click",()=> {
   setTime(Math.min(...bounds.filter(x=>x!==null && x>time+1e-9),data.field.horizon));
 });
 $("export").addEventListener("click",()=> {
-  if (window.BReplayRendered) Plotly.downloadImage("scene",{format:"png",width:1800,height:1250,
-    filename:"B_"+selected+"_"+currentPolicy+"_"+fmt(time,3)+"s"});
+  if (!window.BReplayRendered) return;
+  const filename="B_"+selected+"_"+currentPolicy+"_"+fmt(time,3)+"s";
+  if (activeRenderer==="webgl") {
+    window.Plotly.downloadImage($("plot3d"),{format:"png",width:1800,height:1250,filename});
+  } else if (activeRenderer==="canvas") {
+    const canvas=node("canvas");
+    drawCanvas(canvas,frameGeometry(data.cases[selected],stateFor(selected,currentPolicy,time)),900,625,2);
+    const link=node("a");
+    link.download=filename+".png"; link.href=canvas.toDataURL("image/png"); link.click();
+  }
 });
+$("field").addEventListener("webglcontextlost",e=>{
+  e.preventDefault();
+  activeRenderer="canvas";
+  draw();
+},true);
+window.addEventListener("resize",()=>{if (activeRenderer==="canvas") draw();});
 $("provenance").textContent="Source: verified event intervals • nominal plan "+data.plan_id.slice(0,12)+
   " • field parameter SHA-256 "+data.input_sha256.slice(0,12)+" • team review edition";
-window.BReplay={stateFor, setCase, hitBuilding, checkedKeyframes:data.keyframes};
+window.BReplay={stateFor, setCase, setCamera, hitBuilding, checkedKeyframes:data.keyframes, bookmarks};
+$("field").dataset.camera="iso";
 setCase(selected,currentPolicy,time);

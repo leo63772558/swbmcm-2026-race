@@ -67,6 +67,23 @@ def metrics(root):
         add(name,p3[field],"P3_verification.json","root",field,digits)
     for i, name in enumerate(("BracketLow","BracketHigh")):
         add(name,p3["bracket_m"][i],"P3_verification.json","root",f"bracket_m[{i}]",6)
+    monte_carlo = read_csv(results/"P3_MC.csv")
+    probes = sorted(monte_carlo, key=lambda row: float(row["distance_m"]))
+    assert len(probes) == 3
+    fields = [
+        ("Distance", "distance_m", 6),
+        ("Samples", "samples", None),
+        ("Estimate", "estimate", 6),
+        ("Low", "simultaneous_95_lower", 6),
+        ("High", "simultaneous_95_upper", 6),
+    ]
+    confidence_field = fields[3][1]
+    add("MCConfidence", confidence_field.split("_")[1], "P3_MC.csv", "header", confidence_field)
+    for label, row in zip(("Before", "After", "Limit"), probes, strict=True):
+        for suffix, field, digits in fields:
+            value = row[field]
+            record = "distance_m=" + row["distance_m"]
+            add("MC"+label+suffix, value, "P3_MC.csv", record, field, digits)
     run = read_json(results/"priority_3.json")
     for name,field,places in (("CaseCount","P4_case_count",None),("VFiveDelay","V5_delay_s",3)):
         add(name,run[field],"priority_3.json","root",field,places)
@@ -83,6 +100,145 @@ def metrics(root):
     (paper/"B_review_metrics.tex").write_text(
         "% Automatically generated from NUMBER_PROVENANCE.csv.\n"+"\n".join(macro_lines)+"\n",encoding="utf-8")
     return source
+
+
+
+def evidence_tables(root):
+    """Format the audit records directly from the unchanged result CSVs."""
+    results = root/"results"
+
+    def tex_cell(value):
+        return str(value).replace("_", r"\_")
+
+    def number(row, field, decimals):
+        return f"{float(row[field]):.{decimals}f}" if row[field] else "--"
+
+    def table(title, columns, headings, rows, source_name, note=""):
+        header = " & ".join(headings) + r"\\"
+        lines = [
+            "% Data: results/"+source_name,
+            r"\begin{longtable}{"+columns+"}",
+            r"\caption{"+title+r"}\\",
+            r"\toprule",
+            header,
+            r"\midrule",
+            r"\endfirsthead",
+            r"\toprule",
+            header,
+            r"\midrule",
+            r"\endhead",
+            r"\bottomrule",
+            r"\endlastfoot",
+        ]
+        lines.extend(" & ".join(map(tex_cell, row))+r"\\" for row in rows)
+        lines.append(r"\end{longtable}")
+        if note:
+            lines.append(r"\noindent "+note+r"\par")
+        return "\n".join(lines)
+
+    areas = read_csv(results/"P1_area.csv")
+    grids = [r for r in areas if r["method"]=="point_grid"]
+    p1 = table(
+        "Observable-area estimates from the recorded point grids.",
+        "@{}rrrrrr@{}",
+        ("Step (m)", "Phase", "Samples", "Body-safe (m²)", "LOS (m²)", "Joint area (m²)"),
+        [(r["step_m"], r["phase"],r["sample_count"],number(r,"body_area_m2",2),
+          number(r,"los_area_m2",2),number(r,"intersection_area_m2",2)) for r in grids],
+        "P1_area.csv",
+    )
+    visits = [r for r in read_csv(results/"P2_visit_phases.csv")
+              if r["routing"]=="rounded" and r["beam_width"]=="20"]
+    p2 = table(
+        "Executed visit durations under the rounded route model and common shortlist screens.",
+        "@{}rlccrrrrr@{}",
+        ("Screen", "Policy", "Vehicle", "Alert", "Drive", "Slew", "Wait", "Observe", "Reset"),
+        [(r["k"],r["policy"].capitalize(),"V"+r["vehicle"],r["alert"],
+          *(number(r,field,3) for field in
+            ("drive_s","slew_s","partner_wait_s","observe_s","reset_duration_s"))) for r in visits],
+        "P2_visit_phases.csv",
+        "Phase durations are in seconds. Wait refers to the wait for the partner vehicle.",
+    )
+
+    ranks = [r for r in read_csv(results/"P2_station_ranks.csv")
+             if r["routing"]=="rounded" and r["beam_width"]=="20"]
+    p2_ranks = table(
+        "Station arrival ranks and release times for the matched dispatch plans.",
+        "@{}rlccrrrr@{}",
+        ("Screen", "Policy", "Vehicle", "Alert", "Rank", "Station east*", "Station north*", "Release (s)"),
+        [(r["k"],r["policy"].capitalize(),"V"+r["vehicle"],r["alert"],r["rank"],
+          number(r,"x_m",1),number(r,"y_m",1),number(r,"previous_release_s",3)) for r in ranks],
+        "P2_station_ranks.csv",
+        "Station coordinates marked with an asterisk are in metres.",
+    )
+    ablation = read_csv(results/"P3_ablation.csv")
+    names = {"all":"All terms","without_position":"No position error",
+             "without_zero_offset":"No zero offset","without_control":"No control error"}
+    p3 = table(
+        "Coverage and variance shares from the recorded P3 ablation.",
+        "@{}rlrrrr@{}",
+        ("Travel (m)", "Variant", "Coverage", "Position", "Zero offset", "Control"),
+        [(number(r,"distance_m",6),names[r["variant"]],number(r,"coverage",8),
+          *(number(r,field,5) for field in (
+            "position_variance_share","zero_offset_variance_share","control_variance_share")))
+         for r in ablation],
+        "P3_ablation.csv",
+        "Variance shares are the recorded baseline shares at each travel distance.",
+    )
+
+    cases = {}
+    for row in read_csv(results/"P4_cases.csv"):
+        cases.setdefault(row["case"],{})[row["policy"]] = row
+    assert len(cases) == read_json(results/"priority_3.json")["P4_case_count"]
+    paired = []
+    for key, value in cases.items():
+        keep, recourse = value["keep"], value["reschedule"]
+        assert keep["alerts"] == recourse["alerts"]
+        assert keep["absolute_recovery_s"] == recourse["absolute_recovery_s"]
+        assert keep["outage_duration_s"] == recourse["outage_duration_s"]
+        paired.append((key,number(keep,"absolute_recovery_s",0),number(keep,"outage_duration_s",0),
+                       f'{keep["successes"]}/{keep["alerts"]}',number(keep,"latest_start_s",3),
+                       f'{recourse["successes"]}/{recourse["alerts"]}',number(recourse,"latest_start_s",3)))
+    p4 = table(
+        "Paired scenario outcomes for Keep and Reschedule.",
+        "@{}p{.37\\linewidth}rrrrrr@{}",
+        ("Case", "Recovery", "Outage", "Keep", "Time", "Replan", "Time"),
+        paired, "P4_cases.csv",
+        "Recovery is the absolute communication recovery time. Outage is the duration. "
+        "Time is the recorded latest start used for scoring. Timing is in seconds. "
+        "Policy counts are observed alerts started over requested alerts.",
+    )
+
+    v5 = [r for r in read_csv(results/"P4_V5_event_comparison.csv") if r["phase"]!="idle"]
+    p4_v5 = table(
+        "Executed non-idle intervals in the V5 failure comparison.",
+        "@{}lcllrrrr@{}",
+        ("Policy", "Vehicle", "Phase", "Origin", "Alert", "Start (s)", "End (s)", "Duration (s)"),
+        [(r["policy"].capitalize(),"V"+r["vehicle"],r["phase"].replace("_"," "),r["origin"],
+          r["alert"] or "--",
+          *(number(r,field,3) for field in ("start_s","end_s","duration_s"))) for r in v5],
+        "P4_V5_event_comparison.csv",
+    )
+    interpretations = read_csv(results/"P4_instruction_sensitivity.csv")
+    p4_cached = table(
+        "Recorded comparison of cached plan and ongoing-only instructions.",
+        "@{}p{.28\\linewidth}lrrrr@{}",
+        ("Case", "Instruction", "Recovery (s)", "Outage (s)", "Started", "Time (s)"),
+        [(r["case"],r["interpretation"].replace("_"," "),number(r,"recovery_s",0),
+          number(r,"outage_duration_s",0),r["successes"],number(r,"latest_start_s",3)) for r in interpretations],
+        "P4_instruction_sensitivity.csv",
+    )
+    sections = (
+        ("Geometry Grid Diagnostics",p1),
+        ("Matched Dispatch Phase Records",p2),
+        ("Matched Dispatch Station Ranks",p2_ranks),
+        ("Pointing Error Ablation",p3),
+        ("Policy Comparison by Case ID",p4),
+        ("V5 Failure Phase Records",p4_v5),
+        ("Cached Instruction Sensitivity",p4_cached),
+    )
+    text = "% Automatically generated by b_revision_paper.py.\n"
+    text += "\n".join(r"\EvidenceSection{"+title+"}\n"+body for title,body in sections)+"\n"
+    (root/"paper/B_review_tables.tex").write_text(text,encoding="utf-8")
 
 
 def compile_tex(path,bundle):
@@ -106,7 +262,12 @@ def inspect_pdf(path, qa, *, paper=True):
     assert 0<len(reader.pages)<=25 and not reader.attachments
     assert not (reader.metadata.author if reader.metadata else None)
     qa.mkdir(parents=True,exist_ok=True)
+    for prior_render in qa.glob(path.stem+"-*.png"):
+        if re.fullmatch(re.escape(path.stem) + r"-\d+\.png", prior_render.name):
+            prior_render.unlink()
     subprocess.run(["pdftoppm","-r","140","-png",str(path),str(qa/path.stem)],check=True)
+    pngs = sorted(qa.glob(path.stem+"-*.png"))
+    assert len(pngs)==len(reader.pages)
     logs = []
     text_pages = []
     for i,page in enumerate(reader.pages,start=1):
@@ -126,8 +287,6 @@ def inspect_pdf(path, qa, *, paper=True):
         fonts = page["/Resources"]["/Font"].get_object()
         names = sorted({str(font.get_object().get("/BaseFont","")) for font in fonts.values()})
         assert any("TimesNewRoman" in name for name in names), (i,names)
-        pngs = sorted(qa.glob(path.stem+"-*.png"))
-        assert len(pngs)==len(reader.pages)
         with Image.open(pngs[i-1]) as png:
             mask = png.convert("L").point(lambda v:255 if v<180 else 0)
             bounds = mask.getbbox()
@@ -137,8 +296,9 @@ def inspect_pdf(path, qa, *, paper=True):
     if paper:
         all_text = "".join(text_pages)
         assert all(section in all_text for section in ("Teamreviewcopy","References",
-                                    "SensitivityAnalysis","StrengthsandWeaknesses","AIUsageDisclosure"))
+                                    "SensitivityandRobustnessAnalysis","StrengthsandWeaknesses","AIUsageDisclosure"))
         assert "[FILL" not in all_text
+        assert re.findall(r"Figure(\d+)\.", all_text) == list(map(str, range(1, 9)))
         numbers=read_csv(path.parent/"NUMBER_PROVENANCE.csv")
         linked = [r for r in numbers if not r["macro"].startswith(("From","To","At","Branch"))]
         omitted = [r["macro"] for r in linked if r["rendered"] not in all_text]
@@ -151,6 +311,7 @@ def inspect_pdf(path, qa, *, paper=True):
 
 def generate(root,bundle):
     source=metrics(root)
+    evidence_tables(root)
     output=root/"paper"
     qa=root/"qa"
     paper=inspect_pdf(compile_tex(output/"B_submission.tex",bundle),qa)

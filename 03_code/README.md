@@ -41,6 +41,10 @@ python 03_code/run_all.py --only P2 # 只跑某一问
 
 见仓库根 `requirements.txt`。新增依赖必须钉版本，并写进文件。
 
+## B 题工程复核交接
+
+赛时复核的版本化实现位于 `10_比赛工作区/src/`。输入为 `data/B题题面参数.csv`、存档 `results/B_*.csv` 及复核包的 CSV/JSON。入口为 `python -B 10_比赛工作区/src/reproduce_b_revision.py --out <新目录>`，输出为对照结果、8 组 Matplotlib 图、3 组帧、3D 离线回放和复跑清单。PDF 构建与浏览器检查见复核包的 `REPRODUCE.md`、`VERIFY_REPORT.md`。
+
 ## 提交前
 
 ```bash

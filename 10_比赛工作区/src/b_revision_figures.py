@@ -1,435 +1,813 @@
-"""Draw revision evidence as vector PDF and raster PNG from the same sources.
+"""Render eight Matplotlib review figures from the frozen B evidence.
 
-AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
-Public model release date was not verified. Assistance: routine visualisation.
+AI assistance: ChatGPT (Codex, GPT-6), OpenAI, 2026-11-21.
+Assistance: presentation, archived event visualization, and visual checks.
 """
 from argparse import ArgumentParser
-from collections import Counter
-from math import atan2, cos, degrees, dist, pi, sin, sqrt
-import os
+from collections import defaultdict
+from datetime import datetime, timezone
+from math import atan2, degrees, dist, isclose, log, radians
 from pathlib import Path
-import subprocess
+from random import Random
 
-from reportlab.lib.colors import HexColor, white
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen.canvas import Canvas
+import matplotlib as mpl
 
-import b_revision_geometry as geometry
+mpl.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.colors import BoundaryNorm, ListedColormap, TwoSlopeNorm
+from matplotlib.lines import Line2D
+from matplotlib.patches import Arc, Circle, Ellipse, FancyBboxPatch, Patch, Polygon, Rectangle
+from matplotlib.ticker import MaxNLocator, PercentFormatter
+
+import b_revision_events as events
+import b_revision_geometry as geometry_checks
+from b_revision_data import DEFAULT_OUTPUT, digest, read_csv, read_json, write_csv
+from b_revision_probability import A, B, CONTROL, OFFSET, SEED
 import problem_b_geometry as model
-from b_revision_data import DEFAULT_OUTPUT, read_csv, read_json, write_csv
-from plot_problem_b import NAVY, MUTED, TEAL, TEAL_LIGHT, BLUE, RUST, PURPLE, GRID, WASH
-from plot_problem_b import axes, dot, label, rectangle, segment
 
 
+INK = "#17283A"
+MUTED = "#465A70"
+GRID = "#DCE4ED"
+PAPER = "#F1F5F9"
+BLUE = "#0072B2"
+TEAL = "#007A60"
+ORANGE = "#C44B17"
+GOLD = "#B37600"
+PURPLE = "#75549B"
+COLORS = (BLUE, ORANGE, TEAL, PURPLE, GOLD)
+UNAVAILABLE = "#788694"
 PHASES = {
-    "travel": ("Travel", "#0072B2"), "slew": ("Slew", "#E69F00"),
-    "wait_partner": ("Wait for pair", "#B6C4CF"), "observe": ("Observe", "#007F63"),
-    "reset": ("Reset", "#7866A1"), "cancel_reset": ("Cancellation reset", "#CB5F27"),
-    "missed_pair": ("Missed pair", "#E0A0AE"), "failed": ("Unavailable", "#D9DDE3"),
-    "idle": ("Idle", "#F3F5F7"),
+    "travel": ("Drive", BLUE),
+    "slew": ("Slew", "#E4A000"),
+    "wait_partner": ("Wait", "#B7C8D9"),
+    "observe": ("Observe", TEAL),
+    "reset": ("Reset", PURPLE),
+    "cancel_reset": ("Cancel / reset", ORANGE),
+    "missed_pair": ("Missed pair", "#DDADC0"),
+    "failed": ("Failed", UNAVAILABLE),
 }
-VEHICLE_COLORS = ("#0072B2", "#D55E00", "#007E65", "#7C56A0", "#8A6300")
 FIGURE_MAP = (
-    ("p1_observability", "P1_grid_map.json; P1_geometry.json; official parameters",
-     "Show the observable region, boundary arc and selected readiness witness."),
-    ("t2_geometry", "P2_precision.csv; P2_precision_routes.json; official parameters",
-     "Show both approach routes, the right-angle intersection and the local covariance scale."),
-    ("p3_threshold", "P3_curve.csv; P3_MC.csv; P3_bracket.csv; P3_verification.json",
-     "Show the deterministic threshold and classifications of the two separate sides."),
-    ("p4_scenario_matrix", "P4_cases.csv; P4_archived_comparison.csv",
-     "Separate completion changes from time changes and show the crossed recovery grid."),
-    ("p2_timeline", "P2_main_plans.json; P2_visit_phases.csv; Executed_timeline.json",
-     "Compare the common-k schedules by vehicle and phase."),
-    ("p4_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json",
-     "Expose cancellation resets, changed pairings and the V5 delay."),
-    ("framework", "MODEL_DEPENDENCY_MAP.md; P2_main_plans.json; priority_3.json",
-     "Identify the shared geometry and frozen plan that feed disturbance replay."),
+    ("fig01_framework", "P1_station.csv; P2_precision.csv; priority_3.json; P3_verification.json",
+     "Shared field input and data dependencies between the four questions"),
+    ("fig02_p1_geometry", "P1_grid_map.json; P1_geometry.json; P1_pitch_checks.csv; Route_clearance_comparison.csv; Route_summary.json",
+     "Grid evidence, shadow, exact-radius clearance, optimal arc, route changes and pitch sensitivity"),
+    ("fig03_p2_precision", "P2_precision.csv; P2_precision_routes.json; B题题面参数.csv",
+     "Fixed-pair first-order RMS field and local position uncertainty"),
+    ("fig04_p2_dispatch", "Executed_timeline.json; P2_main_plans.json; P2_trials.csv; P2_visit_phases.csv; P2_critical_chains.csv",
+     "Shared-k schedule, vehicle trajectories and phase breakdown to the final paired start"),
+    ("fig05_p3_risk", "P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv",
+     "First draws of the recorded seeded run; position ellipse; coverage checks and parameter boundary"),
+    ("fig06_p4_resilience", "P4_cases.csv; Executed_timeline.json; priority_3.json",
+     "All case IDs, censoring-aware timing contrast, lexicographic score and replay flow"),
+    ("fig07_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json",
+     "Aligned V5 event clocks, cancellations, assignment changes and last paired starts"),
+    ("fig08_replay_frames", "Executed_timeline.json; P2_main_plans.json; B题题面参数.csv",
+     "3D projection of nominal observation, V5 failure and final-start recovery comparison"),
 )
+PLOT_METADATA = {
+    "Creator": "Matplotlib",
+    "CreationDate": datetime(2026, 11, 21, tzinfo=timezone.utc),
+    "ModDate": None,
+}
+mpl.rcParams.update({
+    "font.family": ["Times New Roman", "DejaVu Serif"],
+    "font.size": 11,
+    "axes.titlesize": 12,
+    "axes.titleweight": "bold",
+    "axes.labelsize": 10.5,
+    "axes.labelcolor": INK,
+    "axes.edgecolor": "#9AAABD",
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.linewidth": .75,
+    "axes.axisbelow": True,
+    "axes.grid": True,
+    "grid.color": GRID,
+    "grid.linewidth": .6,
+    "xtick.labelsize": 9.5,
+    "ytick.labelsize": 9.5,
+    "xtick.color": MUTED,
+    "ytick.color": MUTED,
+    "text.color": INK,
+    "legend.frameon": False,
+    "legend.fontsize": 9.5,
+    "lines.linewidth": 1.6,
+    "pdf.fonttype": 42,
+    "savefig.facecolor": "white",
+})
 
 
-def setup_fonts():
-    fonts = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
-    regular = os.environ.get("B_TNR_REGULAR", str(fonts / "times.ttf"))
-    bold = os.environ.get("B_TNR_BOLD", str(fonts / "timesbd.ttf"))
-    for name, path in (("BodyTimes", regular), ("TitleTimes", bold)):
-        pdfmetrics.registerFont(TTFont(name, path))
+def layout(title, size, rows=1, cols=1, **kwargs):
+    fig = plt.figure(figsize=size, layout="constrained")
+    fig.suptitle(title, x=.02, ha="left", fontsize=15, fontweight="bold")
+    return fig, fig.add_gridspec(rows, cols, **kwargs)
 
 
-def new_canvas(directory, name, height, width=490):
-    return Canvas(str(directory / (name + ".pdf")), pagesize=(width, height),
-                  invariant=1, pageCompression=1)
+def panel(ax, letter, title):
+    ax.set_title(f"{letter}   {title}", loc="left")
 
 
-def heading(pdf, x, y, title, subtitle=None):
-    label(pdf, x, y, title, size=14, bold=True)
-    if subtitle:
-        label(pdf, x, y-16, subtitle, size=11, color=MUTED)
+def save(fig, directory, stem):
+    directory.mkdir(parents=True, exist_ok=True)
+    fig.savefig(directory / f"{stem}.pdf", metadata=PLOT_METADATA)
+    fig.savefig(directory / f"{stem}.png", dpi=320, metadata={"Software": "Matplotlib"})
+    plt.close(fig)
 
 
-def path_line(pdf, points, color, width=1.6, dash=(), closed=False, fill=None):
-    points = list(points)
-    if len(points) < 2:
-        return
-    part = pdf.beginPath()
-    part.moveTo(*points[0])
-    for point in points[1:]:
-        part.lineTo(*point)
-    if closed:
-        part.close()
-    pdf.setStrokeColor(color)
-    pdf.setLineWidth(width)
-    pdf.setDash(dash)
-    if fill is not None:
-        pdf.setFillColor(fill)
-    pdf.drawPath(part, fill=int(fill is not None), stroke=int(width > 0))
-    pdf.setDash()
+def xy_axes(ax, xlim=(0, model.WIDTH), ylim=(0, model.DEPTH)):
+    ax.set(xlim=xlim, ylim=ylim, xlabel="East (m)", ylabel="North (m)", aspect="equal")
+    ax.xaxis.set_major_locator(MaxNLocator(5))
+    ax.yaxis.set_major_locator(MaxNLocator(5))
 
 
-def building_plan(pdf, map_xy):
+def footprint(ax, *, clearance=False, labels=True):
     for i, (x0, x1, y0, y1, _) in enumerate(model.BUILDINGS, 1):
-        x, y = map_xy(x0, y0)
-        u, v = map_xy(x1, y1)
-        rectangle(pdf, x, y, u-x, v-y, HexColor("#8495A6"))
-        label(pdf, (x+u)/2, (y+v)/2-3.5, f"B{i}", align="center", size=10, bold=True)
+        if clearance:
+            r = model.RADIUS
+            ax.add_patch(FancyBboxPatch((x0, y0), x1-x0, y1-y0,
+                         boxstyle=f"round,pad={r},rounding_size={r}", linewidth=1,
+                         facecolor="#F9CCD4", edgecolor=ORANGE, alpha=.65, zorder=3))
+        ax.add_patch(Rectangle((x0, y0), x1-x0, y1-y0, facecolor="#8599AC",
+                               edgecolor=MUTED, lw=.7, zorder=4))
+        if labels:
+            ax.text((x0+x1)/2, (y0+y1)/2, f"B{i}", ha="center", va="center",
+                    fontsize=8.5, color="white", clip_on=True, zorder=5)
 
 
-def map_axes(pdf, x, y, size):
-    x_ticks = [(n,n) for n in range(0, int(model.WIDTH)+1, 25)]
-    y_ticks = [(n,n) for n in range(0, int(model.DEPTH)+1, 25)]
-    return axes(pdf,x,y,size,size,(0,model.WIDTH),(0,model.DEPTH),x_ticks,y_ticks,"East (m)","North (m)")
+def node(ax, x, y, w, h, title, body, color):
+    card = FancyBboxPatch((x, y), w, h, boxstyle="round,pad=.007,rounding_size=.014",
+                         lw=.8, fc=PAPER, ec="#B8C8D7")
+    ax.add_patch(card)
+    ax.add_patch(Rectangle((x, y+.012), .007, h-.024, color=color, lw=0))
+    ax.text(x+.019, y+h*.68, title, weight="bold", fontsize=11, va="center")
+    ax.text(x+.019, y+h*.32, body, fontsize=9.8, va="center", color=MUTED)
 
 
-def p1_figure(results, directory):
+def connect(ax, start, end, *, style="-"):
+    ax.annotate("", end, start, arrowprops={"arrowstyle": "-|>", "color": MUTED,
+                "lw": .9, "linestyle": style, "mutation_scale": 12})
+
+
+def framework(results):
+    p1 = read_json(results / "P1_geometry.json")["ties"]["ready"]
+    precision, = read_csv(results / "P2_precision.csv")
+    summary = read_json(results / "priority_3.json")
+    spread = read_json(results / "P3_verification.json")
+    fig, gs = layout("Problem B  |  Evidence and dependency map", (9.3, 4.9))
+    ax = fig.add_subplot(gs[0, 0])
+    ax.set(xlim=(0, 1), ylim=(0, 1))
+    ax.axis("off")
+    node(ax, .025, .70, .268, .19, "Official field and alerts", "Buildings, vehicle states, target locations", BLUE)
+    node(ax, .365, .70, .268, .19, "Shared geometry", "Euclidean clearance, pitch, line of sight", BLUE)
+    node(ax, .708, .70, .265, .19, "P1  Observation region",
+         f"Quality-optimal witness: {p1['ready_s']:.3f} s ready", TEAL)
+    node(ax, .025, .385, .268, .19, "P2(1)  Bearing precision",
+         f"T2 local horizontal RMS: {float(precision['horizontal_rms_m']):.6f} m", PURPLE)
+    node(ax, .365, .385, .268, .19, "P2(2)  Paired dispatch",
+         f"Beam incumbent: {summary['P2_latest_starts_s']['beam']:.3f} s last start", TEAL)
+    node(ax, .708, .385, .265, .19, "P4  Disturbance replay",
+         f"{summary['P4_case_count']} case IDs, frozen dispatch plan", ORANGE)
+    node(ax, .025, .07, .268, .19, "P3  Pointing uncertainty",
+         f"Coverage crossing: {spread['independent_crossing_m']:.6f} m", PURPLE)
+    node(ax, .365, .07, .268, .19, "Event log and replay",
+         "Executed phases, paths, time and status", ORANGE)
+    node(ax, .708, .07, .265, .19, "Deployment review",
+         "Geometry, precision and resilience checks", BLUE)
+    connect(ax, (.30,.795), (.358,.795))
+    connect(ax, (.640,.795), (.701,.795))
+    connect(ax, (.47,.692), (.21,.581))
+    connect(ax, (.50,.692), (.50,.582))
+    connect(ax, (.641,.480), (.701,.480))
+    connect(ax, (.840,.377), (.61,.267))
+    connect(ax, (.641,.16), (.701,.16))
+    ax.annotate("", (.709,.095), (.292,.092), arrowprops={"arrowstyle":"-|>",
+                "connectionstyle":"arc3,rad=.29", "color":MUTED, "lw":.9, "ls":"--"})
+    ax.plot([.08,.011,.011],[.7,.67,.21],color=MUTED,lw=.9,ls="--")
+    connect(ax, (.011,.21), (.017,.195), style="--")
+    return fig
+
+
+def p1_geometry(results):
     grid = read_json(results / "P1_grid_map.json")
-    info = read_json(results / "P1_geometry.json")
-    pdf = new_canvas(directory, "p1_observability", 336)
-    heading(pdf, 18, 314, "T1 observable stations", f"Center samples on a {grid['step_m']:g} m grid")
-    p = map_axes(pdf, 37, 51, 211)
-    step, shift = grid["step_m"], (grid["phase"]-.5)*grid["step_m"]
-    for j, a, b in grid["runs"]:
-        x,y = p(a*step+shift,j*step+shift)
-        xx,yy = p((b+1)*step+shift,(j+1)*step+shift)
-        rectangle(pdf, x,y,xx-x,yy-y,TEAL_LIGHT)
-    building_plan(pdf,p)
-    goal = model.TARGETS["T1"]
-    center = goal[:2]
-    ready = info["ties"]["ready"]
-    station = ready["x_m"], ready["y_m"]
-    for first,second in zip(ready["path"], ready["path"][1:]):
-        segment(pdf,p(*first),p(*second),BLUE,1.8)
-    dot(pdf,p(*center),NAVY,radius=3.5)
-    dot(pdf,p(*station),RUST,radius=4,hollow=True)
-    x,y = p(*model.VEHICLES[ready["vehicle"]-1])
-    label(pdf,x+8,y+3,f'V{ready["vehicle"]}',size=10,bold=True)
-
-    heading(pdf, 280, 272, "Boundary near T1")
-    panel = (283, 88, 182)
-    box_x, box_y, size = panel
-    rectangle(pdf, box_x, box_y, size, size, WASH)
-    scale = size / 23
-    q = lambda x,y: (box_x+size/2+scale*(x-center[0]),box_y+size/2+scale*(y-center[1]))
-    pdf.saveState()
-    clip = pdf.beginPath()
-    clip.rect(*panel, size)
-    pdf.clipPath(clip, stroke=0, fill=0)
-    x0,x1,y0,y1,_ = model.BUILDINGS[1]
-    corner = model.RADIUS
-    bx,by = q(x0-corner,y0-corner)
-    ex,ey = q(x1+corner,y1+corner)
-    pdf.setFillColor(HexColor("#DCE3EA"))
-    pdf.setStrokeColor(MUTED)
-    pdf.setLineWidth(.75)
-    pdf.roundRect(bx,by,ex-bx,ey-by,scale*corner,stroke=1,fill=1)
-    bx,by = q(x0,y0)
-    ex,ey = q(x1,y1)
-    rectangle(pdf,bx,by,ex-bx,ey-by,HexColor("#8495A6"))
-    label(pdf,box_x+15,box_y+size/2-10,"B2",size=11,bold=True)
-    rr = scale*ready["range_m"]
-    cx,cy = q(*center)
-    pdf.setStrokeColor(MUTED)
-    pdf.setDash(3,3)
-    pdf.circle(cx,cy,rr,stroke=1,fill=0)
-    pdf.setDash()
-    for arc in info["arcs"]:
-        a,b = arc["start_deg"],arc["end_deg"]
-        pdf.setStrokeColor(TEAL)
-        pdf.setLineWidth(2.8)
-        pdf.arc(cx-rr,cy-rr,cx+rr,cy+rr,a,b-a)
-        for tag in ("start","end"):
-            th = arc[tag+"_deg"]*pi/180
-            dot(pdf,q(*geometry.point_on_circle(center,ready["range_m"],th)),TEAL,radius=3,
-                hollow=not arc[tag+"_included"])
-    dot(pdf,q(*center),NAVY,radius=3.1)
-    label(pdf,cx+7,cy+5,"T1",size=10,bold=True)
-    dot(pdf,q(*station),RUST,radius=4.4,hollow=True)
-    pdf.restoreState()
-    segment(pdf,(284,70),(301,70),TEAL,2.8)
-    label(pdf,307,66,"Feasible quality-optimal arc",size=10.5)
-    dot(pdf,(292,51),RUST,radius=3.6,hollow=True)
-    label(pdf,307,47,f'Earliest ready: {ready["ready_s"]:.3f} s',size=10.5)
-    label(pdf,280,23,f'Range {ready["range_m"]:.3f} m  |  Pitch {ready["elevation_deg"]:.0f}°',size=11,color=MUTED)
-    pdf.save()
+    geometry = read_json(results / "P1_geometry.json")
+    ready = geometry["ties"]["ready"]
+    pitch = read_csv(results / "P1_pitch_checks.csv")
+    routes = read_csv(results / "Route_clearance_comparison.csv")
+    route_summary = read_json(results / "Route_summary.json")
+    fig, gs = layout("P1  |  Observation geometry and sensitivity", (9.5, 7.8), 2, 2)
+    ax, close, comparison, sensitivity = [fig.add_subplot(gs[i, j])
+                                             for i in range(2) for j in range(2)]
+    panel(ax, "A", "Observable stations and building shadows")
+    panel(close, "B", "Quality-optimal arc near T1")
+    target = np.array(model.TARGETS["T1"][:2])
+    spacing = grid["step_m"]
+    shift = (grid["phase"]-.5)*spacing
+    rectangles = [Rectangle((a*spacing+shift, j*spacing+shift),
+                             (b-a+1)*spacing, spacing) for j,a,b in grid["runs"]]
+    from matplotlib.collections import PatchCollection
+    ax.add_collection(PatchCollection(rectangles, facecolor="#B7E0D4", edgecolor="none", zorder=1))
+    for a in (ax, close):
+        for shadow in geometry["shadows"]:
+            a.add_patch(Polygon(shadow, closed=True, facecolor="#C5BAD6", alpha=.44,
+                                edgecolor=PURPLE, lw=.45, zorder=2))
+        footprint(a, clearance=True)
+        a.scatter(*target, s=40, marker="*", color=PURPLE, zorder=8)
+        a.scatter(ready["x_m"], ready["y_m"], s=40, fc="white", ec=ORANGE, zorder=8)
+        a.plot(*np.array(ready["path"]).T, color=BLUE, lw=1.3, zorder=6)
+    xy_axes(ax)
+    span = 1.48*ready["range_m"]
+    xy_axes(close, (target[0]-span, target[0]+span), (target[1]-span, target[1]+span))
+    ax.add_patch(Rectangle(target-span, 2*span, 2*span, fill=False, lw=1.2,
+                           ls="--", color=INK, zorder=9))
+    close.add_patch(Circle(target, ready["range_m"], fill=False, ec=MUTED,
+                           lw=.8, ls="--", zorder=6))
+    for arc in geometry["arcs"]:
+        theta = np.radians(np.linspace(arc["start_deg"], arc["end_deg"], 300))
+        points = target[:, None]+ready["range_m"]*np.array([np.cos(theta), np.sin(theta)])
+        close.plot(*points, color=TEAL, lw=2.6, zorder=7, label="Feasible optimum")
+        for j,key in [(0,"start_included"),(-1,"end_included")]:
+            close.scatter(*points[:, j], s=24, ec=TEAL, fc=TEAL if arc[key] else "white", zorder=9)
+    close.text(.97,.04,f"Range: {ready['range_m']:.3f} m\nReady: {ready['ready_s']:.3f} s",
+               transform=close.transAxes, ha="right", va="bottom", color=INK, fontsize=9.5,
+               bbox={"boxstyle":"round,pad=.3","fc":"white","ec":GRID}, zorder=9)
+    ax.legend(handles=[Patch(fc="#B7E0D4",label="Observable grid"), Patch(fc="#C5BAD6",label="Shadow"),
+                       Patch(fc="#F9CCD4",label="Safety offset")], loc="upper left", fontsize=8.6)
+    assert len(routes)==route_summary["compared_routes"]
+    positive = [100*float(x["saving_m"]) for x in routes if x["saving_m"] and float(x["saving_m"]) > 1e-8]
+    restored = sum(x["aabb_reachable"] == "False" and bool(x["rounded_verified_distance_m"]) for x in routes)
+    assert len(positive)==route_summary["shorter_paths"] and restored==route_summary["restored_endpoints"]
+    panel(comparison, "C", "Rounded vs rectangular route checks")
+    comparison.hist(positive, bins=np.linspace(0, max(positive)*1.001, 11), fc=TEAL, ec="white")
+    comparison.set(xlabel="Distance saved among shorter routes (cm)", ylabel="Routes")
+    comparison.yaxis.set_major_locator(MaxNLocator(integer=True))
+    comparison.text(.97,.94,f"{len(positive)} routes shorter\n{restored} endpoints restored",
+                    transform=comparison.transAxes, ha="right", va="top", weight="bold",
+                    bbox={"boxstyle":"round,pad=.3","fc":"white","ec":GRID})
+    panel(sensitivity, "D", "Pitch ceiling and quality")
+    deg = [float(row["elevation_ceiling_deg"]) for row in pitch]
+    losses = [100*float(row["relative_quality_loss"]) for row in pitch]
+    sensitivity.plot(deg,losses,"o:",color=BLUE, label="Checked limits")
+    sensitivity.scatter(deg[1],losses[1],s=62,facecolor="white",edgecolor=ORANGE,zorder=5)
+    sensitivity.annotate(f"{deg[0]:g}° to {deg[1]:g}°\n{losses[1]:.4f}% reduction",
+                        (deg[1],losses[1]),xytext=(-85,30),textcoords="offset points",
+                        arrowprops={"arrowstyle":"->","color":ORANGE},color=ORANGE,fontsize=10.5,
+                        bbox={"fc":"white","ec":"none","pad":1.4})
+    sensitivity.set(xlabel="Pitch ceiling (degrees)",ylabel="Loss of quality (%)",ylim=(-3,max(losses)+8))
+    return fig
 
 
-def t2_figure(results, directory):
-    record, = read_csv(results / "P2_precision.csv")
+def covariance_ellipse(ax, center, cov, *, color=ORANGE):
+    values, vectors = np.linalg.eigh(cov)
+    assert values[0] > 0
+    radii = np.sqrt(-2*log(.05)*values)
+    angle = degrees(atan2(vectors[1,1],vectors[0,1]))
+    ax.add_patch(Ellipse(center, 2*radii[1], 2*radii[0], angle=angle, facecolor=color,
+                         edgecolor=color, alpha=.16, zorder=3))
+    ax.add_patch(Ellipse(center, 2*radii[1], 2*radii[0], angle=angle, fill=False,
+                         ec=color, lw=1.3, zorder=4))
+    return radii
+
+
+def precision(results):
+    evidence, = read_csv(results / "P2_precision.csv")
     routes = read_json(results / "P2_precision_routes.json")
-    pdf = new_canvas(directory, "t2_geometry", 333)
-    heading(pdf,18,311,"T2 intersection geometry","Field routes and horizontal bearing intersection")
-    p = map_axes(pdf,37,49,204)
-    building_plan(pdf,p)
-    stations = [(float(record[f"x_{i}_m"]), float(record[f"y_{i}_m"])) for i in (1,2)]
-    target = model.TARGETS["T2"][:2]
-    for i,route in enumerate(routes):
-        tone = (BLUE,TEAL)[i]
-        path_line(pdf,(p(*xy) for xy in route),tone,1.8,() if i==0 else (4,2))
-        dot(pdf,p(*route[0]),tone,radius=3.1)
-        dot(pdf,p(*route[-1]),tone,radius=3.5,hollow=True)
-        x,y=p(*route[0])
-        label(pdf,x+6,y+7,f"V{record[f'vehicle_{i+1}']}",size=10,bold=True)
-    dot(pdf,p(*target),RUST,radius=3.3)
-    panel = 281,117,187
-    x,y,n = panel
-    rectangle(pdf,x,y,n,132,WASH)
-    q = lambda a,b:(x+n/2+13*(a-target[0]+1.5),y+66+13*(b-target[1]))
-    tx,ty=q(*target)
-    points = [q(*xy) for xy in stations]
-    segment(pdf,*points,MUTED,1.1,(4,3))
-    for i,pt in enumerate(points):
-        segment(pdf,pt,(tx,ty),(BLUE,TEAL)[i],2)
-        dot(pdf,pt,(BLUE,TEAL)[i],radius=4,hollow=True)
-        label(pdf,pt[0]-8,pt[1]-4,f"S{i+1}",align="right",bold=True)
-    dot(pdf,(tx,ty),RUST,radius=4)
-    label(pdf,tx+8,ty+4,"T2",bold=True)
-    start = degrees(atan2(points[1][1]-ty,points[1][0]-tx))
-    sweep = ((degrees(atan2(points[0][1]-ty,points[0][0]-tx))-start+180)%360)-180
-    pdf.setStrokeColor(RUST)
-    pdf.setLineWidth(1.1)
-    pdf.arc(tx-15,ty-15,tx+15,ty+15,start,sweep)
-    label(pdf,tx-34,ty-3,f'{float(record["crossing_deg"]):.0f}°',size=10,bold=True,color=RUST)
-    label(pdf,281,96,f'Baseline: {float(record["baseline_m"]):.3f} m',size=11)
-    label(pdf,281,75,f'Local first-order RMS: {float(record["horizontal_rms_m"]):.6f} m',size=11,bold=True)
-    label(pdf,281,53,"Travel / time limit",size=10.5,color=MUTED)
-    time_limit = model.number("p2_1","vehicle","travel_time_max")
-    for i,tone in enumerate((BLUE,TEAL),1):
-        x = 281 + (i-1)*96
-        value=float(record[f"rounded_travel_{i}_s"])
-        label(pdf,x,36,f'V{record[f"vehicle_{i}"]}  {value:.2f} / {time_limit:g} s',size=10.5,color=tone)
-    pdf.save()
+    target = np.array(model.TARGETS["T2"][:2])
+    stations = np.array([(float(evidence[f"x_{i}_m"]),float(evidence[f"y_{i}_m"])) for i in (1,2)])
+    sigma = radians(model.number("p2_1","bearing","error_std"))
+    rms = float(evidence["horizontal_rms_m"])
+    assert all(np.allclose(route[-1], station) for route,station in zip(routes,stations))
+    cov = np.array([[float(evidence["cov_xx_m2"]),float(evidence["cov_xy_m2"])],
+                    [float(evidence["cov_xy_m2"]),float(evidence["cov_yy_m2"])]])
+    x = np.linspace(min(stations[:,0])-.4, target[0]+6, 130)
+    y = np.linspace(stations[0,1]-.75, stations[1,1]+.75, 130)
+    X,Y = np.meshgrid(x,y)
+    u,v = [np.array([X-sx,Y-sy]) for sx,sy in stations]
+    ru,rv = np.hypot(*u),np.hypot(*v)
+    det = abs(u[0]*v[1]-u[1]*v[0])
+    with np.errstate(divide="ignore", invalid="ignore"):
+        spread = sigma*np.sqrt(ru**2+rv**2)*ru*rv/det
+    fig, gs = layout("P2(1)  |  Fixed-pair localization sensitivity near T2", (9.5, 4.6), 1, 2,
+                     width_ratios=(1.22,1))
+    ax = fig.add_subplot(gs[0,0])
+    close = fig.add_subplot(gs[0,1])
+    panel(ax,"A","Local first-order RMS with stations fixed")
+    upper = np.nanquantile(spread[np.isfinite(spread)],.86)
+    mesh = ax.contourf(X,Y,np.ma.masked_invalid(spread),levels=np.linspace(rms*.7,upper,18),
+                      cmap="cividis",extend="both")
+    fig.colorbar(mesh,ax=ax,label="Horizontal RMS (m)",shrink=.82,format="%.2f",ticks=MaxNLocator(5))
+    for i,(sx,sy) in enumerate(stations,1):
+        ax.plot([sx,target[0]],[sy,target[1]],color="white",lw=1.5)
+        ax.scatter(sx,sy,c="white",edgecolors=BLUE,zorder=5,s=35)
+        ax.annotate(f"S{i} (V{evidence[f'vehicle_{i}']})",(sx,sy),
+                    xytext=(6,2),textcoords="offset points",fontsize=9,weight="bold",
+                    bbox={"fc":"white","ec":"none","alpha":.91,"pad":1})
+    theta = [degrees(atan2(*(p-target)[::-1])) for p in stations]
+    left,right = theta[1],theta[0]
+    while right < left:
+        right += 360
+    assert isclose(right-left,float(evidence["crossing_deg"]),abs_tol=1e-6)
+    ax.add_patch(Arc(target,2.15,2.15,theta1=left,theta2=right,ec="white",lw=1.1,zorder=5))
+    ax.annotate(f"{float(evidence['crossing_deg']):.0f}°", target+[-1.46,0],
+                color="white",weight="bold",ha="center",va="center")
+    ax.scatter(*target,color=ORANGE,marker="*",s=55,zorder=6)
+    ax.annotate("T2", target, xytext=(6,6), textcoords="offset points", color="white",weight="bold")
+    xy_axes(ax,(x[0],x[-1]),(y[0],y[-1]))
+    panel(close,"B","Local Gaussian position ellipse")
+    radii = covariance_ellipse(close,(0,0),cov)
+    amplitude = float(max(radii))*1.5
+    close.axhline(0,color=GRID,lw=.8)
+    close.axvline(0,color=GRID,lw=.8)
+    close.scatter(0,0,color=ORANGE,marker="*",s=58,zorder=5)
+    close.set(xlim=(-amplitude,amplitude),ylim=(-amplitude,amplitude),aspect="equal",
+              xlabel="East error relative to T2 (m)",ylabel="North error relative to T2 (m)")
+    close.text(.03,.96,f"95% ellipse\nRMS {rms:.6f} m",va="top",transform=close.transAxes,
+               bbox={"fc":"white","ec":GRID,"boxstyle":"round,pad=.25"},zorder=8)
+    return fig
 
 
-def p3_figure(results,directory):
-    curve=read_csv(results/"P3_curve.csv")
-    mc=read_csv(results/"P3_MC.csv")
-    bracket=read_json(results/"P3_verification.json")
-    cross=bracket["independent_crossing_m"]
-    req=float(curve[0]["required"])
-    pdf=new_canvas(directory,"p3_threshold",276)
-    heading(pdf,18,254,"Pointing coverage near the travel limit","Deterministic integration with separate Monte Carlo checks on either side")
-    for i,(xl,yl,ticks,yticks) in enumerate((
-            ((0,100),(.84,1.005),(0,20,40,60,80,100),(.85,.9,.95,1.0)),
-            ((cross-1.5,cross+1.5),(.9455,.9545),tuple(round(cross)+j for j in (-1,0,1)),(.946,.95,.954)))):
-        x=49+239*i
-        p=axes(pdf,x,57,185,143,xl,yl,[(j,f"{j:g}") for j in ticks],
-               [(j,f"{100*j:g}%") for j in yticks],"Travel (m)","Coverage" if i==0 else "Threshold detail")
-        subset=[r for r in curve if xl[0]<=float(r["distance_m"])<=xl[1]]
-        for name,tone,dash in (("linear_coverage",MUTED,(4,3)),("nonlinear_coverage",TEAL,())):
-            xy=[p(float(r["distance_m"]),float(r[name])) for r in subset]
-            path_line(pdf,xy,tone,1.75,dash)
-        segment(pdf,p(xl[0],req),p(xl[1],req),RUST,1.0,(3,3))
-        segment(pdf,p(cross,yl[0]),p(cross,yl[1]),MUTED,.85,(2,3))
-        for row in mc:
-            s,value = float(row["distance_m"]),float(row["estimate"])
-            lo,hi = float(row["simultaneous_95_lower"]),float(row["simultaneous_95_upper"])
-            if xl[0]<=s<=xl[1]:
-                a,b=p(s,lo),p(s,hi)
-                segment(pdf,a,b,BLUE,1.25)
-                for u,v in (a,b):
-                    segment(pdf,(u-3,v),(u+3,v),BLUE,1)
-                dot(pdf,p(s,value),BLUE,radius=3.3,hollow=True)
-        if i==1:
-            label(pdf,x+182,207,f'{cross:.3f} m',color=TEAL,align="right",bold=True)
-    for x,line,color,dash in ((47,"Nonlinear",TEAL,()),(151,"Local linear",MUTED,(4,3)),
-                               (269,"Required",RUST,(3,3))):
-        segment(pdf,(x,13),(x+17,13),color,1.6,dash)
-        label(pdf,x+22,9,line,size=10.5)
-    dot(pdf,(377,13),BLUE,radius=3,hollow=True)
-    label(pdf,386,9,"MC 95% intervals",size=10.5)
-    pdf.save()
-
-def p4_matrix(results,directory):
-    records=read_csv(results/"P4_cases.csv")
-    grouped={}
-    for row in records:
-        grouped.setdefault(row["case"],{})[row["policy"]]=row
-    crossed=[a for a in grouped if a.startswith("new_") and "_recovery_" in a]
-    clocks=sorted({float(grouped[a]["keep"]["dispatch_allowed_from_s"]) for a in crossed})
-    failed=sorted({int(grouped[a]["keep"]["failed_vehicle"]) for a in crossed})
-    locations=sorted({a.split("_V")[0] for a in crossed})
-    disturbance=model.number("p4","disturbance","occurrence_time")
-    scores = Counter()
-    for variants in grouped.values():
-        keep,replan=(variants[p] for p in ("keep","reschedule"))
-        a=(int(keep["successes"]),-float(keep["latest_start_s"]))
-        b=(int(replan["successes"]),-float(replan["latest_start_s"]))
-        scores[(b>a)-(b<a)] += 1
-    pdf=new_canvas(directory,"p4_scenario_matrix",346)
-    heading(pdf,18,324,"Recovery cases by alert position and failed vehicle",
-            "Change in the number of alerts that initiate observation")
-    cw,ch=65,19
-    for j,vehicle in enumerate(failed):
-        label(pdf,112+(j+.5)*cw,278,f"V{vehicle}",align="center",bold=True)
-    for i,clock in enumerate(clocks):
-        y=253-i*76
-        clock_label="No outage" if clock==disturbance else f"Recovery {clock:g} s"
-        label(pdf,23,y+12,clock_label,size=10.5,bold=True)
-        label(pdf,23,y-3,f"Duration {clock-disturbance:g} s",size=10,color=MUTED)
-        for k,loc in enumerate(locations):
-            ycell=y-k*ch
-            label(pdf,103,ycell+5,f"N{loc[-1]}",size=10.5,align="right",color=MUTED)
-            for j,vehicle in enumerate(failed):
-                case=f"{loc}_V{vehicle}_recovery_{clock:g}"
-                a,b=(grouped[case][p] for p in ("keep","reschedule"))
-                delta=int(b["successes"])-int(a["successes"])
-                color={0:WASH,1:HexColor("#CBE5E2"),2:HexColor("#89C8BB"),
-                       3:HexColor("#57A599")}.get(delta,HexColor("#EBC4B8"))
-                rectangle(pdf,112+j*cw,ycell,cw-2,ch-2,color)
-                label(pdf,112+(j+.5)*cw,ycell+4, "0" if not delta else f"{delta:+d}",
-                      align="center",size=11,bold=bool(delta))
-    label(pdf,23,24,f"{len(grouped)} case IDs in the full catalogue: {scores[1]} improve, "
-                     f"{scores[0]} tie, {scores[-1]} worsen.",size=10.5,color=MUTED)
-    label(pdf,23,11,"The catalogue includes overlap between the archive and the crossed grid.",size=10,color=MUTED)
-    pdf.save()
+def vehicle_legend(ax, **kwargs):
+    handles = [Line2D([0],[0],color=c,lw=2,marker="o",ms=4,label=f"V{i}")
+               for i,c in enumerate(COLORS,1)]
+    return ax.legend(handles=handles,ncols=5,**kwargs)
 
 
-def timeline_legend(pdf, phases, y):
-    positions=(28,137,246,355)
-    for i,key in enumerate(phases):
-        x=positions[i%4]
-        yy=y-17*(i//4)
-        title,color=PHASES[key]
-        rectangle(pdf,x,yy,12,7,HexColor(color))
-        label(pdf,x+16,yy-1,title,size=10.5)
+def phase_legend(ax, keys, **kwargs):
+    return ax.legend(handles=[Patch(fc=PHASES[k][1],label=PHASES[k][0]) for k in keys],
+                     ncols=min(len(keys),7),**kwargs)
 
 
-def timeline_panel(pdf, events, x0, y0, xmax, title, score, *, fault=None):
-    w=410
-    y_step=16
-    y_max=y0+5*y_step
-    tx=lambda t: x0+w*t/xmax
-    label(pdf,x0,y_max+10,title,bold=True)
-    label(pdf,x0+w,y_max+10,f"Last start {score:.3f} s",size=11,align="right",color=TEAL,bold=True)
-    for v in range(1,6):
-        yy=y_max-v*y_step
-        rectangle(pdf,x0,yy,w,12,WASH)
-        label(pdf,x0-7,yy+2,f"V{v}",size=10.5,align="right")
-    for item in events:
-        if item["phase"]=="idle":
+def scene(ax, timeline, targets, *, time=None, labels=True):
+    """Deterministic 3D-to-page projection; geometry uses the official field axes."""
+    from matplotlib import patheffects
+    from math import cos, sin
+
+    def project(x,y,z=0):
+        return .77*x+.65*y, -.33*x+.39*y+.88*z
+
+    def line(coords, **kwargs):
+        ax.plot(*zip(*(project(*p) for p in coords)),**kwargs)
+
+    def poly(coords, **kwargs):
+        ax.add_patch(Polygon([project(*p) for p in coords],closed=True,**kwargs))
+
+    def tag(name, xyz, delta, c=INK, size=8.8):
+        if labels:
+            ax.annotate(name, project(*xyz), xytext=delta, textcoords="offset points",
+                        color=c, fontsize=size, weight="bold", zorder=19,
+                        path_effects=[patheffects.withStroke(linewidth=2.3, foreground="white")])
+
+    ax.set_aspect("equal")
+    ax.axis("off")
+    w,d = model.WIDTH, model.DEPTH
+    poly([(0,0),(w,0),(w,d),(0,d)],fc="#F2F6FA",ec="#B4C4D4",lw=.8,zorder=1)
+    for tick in range(0,int(w)+1,25):
+        line([(tick,0),(tick,d)],color=GRID,lw=.5,zorder=2)
+    for tick in range(0,int(d)+1,25):
+        line([(0,tick),(w,tick)],color=GRID,lw=.5,zorder=2)
+    structures = sorted(enumerate(model.BUILDINGS,1),key=lambda row:sum(row[1][:2])-sum(row[1][2:4]))
+    for i,(x0,x1,y0,y1,h) in structures:
+        poly([(x0,y0),(x1,y0),(x1,y0,h),(x0,y0,h)],fc="#8299B0",ec="#4A647E",
+             alpha=.74,lw=.7,zorder=6)
+        poly([(x1,y0),(x1,y1),(x1,y1,h),(x1,y0,h)],fc="#68839B",ec="#4A647E",
+             alpha=.72,lw=.7,zorder=6)
+        poly([(x0,y0,h),(x1,y0,h),(x1,y1,h),(x0,y1,h)],fc="#D4E1EC",ec="#627F99",
+             alpha=.94,lw=.7,zorder=6)
+        offset = (-13,-3) if i == 3 else (2,-2) if i == 5 else (-4,0)
+        tag(f"B{i}",((x0+x1)/2,(y0+y1)/2,h),offset,size=8)
+    last_heading = {i:None for i in range(1,len(model.VEHICLES)+1)}
+    for item in sorted(timeline,key=lambda e:e["start_s"]):
+        if item["phase"]!="travel" or len(item["path"])<2:
             continue
-        start,end=map(tx,(item["start_s"],min(item["end_s"],xmax)))
+        color = COLORS[item["vehicle"]-1]
+        path = item["path"]
+        assert all(geometry_checks.road_clear(tuple(a),tuple(b)) for a,b in zip(path,path[1:]))
+        line(path,color=color,lw=1.45,alpha=.75 if time is None else .30,zorder=4,ls="--" if time is not None else "-")
+        if time is not None and time >= item["start_s"]:
+            length = model.SPEED*(min(time,item["end_s"])-item["start_s"])
+            progress = [path[0]]
+            for a,b in zip(path,path[1:]):
+                leg = dist(a,b)
+                if length < leg:
+                    progress.append(model.route_position((a,b),length))
+                    if length > 1e-9:
+                        last_heading[item["vehicle"]] = atan2(b[1]-a[1],b[0]-a[0])
+                    break
+                progress.append(b)
+                last_heading[item["vehicle"]] = atan2(b[1]-a[1],b[0]-a[0])
+                length -= leg
+            line(progress,color=color,lw=1.9,alpha=.95,zorder=5)
+    for i,(label,goal) in enumerate(targets.items(),1):
+        line([goal[:2],goal],color="#76879B",ls=":",lw=.9,zorder=8)
+        ax.scatter(*project(*goal),marker="*",s=51,fc=INK,ec="white",lw=.65,zorder=13)
+        tag(label,goal,(4,3),size=9)
+    vehicle_offsets = ((7,9), (1,-12), (-12,10), (-16,-13), (-17,9))
+    if time is None:
+        for v,home in enumerate(model.VEHICLES,1):
+            ax.scatter(*project(*home),s=28,ec="white",lw=.55,color=COLORS[v-1],zorder=15)
+            tag(f"V{v}",home,vehicle_offsets[v-1],COLORS[v-1])
+    else:
+        for v, intervals in events.per_vehicle(timeline).items():
+            item,(point,pan,tilt) = events.state_at(intervals,time)
+            origin = (*point,model.HEIGHT)
+            color = COLORS[v-1]
+            target = targets.get(item["alert"])
+            if target and item["phase"] in ("slew","wait_partner","observe"):
+                blocked = any(model.segment_hits_box(origin,target,((x0,x1),(y0,y1),(0,h)))
+                              for x0,x1,y0,y1,h in model.BUILDINGS)
+                line([origin,target],color=ORANGE if blocked else color,
+                     ls="--" if blocked else "-",lw=1.2,alpha=.85,zorder=10)
+            px,py = project(*origin)
+            failed = item["phase"]=="failed"
+            ax.scatter(px,py,c=ORANGE if failed else color,marker="X" if failed else "o",
+                       edgecolors="white",linewidths=.65,s=55 if failed else 36,zorder=16)
+            heading = last_heading[v] if item["phase"]=="travel" else radians(pan)
+            if not failed and heading is not None:
+                ax.annotate("",project(point[0]+5*cos(heading),point[1]+5*sin(heading),model.HEIGHT),
+                            (px,py),arrowprops={"arrowstyle":"-|>","color":color,
+                                                "lw":.95,"mutation_scale":9},zorder=17)
+            tag(f"V{v}",origin,vehicle_offsets[v-1],color)
+    ax.set(xlim=(-5, project(w,d)[0]+7), ylim=(project(w,0)[1]-8, max(
+        project(*goal)[1] for goal in targets.values())+10))
+
+
+def gantt(ax, timeline, xend, final=None, *, fault=None):
+    for item in timeline:
+        kind = item["phase"]
+        if kind not in PHASES:
+            continue
+        start = float(item["start_s"])
+        end = min(float(item["end_s"]),xend)
         if end<=start:
             continue
-        _,color=PHASES[item["phase"]]
-        y=y_max-item["vehicle"]*y_step
-        rectangle(pdf,start,y,end-start,12,HexColor(color))
-        if item["phase"]=="observe" and end-start>=21:
-            label(pdf,(start+end)/2,y+2,item["alert"],size=9.5,color=white,align="center",bold=True)
-    for value,tone,dash in ((score,TEAL,(3,3)),(fault,RUST,(5,2))):
-        if value is not None:
-            x=tx(value)
-            segment(pdf,(x,y0-1),(x,y_max),tone,.85,dash)
-    for t in range(0,int(xmax)+1,5):
-        at=tx(t)
-        segment(pdf,(at,y0-2),(at,y0-5),MUTED,.65)
-        label(pdf,at,y0-17,str(t),size=10.5,align="center")
+        vehicle = int(item["vehicle"])
+        ax.barh(vehicle,end-start,left=start,height=.61,fc=PHASES[kind][1],
+                lw=.45,ec="white",hatch="///" if kind=="failed" else None,zorder=3)
+        if kind=="observe" and item["alert"] and end-start>=1.35:
+            ax.text((start+end)/2,vehicle,item["alert"],color="white",ha="center",
+                    va="center",fontsize=8.8,weight="bold",zorder=4)
+    if final is not None:
+        ax.axvline(final, color=TEAL, lw=1.2, ls="--", zorder=6)
+        ax.text(final,.17,f"{final:.3f} s",color=TEAL,ha="center",weight="bold",
+                va="center",fontsize=9.3)
+    if fault is not None:
+        ax.axvline(fault,color=ORANGE,lw=1.25,ls=":",zorder=7)
+        ax.text(fault,.17,f"Fault at {fault:g} s",color=ORANGE,ha="center",
+                va="center",fontsize=9.3,weight="bold")
+    ax.set(xlim=(0,xend),ylim=(5.65,-.17),yticks=list(range(1,6)),
+           yticklabels=[f"V{i}" for i in range(1,6)],xlabel="Time (s)")
+    ax.grid(False,axis="y")
+    ax.xaxis.set_major_locator(MaxNLocator(7))
 
 
-def gantts(results,directory):
-    timeline=read_json(results/"Executed_timeline.json")
-    summary=read_json(results/"priority_3.json")
-    scores=summary["P2_latest_starts_s"]
-    pdf=new_canvas(directory,"p2_timeline",330)
-    heading(pdf,18,309,"Synchronized dispatch with a shared shortlist",
-            f"Both policies use k = {summary['shared_k']} and the same route and station feasibility checks")
-    for policy,title,y0 in (("beam","Beam incumbent",190),("nearest","Nearest assignment",63)):
-        timeline_panel(pdf,timeline["nominal_policies"][policy],52,y0,25,title,scores[policy])
-    timeline_legend(pdf,("travel","slew","wait_partner","observe","reset"),37)
-    label(pdf,462,15,"Time (s)",size=10.5,align="right",color=MUTED)
-    pdf.save()
+def dispatch(results):
+    execution = read_json(results/"Executed_timeline.json")
+    plans = read_json(results/"P2_main_plans.json")
+    summary = read_json(results/"priority_3.json")
+    assert digest(plans["beam"]) == execution["plan_id"] == summary["nominal_plan_id"]
+    trials = read_csv(results/"P2_trials.csv")
+    visits = read_csv(results/"P2_visit_phases.csv")
+    chains = read_csv(results/"P2_critical_chains.csv")
+    fig, gs = layout("P2(2)  |  Coordinated dispatch and shortlist sensitivity", (10,8.2), 3,4,
+                     height_ratios=(1.45,1,.10))
+    map_ax = fig.add_subplot(gs[0,:2])
+    nominal = execution["nominal_policies"]["beam"]
+    panel(map_ax,"A","Beam incumbent vehicle routes")
+    scene(map_ax,nominal,model.TARGETS)
+    vehicle_legend(map_ax,loc="lower center",bbox_to_anchor=(.5,-.02),columnspacing=.9)
+    clock = fig.add_subplot(gs[0,2:])
+    panel(clock,"B",f"Executed phases at shared k = {summary['shared_k']}")
+    gantt(clock,nominal,max(i["end_s"] for i in nominal if i["phase"]!="idle")*1.08,
+          summary["P2_latest_starts_s"]["beam"])
+    segment_cols = (
+        ("depart_s","arrival_s","travel"),("arrival_s","ready_s","slew"),
+        ("ready_s","start_s","wait_partner"),("start_s","end_s","observe"),
+        ("end_s","reset_s","reset"),
+    )
+    shared_width = next(row["beam_width"] for row in trials if row["plan_id"]==execution["plan_id"])
+    selected = [t for t in trials if t["routing"]=="rounded" and t["beam_width"]==shared_width]
+    assert len(selected)==4
+    for j,trial in enumerate(selected):
+        ax = fig.add_subplot(gs[1,j])
+        k,policy = trial["k"],trial["policy"]
+        latest = float(trial["latest_start_s"])
+        bottleneck = int(trial["critical_vehicle"])
+        evidence = next(row for row in chains if (row["routing"],row["k"],row["policy"],row["beam_width"])==("rounded",k,policy,shared_width))
+        assert isclose(float(evidence["latest_start_s"]),latest)
+        panel(ax,"CDEF"[j],f"k = {k}  ·  {policy.title()}")
+        accum = defaultdict(float)
+        for v in (item for item in visits if (item["routing"],item["k"],item["policy"],item["beam_width"])==("rounded",k,policy,shared_width)):
+            for first,last,phase in segment_cols:
+                duration = max(0,min(float(v[last]),latest)-float(v[first]))
+                accum[int(v["vehicle"]),phase] += duration
+        for vehicle in range(1,6):
+            bar = 0
+            for _,__,phase in segment_cols:
+                value = accum[vehicle,phase]
+                ax.barh(vehicle,value,left=bar,height=.66,fc=PHASES[phase][1],ec="white",lw=.45)
+                bar += value
+        ax.set(xlim=(0,max(float(row["latest_start_s"]) for row in selected)*1.055),
+               ylim=(5.6,-.4),yticks=list(range(1,6)),yticklabels=[f"V{i}" for i in range(1,6)],
+               xlabel="Active phase time (s)")
+        ax.xaxis.set_major_locator(MaxNLocator(4))
+        ax.grid(False,axis="y")
+        ax.text(.97,.93,f"Last start {latest:.3f} s\nV{bottleneck} · {evidence['chain'].replace('>',' → ')}",
+                transform=ax.transAxes,ha="right",va="top",fontsize=8.7,weight="bold",
+                bbox={"fc":"white","ec":"none","alpha":.9,"pad":1.2})
+        ax.get_yticklabels()[bottleneck-1].set_color(ORANGE)
+        ax.get_yticklabels()[bottleneck-1].set_weight("bold")
+    key = fig.add_subplot(gs[2,:])
+    key.axis("off")
+    phase_legend(key,tuple(phase for _,__,phase in segment_cols),loc="center")
+    return fig
 
-    case=timeline["cases"]["failure_V5"]
-    pdf=new_canvas(directory,"p4_v5_timeline",347)
-    delay=summary["V5_delay_s"]
-    heading(pdf,18,324,"V5 failure and cancellation costs",
-            f"Fault at {case['failure_s']:g} s. Both policies start all three alerts. Delay {delay:+.3f} s.")
-    for policy,title,y0 in (("keep","Keep cached schedule",198),("reschedule","Reschedule",68)):
-        score=case["scores"][policy]["latest_start_s"]
-        timeline_panel(pdf,case["policies"][policy],52,y0,25,title,score,fault=case["failure_s"])
-    timeline_legend(pdf,("travel","slew","wait_partner","observe","reset","cancel_reset","failed"),41)
-    label(pdf,461,11,"Time (s)",size=10.5,align="right",color=MUTED)
-    pdf.save()
+
+def p3_risk(results):
+    curve = read_csv(results/"P3_curve.csv")
+    mc = read_csv(results/"P3_MC.csv")
+    boundary = read_csv(results/"P3_parameters.csv")
+    verified = read_json(results/"P3_verification.json")
+    requirement = float(curve[0]["required"])
+    crossing = verified["independent_crossing_m"]
+    assert all(int(row["seed"])==SEED for row in mc)
+    assert all(int(row["samples"])==verified["mc_samples_per_probe"] for row in mc)
+    assert [row["assessment"] for row in mc]==["above","below","below"]
+    view = mc[0]
+    rng = Random(SEED)
+    sigma = A+B*float(view["distance_m"])
+    # Match the first two position variates and consume both gimbal variates
+    # exactly as in monte_carlo(). The stored 2M-sample counts are not altered.
+    draws = []
+    for _ in range(1200):
+        draws.append((rng.gauss(0,1)*sigma,rng.gauss(0,1)*sigma))
+        rng.gauss(0,OFFSET)
+        rng.gauss(0,CONTROL)
+    fig, gs = layout("P3  |  Pointing uncertainty and verified coverage boundary", (10.0,7.8), 2,2,
+                     width_ratios=(1,1.25),height_ratios=(1,1.02))
+    cloud, broad, bounds, zoom = (fig.add_subplot(gs[i,j]) for i,j in ((0,0),(0,1),(1,0),(1,1)))
+    panel(cloud,"A","Position uncertainty at the lower probe")
+    covariance_ellipse(cloud,(0,0),np.eye(2)*sigma**2,color=ORANGE)
+    cloud.scatter(*np.asarray(draws).T,s=6,alpha=.35,color=BLUE,edgecolors="none",zorder=3)
+    lim = max(abs(p) for row in draws for p in row)*1.07
+    cloud.set(xlim=(-lim,lim),ylim=(-lim,lim),aspect="equal",
+              xlabel="Longitudinal position error (m)",ylabel="Lateral position error (m)")
+    cloud.text(.02,.98,f"First {len(draws):,} seeded draws\n95% analytic position ellipse",
+               transform=cloud.transAxes,va="top",ha="left",fontsize=8.8,
+               bbox={"fc":"white","ec":GRID,"boxstyle":"round,pad=.28"},zorder=8)
+    distances = np.array([float(row["distance_m"]) for row in curve])
+    for ax in (broad,zoom):
+        for key,color,style,label in (("linear_coverage",MUTED,"--","First-order"),(
+                "nonlinear_coverage",TEAL,"-","Nonlinear quadrature")):
+            ax.plot(distances,[float(row[key]) for row in curve],color=color,ls=style,label=label)
+        ax.axhline(requirement,color=ORANGE,ls=":",lw=1.2,label="Coverage requirement")
+        ax.axvline(crossing,color=MUTED,ls=":",lw=1.2)
+        for i,row in enumerate(mc):
+            s,p = float(row["distance_m"]), float(row["estimate"])
+            lo,hi = [float(row[f"simultaneous_95_{suffix}"]) for suffix in ("lower","upper")]
+            ax.errorbar(s,p,yerr=[[p-lo],[hi-p]],color=BLUE,fmt="o",mfc="white",
+                        capsize=3.2,zorder=6,label="MC simultaneous 95% CI" if i==0 else None)
+        ax.yaxis.set_major_formatter(PercentFormatter(xmax=1,decimals=1))
+        ax.set(xlabel="Travel distance (m)",ylabel="Coverage")
+    panel(broad,"B","Coverage by travel distance")
+    broad.set(xlim=(0,max(float(row["distance_m"]) for row in mc)*1.18),ylim=(.86,1.004))
+    broad.legend(loc="lower left",fontsize=8.6)
+    panel(zoom,"D","Threshold and sided Monte Carlo checks")
+    probe_offset = crossing-float(mc[0]["distance_m"])
+    lo = min(float(row["simultaneous_95_lower"]) for row in mc[:2])
+    hi = max(float(row["simultaneous_95_upper"]) for row in mc[:2])
+    bounds_x = (crossing-2.5*probe_offset,crossing+2.5*probe_offset)
+    broad.add_patch(Rectangle((bounds_x[0],lo-.0016), bounds_x[1]-bounds_x[0],
+                              hi-lo+.0032, fill=False, ec=MUTED, lw=.8, zorder=8))
+    zoom.set(xlim=bounds_x,
+             ylim=(lo-.0016,hi+.0016))
+    zoom.annotate(f"{crossing:.6f} m", (crossing,requirement),xytext=(7,32),
+                  textcoords="offset points",arrowprops={"arrowstyle":"->","color":MUTED},weight="bold")
+    zoom.text(.97,.95,f"{int(mc[0]['samples']):,} trials per probe",
+              transform=zoom.transAxes,ha="right",va="top",fontsize=9.5)
+    panel(bounds,"C","Feasible position-error parameter boundary")
+    equal = sorted([r for r in boundary if r["case"]=="on_crossing"],key=lambda r:float(r["a_m"]))
+    a = [float(r["a_m"]) for r in equal]
+    b = [float(r["b_m_per_m"]) for r in equal]
+    bounds.fill_between(a,0,b,facecolor="#B7E0D4",alpha=.8,label="At or above requirement")
+    bounds.plot(a,b,color=TEAL,label=f"Boundary at {float(equal[0]['distance_m']):g} m")
+    for group,mark,c in (("inside","o",TEAL),("outside","x",ORANGE)):
+        rows = [r for r in boundary if r["case"]==group]
+        bounds.scatter([float(r["a_m"]) for r in rows],[float(r["b_m_per_m"]) for r in rows],
+                       marker=mark,s=28,color=c,label=group.capitalize()+" checks",zorder=4)
+    bounds.set(xlim=(-.035,max(a)*1.19),ylim=(-.001,max(b)*1.19),
+               xlabel="Intercept a (m)",ylabel="Distance coefficient b (m/m)")
+    bounds.legend(loc="upper right",fontsize=8.3)
+    return fig
 
 
-def arrow(pdf,a,b,color=MUTED,dash=()):
-    segment(pdf,a,b,color,1.0,dash)
-    theta=atan2(b[1]-a[1],b[0]-a[0])
-    heads=[(b[0]-5*cos(theta+d),b[1]-5*sin(theta+d)) for d in (-.45,.45)]
-    path_line(pdf,[heads[0],b,heads[1]],color,1.0)
+def p4_resilience(results):
+    groups = {}
+    for row in read_csv(results/"P4_cases.csv"):
+        groups.setdefault(row["case"], {})[row["policy"]] = row
+    summary = read_json(results/"priority_3.json")
+    trace = read_json(results/"Executed_timeline.json")
+    assert len(groups)==summary["P4_case_count"] and groups.keys()==trace["cases"].keys()
+    expected_plan = summary["nominal_plan_id"]
+    assert all(r["plan_id"]==expected_plan for pair in groups.values() for r in pair.values())
+    index, matrix = [], []
+    for n,(case,pair) in enumerate(groups.items(),1):
+        keep,replan = (pair[k] for k in ("keep","reschedule"))
+        last = [float(r["latest_start_s"]) for r in (keep,replan)]
+        success = [int(r["successes"]) for r in (keep,replan)]
+        ratios = [float(r["completion_ratio"]) for r in (keep,replan)]
+        score_keep,score_plan = (success[0],-last[0]),(success[1],-last[1])
+        result = (score_plan > score_keep)-(score_plan < score_keep)
+        both_completed = success[0]==success[1]==int(keep["alerts"])
+        matrix.append((*ratios,last[1]-last[0] if both_completed else np.nan,result))
+        index.append({
+            "column":n,"case":case,"keep_ratio":keep["completion_ratio"],"reschedule_ratio":replan["completion_ratio"],
+            "reschedule_minus_keep_s":f"{last[1]-last[0]:.12g}" if both_completed else "",
+            "score_outcome":{-1:"keep",0:"tie",1:"reschedule"}[result],
+        })
+    values = np.asarray(matrix)
+    fig, gs = layout(f"P4  |  Resilience across {len(groups)} archived case IDs",
+                     (10,7.8),4,2,height_ratios=(1,1,1,1.85),width_ratios=(28,1))
+    norm_time = max(abs(v) for v in values[:,2] if np.isfinite(v)) or 1
+    time_map = mpl.colormaps["PuOr_r"].copy()
+    time_map.set_bad("#D4DCE3")
+    score_map = ListedColormap(["#E6A754","#E1E9F0","#48A799"])
+    image_rows = [
+        ("Keep completion", mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
+        ("Reschedule completion",mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
+        ("Start difference (s)", time_map,TwoSlopeNorm(vmin=-norm_time,vcenter=0,vmax=norm_time)),
+        ("Score winner", score_map,BoundaryNorm([-1.5,-.5,.5,1.5],score_map.N)),
+    ]
+    chunks = np.array_split(values,3)
+    for p,rows in enumerate(chunks):
+        ax = fig.add_subplot(gs[p,0])
+        color_ax = fig.add_subplot(gs[p,1])
+        color_ax.axis("off")
+        letter = "ABC"[p]
+        first = sum(len(s) for s in chunks[:p])+1
+        panel(ax,letter,f"Case IDs {first}–{first+len(rows)-1}  |  source order")
+        for y,(_,color,norm) in enumerate(image_rows):
+            rendered = norm(np.ma.masked_invalid(rows[:,y]))
+            for j,value in enumerate(rendered):
+                ax.add_patch(Rectangle((first+j-.5,y-.46),1,.92,lw=0,fc=color(value),
+                                       antialiased=False,zorder=3))
+            scale = mpl.cm.ScalarMappable(norm=norm,cmap=color)
+            if p==0 and y==0:
+                bar = fig.colorbar(scale,cax=color_ax.inset_axes([.04,.08,.35,.84]),ticks=[0,.5,1],
+                             format=PercentFormatter(1,decimals=0))
+                bar.solids.set_rasterized(False)
+            if p==1 and y==2:
+                bar = fig.colorbar(scale,cax=color_ax.inset_axes([.04,.08,.35,.84]),ticks=[-norm_time,0,norm_time],
+                             format="%.1f")
+                bar.solids.set_rasterized(False)
+        ticks = np.arange(first,first+len(rows),2)
+        ax.set(xlim=(first-.5,first+len(rows)-.5),ylim=(3.55,-.55),yticks=np.arange(4),
+               yticklabels=[x[0] for x in image_rows],xticks=ticks)
+        ax.tick_params(axis="y",length=0)
+        ax.tick_params(axis="x",length=2)
+        ax.grid(False)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+    flow = fig.add_subplot(gs[-1,:])
+    flow.axis("off")
+    flow.set(xlim=(0,1),ylim=(0,1))
+    panel(flow,"D","Event-driven policy comparison")
+    node(flow,.015,.34,.213,.37,"Freeze nominal plan","Case clocks and availability",BLUE)
+    node(flow,.265,.34,.213,.37,"Advance event state","Replay to release time",BLUE)
+    node(flow,.523,.56,.216,.31,"Keep","Replay cached assignments",GOLD)
+    node(flow,.523,.16,.216,.31,"Reschedule","Lock pairs, revisit pending",TEAL)
+    node(flow,.78,.34,.204,.37,"Compare","Score starts in window",PURPLE)
+    connect(flow,(.232,.525),(.261,.525))
+    connect(flow,(.482,.525),(.519,.696))
+    connect(flow,(.482,.525),(.519,.325))
+    connect(flow,(.744,.697),(.776,.525))
+    connect(flow,(.744,.324),(.776,.525))
+    wins = np.asarray(values[:,3],dtype=int)
+    handles = [
+        Patch(fc="#D4DCE3",label="Time masked if either policy incomplete"),
+        Patch(fc="#E6A754",label=f"Keep {sum(wins<0)}"),
+        Patch(fc="#E1E9F0",label=f"Ties {sum(wins==0)}"),
+        Patch(fc="#48A799",label=f"Reschedule {sum(wins>0)}"),
+    ]
+    flow.legend(handles=handles,loc="lower center",ncols=4,fontsize=9,columnspacing=1)
+    return fig,index
 
 
-def framework(results,directory):
-    summary=read_json(results/"priority_3.json")
-    pdf=new_canvas(directory,"framework",308)
-    heading(pdf,18,286,"Problem B data flow",
-            f'One frozen nominal plan feeds all {summary["P4_case_count"]} disturbance case IDs')
-    nodes={
-        "input":(169,221,152,29,"Official field and alerts",None),
-        "geom":(169,171,152,32,"Shared observation geometry","Vehicle disk, pitch and LOS"),
-        "p1":(20,111,115,36,"P1  Observation region","Arc and time criterion"),
-        "p2b":(169,111,152,36,"P2(2)  Nominal dispatch","Paired vehicle events"),
-        "p2a":(356,111,114,36,"P2(1)  Precision","Local horizontal RMS"),
-        "p4":(169,45,152,37,"P4  Disturbance replay","Cached or revised events"),
-        "p3":(356,221,114,29,"P3  Pointing risk",None),
-        "deploy":(356,45,114,37,"Deployment checks","Precision and risk"),
-    }
-    for name,(x,y,w,h,title,extra) in nodes.items():
-        rectangle(pdf,x,y,w,h,TEAL_LIGHT if name in {"geom","p2b","p4"} else WASH)
-        label(pdf,x+w/2,y+h-14,title,align="center",bold=True,size=10.5)
-        if extra:
-            label(pdf,x+w/2,y+6,extra,align="center",size=9.8,color=MUTED)
-    for a,b in (((245,221),(245,203)),((245,171),(245,147)),((245,111),(245,82)),
-                ((169,181),(78,147)),((321,181),(413,147)),((321,235),(356,235))):
-        arrow(pdf,a,b,TEAL)
-    arrow(pdf,(413,111),(413,82),MUTED,(3,2))
-    for a,b in (((470,235),(480,235)),((480,235),(480,63)),((480,63),(470,63))):
-        segment(pdf,a,b,MUTED,.75,(2,2))
-    arrow(pdf,(478,63),(470,63),MUTED,(2,2))
-    label(pdf,21,18,"Solid: main geometry and plan inputs. Dashed: deployment assessment.",size=10.5,color=MUTED)
-    pdf.save()
+def v5_timeline(results):
+    comparison = read_csv(results/"P4_V5_event_comparison.csv")
+    summary = read_json(results/"priority_3.json")
+    execution = read_json(results/"Executed_timeline.json")["cases"]["failure_V5"]
+    scores = summary["V5_scores"]
+    assert scores == execution["scores"]
+    policy_rows = {p:[e for e in comparison if e["policy"]==p] for p in scores}
+    for policy,rows in policy_rows.items():
+        assert len(rows) == len(execution["policies"][policy])
+    labels = {"keep":"Keep cached schedule","reschedule":"Reschedule"}
+    delay = scores["reschedule"]["latest_start_s"] - scores["keep"]["latest_start_s"]
+    assert isclose(delay,summary["V5_delay_s"])
+    fig, gs = layout("P4  |  V5 failure and policy divergence", (9.5,7.4), 3,1,
+                     height_ratios=(1,1,.51))
+    fault = execution["failure_s"]
+    xend = max(float(row["end_s"]) for row in comparison
+               if row["phase"] not in {"idle","failed"})*1.04
+    for index,(policy,score) in enumerate(scores.items()):
+        ax = fig.add_subplot(gs[index,0])
+        panel(ax,"AB"[index],f"{labels[policy]}  ·  {score['successes']}/{score['alerts']} starts")
+        gantt(ax,policy_rows[policy],xend,score["latest_start_s"],fault=fault)
+        last_alert = max(score["starts"],key=lambda alert:score["starts"][alert])
+        candidates = [e for e in policy_rows[policy] if e["phase"]=="observe"
+                      and e["alert"]==last_alert and isclose(float(e["start_s"]),score["latest_start_s"])]
+        assert len(candidates)==2
+        ax.text(.99,.98,f"Last pair: {last_alert} · "+ " + ".join(f"V{e['vehicle']}" for e in candidates),
+                transform=ax.transAxes,va="top",ha="right",color=INK,fontsize=9,weight="bold")
+    ax = fig.add_subplot(gs[-1,0])
+    ax.axis("off")
+    ax.set(xlim=(0,1),ylim=(0,1))
+    resets = [e for e in policy_rows["reschedule"] if e["phase"]=="cancel_reset"]
+    reset_note = ", ".join(f"V{r['vehicle']} {float(r['duration_s']):.3f} s" for r in resets)
+    changed = []
+    for vehicle in range(1,6):
+        sets = [[e["alert"] for e in policy_rows[p] if int(e["vehicle"])==vehicle
+                 and e["phase"]=="observe" and float(e["start_s"])>=fault] for p in scores]
+        if all(sets) and sets[0]!=sets[1]:
+            changed.append(f"V{vehicle}: {'/'.join(sets[0])} → {'/'.join(sets[1])}")
+    node(ax,.015,.30,.380,.53,"Cancellation resets",reset_note,ORANGE)
+    node(ax,.418,.30,.276,.53,"Observed alert changes",";  ".join(changed),BLUE)
+    last_alerts = [max(score["starts"],key=lambda a:score["starts"][a]) for score in scores.values()]
+    node(ax,.719,.30,.264,.53,f"Last start {delay:+.3f} s",
+         f"Final paired alert: {last_alerts[0]} → {last_alerts[1]}",TEAL)
+    phase_legend(ax,("travel","slew","wait_partner","observe","reset","cancel_reset","failed"),
+                 loc="lower center",columnspacing=.9)
+    return fig
+
+
+def replay_frames(results, directory):
+    execution = read_json(results/"Executed_timeline.json")
+    plans = read_json(results/"P2_main_plans.json")
+    assert digest(plans["beam"])==execution["plan_id"]
+    nominal = execution["nominal_policies"]["beam"]
+    v5 = execution["cases"]["failure_V5"]
+    first = min(float(e["start_s"]) for e in nominal if e["phase"]=="observe")
+    t_fault = v5["failure_s"]
+    last = v5["scores"]["reschedule"]["latest_start_s"]
+    snapshots = [
+        ("normal_coordination","Nominal paired observation",first,model.TARGETS,[("Beam",nominal)]),
+        ("v5_fault_trigger","V5 failure trigger",t_fault,v5["targets"],[("Reschedule branch",v5["policies"]["reschedule"])]),
+        ("v5_recovery_compare","V5 case at the replan's final paired start",last,v5["targets"],
+         [(title,v5["policies"][key]) for title,key in (("Keep","keep"),("Reschedule","reschedule"))]),
+    ]
+    keydir = directory/"replay_frames"
+    sources = []
+    for stem,title,t,targets,views in snapshots:
+        fig, gs = layout(f"{title}  |  t = {t:.3f} s",(10,4.7) if len(views)==2 else (7.5,5),1,len(views))
+        for index,(policy,timeline) in enumerate(views):
+            ax = fig.add_subplot(gs[0,index])
+            panel(ax,"AB"[index],policy)
+            scene(ax,timeline,targets,time=t)
+            vehicle_legend(ax,loc="lower center",columnspacing=1.25,bbox_to_anchor=(.5,-.045))
+            sources.append({"figure":stem,"case":"nominal" if index==0 and stem=="normal_coordination" else "failure_V5",
+                            "policy":policy,"time_s":t,"source":"Executed_timeline.json; P2_main_plans.json; B题题面参数.csv",
+                            "projection":"Orthographic 3D-to-page","formats":"Vector PDF; PNG 320 dpi"})
+        save(fig,keydir,stem)
+    write_csv(keydir/"KEYFRAME_SOURCES.csv",sources)
+
+    fig, gs = layout("Replay keyframes  |  Nominal, fault, and response", (10.1,7.2), 2,2,
+                     height_ratios=(1,1))
+    ax = fig.add_subplot(gs[0,0])
+    panel(ax,"A",f"Nominal cooperation  ·  {first:.3f} s")
+    scene(ax,nominal,model.TARGETS,time=first)
+    ax = fig.add_subplot(gs[0,1])
+    panel(ax,"B",f"V5 fault trigger  ·  {t_fault:.3f} s")
+    scene(ax,v5["policies"]["reschedule"],v5["targets"],time=t_fault)
+    for column,(policy,title) in enumerate((("keep","Keep"),("reschedule","Reschedule"))):
+        ax = fig.add_subplot(gs[1,column])
+        panel(ax,"C1" if column==0 else "C2",f"{title} response  ·  {last:.3f} s")
+        scene(ax,v5["policies"][policy],v5["targets"],time=last)
+        vehicle_legend(ax,loc="lower center",columnspacing=.9,bbox_to_anchor=(.5,-.045))
+    return fig
 
 
 def generate(root):
-    setup_fonts()
-    figs=root/"figures"
-    figs.mkdir(parents=True,exist_ok=True)
-    results=root/"results"
-    p1_figure(results,figs)
-    t2_figure(results,figs)
-    p3_figure(results,figs)
-    p4_matrix(results,figs)
-    gantts(results,figs)
-    framework(results,figs)
-    for name,_,_ in FIGURE_MAP:
-        subprocess.run(["pdftoppm","-singlefile","-png","-r","300",str(figs/(name+".pdf")),
-                        str(figs/name)],check=True)
-    write_csv(figs/"FIGURE_SOURCES.csv",({"figure":n,"source":s,"purpose":p,"formats":"PDF; PNG 300 dpi"}
-                                         for n,s,p in FIGURE_MAP))
-    print(f"Rendered {len(FIGURE_MAP)} vector/PNG pairs from the verified data.")
+    directory = root/"figures"
+    results = root/"results"
+    scripts = (framework,p1_geometry,precision,dispatch,p3_risk,p4_resilience,v5_timeline)
+    for row,draw in zip(FIGURE_MAP,scripts):
+        stem,_,_ = row
+        out = draw(results)
+        if stem=="fig06_p4_resilience":
+            out,index = out
+            write_csv(directory/"P4_PANEL_INDEX.csv",index)
+        save(out,directory,stem)
+    save(replay_frames(results,directory),directory,FIGURE_MAP[-1][0])
+    write_csv(directory/"FIGURE_SOURCES.csv",(
+        {"figure":name,"source":inputs,"purpose":description,"formats":"Vector PDF; PNG 320 dpi"}
+        for name,inputs,description in FIGURE_MAP
+    ))
+    print("Rendered 8 analytical figure groups and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
 
 
 if __name__=="__main__":
-    parser=ArgumentParser(description=__doc__)
-    parser.add_argument("--out",type=Path,default=DEFAULT_OUTPUT)
-    generate(parser.parse_args().out)
+    cli = ArgumentParser(description=__doc__)
+    cli.add_argument("--out",type=Path,default=DEFAULT_OUTPUT)
+    generate(cli.parse_args().out)
 

@@ -5,6 +5,8 @@ const fs = require("node:fs");
 const vm = require("node:vm");
 
 const html = fs.readFileSync(process.argv[2], "utf8");
+assert.match(html, /<script id="plotly-runtime">[\s\S]+<\/script>/);
+assert.doesNotMatch(html, /<script[^>]*\bsrc=["']/i);
 const serialized = html.match(/<script id="payload" type="application\/json">([\s\S]*?)<\/script>/)[1];
 const logic = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const parsed = JSON.parse(serialized);
@@ -14,6 +16,8 @@ class Element {
   append(...children) { this.children.push(...children); }
   get options() { return this.children; }
   addEventListener() {}
+  setAttribute() {}
+  querySelector() { return {}; }
 }
 const elements = new Map();
 const doc = {
@@ -21,20 +25,24 @@ const doc = {
     if (!elements.has(id)) elements.set(id, new Element());
     return elements.get(id);
   },
-  createElement: () => new Element(),
+  createElement: tag => {
+    const el = new Element();
+    if (tag==="canvas") el.getContext=()=>({getExtension:()=>null});
+    return el;
+  },
   createTextNode: text => text,
   querySelectorAll: () => [],
 };
 doc.getElementById("payload").textContent = serialized;
 let renders = 0;
 const context = {
-  document: doc, window: {}, console, requestAnimationFrame: () => {},
-  Plotly: { react: async (id, traces, layout) => {
-    assert.equal(id, "scene");
+  document: doc, console, requestAnimationFrame: () => {},
+  window: {addEventListener(){}, Plotly: { react: async (el, traces, layout) => {
+    assert.equal(el, doc.getElementById("plot3d"));
     assert.equal(traces.filter(trace=>trace.type==="mesh3d").length, 5);
     assert.equal(layout.scene.xaxis.range[1], parsed.field.width);
     renders++;
-  }},
+  }}},
 };
 vm.runInNewContext(logic, context);
 const replay = context.window.BReplay;

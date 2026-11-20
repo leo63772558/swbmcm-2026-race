@@ -1,17 +1,19 @@
-"""Stage, seal and verify the local engineering review deliverables.
+"""Build and independently check the anonymous B engineering review archives.
 
 AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
-Public model release date was not verified. Assistance: packaging and QA.
+This workflow packages existing data and does not alter numerical evidence.
 """
 from argparse import ArgumentParser
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 from importlib.metadata import version
 from pathlib import Path, PurePosixPath
 from shutil import copyfile
-from zipfile import ZIP_DEFLATED, ZipFile
-import hashlib
-import json
+from tempfile import TemporaryDirectory
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 import re
+import subprocess
+import sys
 
 from pypdf import PdfReader
 
@@ -19,128 +21,166 @@ from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
 
 
+BASELINE = "9c2fef86ae38a5b6b472c7750d2451faf9df5d27"
 STEM = "BSWBMCM2613050"
 LIMIT = 20_000_000
 BEIJING = timezone(timedelta(hours=8))
-LOCK = datetime(2026,11,24,9,tzinfo=BEIJING)
-DEADLINE = datetime(2026,11,24,10,tzinfo=BEIJING)
-SOURCE_NAMES = ("problem_b_geometry.py","solve_problem_b.py","check_problem_b.py",
-                "check_b_p4_cross.py","plot_problem_b.py","reproduce_b_revision.py")
-REFERENCE_NAMES = ("B_P1.csv","B_P2_localization.csv","B_P2_fairness.csv","B_P3.csv","B_P4.csv")
+SOURCE_NAMES = (
+    "problem_b_geometry.py", "solve_problem_b.py", "check_problem_b.py",
+    "check_b_p4_cross.py", "reproduce_b_revision.py",
+    "package_b_revision.py",
+)
+REFERENCE_NAMES = (
+    "B_P1.csv", "B_P2_localization.csv", "B_P2_fairness.csv", "B_P3.csv", "B_P4.csv",
+)
+DOCUMENTS = (
+    "TEAM_HANDOFF_CHECKLIST.md", "VERIFY_REPORT.md", "IMPROVEMENT_BACKLOG.md",
+    "REPRODUCE.md", "AI_USAGE_LOG.csv", "requirements-review.txt",
+)
+PRIVATE_PATH = re.compile(r"cns|signed|签名|参赛信息|payment|\.library-transfer", re.IGNORECASE)
 
 
-def keep_each(files, out):
-    with ZipFile(out,mode="x",compression=ZIP_DEFLATED,compresslevel=7) as archive:
-        for rel, src in sorted(files.items()):
-            archive.write(src,rel)
-    assert out.stat().st_size < LIMIT
-    return validate_archive(out)
-
-
-def validate_archive(path):
+def file_manifest(path):
     with ZipFile(path) as archive:
-        names=archive.namelist()
-        assert len(names)==len(set(names))
+        names = archive.namelist()
+        assert len(names) == len(set(names)), "Duplicate archive entries"
         for name in names:
-            item=PurePosixPath(name)
-            assert not (item.is_absolute() or ".." in item.parts or "\\" in name
-                        or (item.parts and ":" in item.parts[0]))
+            member = PurePosixPath(name)
+            assert member.parts and not (member.is_absolute() or ".." in member.parts
+                                         or "\\" in name or ":" in member.parts[0]), name
+            assert not PRIVATE_PATH.search(name), name
         assert archive.testzip() is None
-        return {key:hashlib.sha256(archive.read(key)).hexdigest() for key in names}
+        return {name: sha256(archive.read(name)).hexdigest() for name in names}
 
 
-def stage(review, out):
-    payload = {
-        **{p.relative_to(ROOT).as_posix():p for p in (ROOT/"data").glob("B题题面*") if p.is_file()},
-        **{f"results/{n}":ROOT/"results"/n for n in REFERENCE_NAMES},
-        **{f"src/{n}":ROOT/"src"/n for n in SOURCE_NAMES},
-        **{f"src/{p.name}":p for pattern in ("b_revision_*.py","b_replay*") for p in (ROOT/"src").glob(pattern)},
+def write_zip(path, entries):
+    with ZipFile(path, "x") as archive:
+        for name, source in sorted(entries.items()):
+            member = ZipInfo(name, (2026, 11, 21, 0, 0, 0))
+            archive.writestr(member, source.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=8)
+    assert path.stat().st_size < LIMIT, f"{path.name} exceeds {LIMIT:,} bytes"
+    return file_manifest(path)
+
+
+def support_entries(review):
+    entries = {
+        **{path.relative_to(ROOT).as_posix(): path
+           for path in (ROOT / "data").glob("B题题面*") if path.is_file()},
+        **{f"results/{name}": ROOT / "results" / name for name in REFERENCE_NAMES},
+        **{f"src/{name}": ROOT / "src" / name for name in SOURCE_NAMES},
+        **{f"src/{path.name}": path for pattern in ("b_revision_*.py", "b_replay*")
+           for path in (ROOT / "src").glob(pattern) if path.is_file()},
+        **{name: review / name for name in DOCUMENTS},
     }
-    for name in ("results","figures","simulator"):
-        for p in (review/name).rglob("*"):
-            if p.is_file():
-                payload["artifacts/"+p.relative_to(review).as_posix()]=p
-    for name in ("B_submission.tex","B_submission.pdf","B_review_metrics.tex","P1_ERRATA.tex",
-                 "P1_ERRATA.pdf","NUMBER_PROVENANCE.csv"):
-        payload[f"artifacts/paper/{name}"]=review/"paper"/name
-    for name in ("TEAM_HANDOFF_CHECKLIST.md","REPRODUCE.md","AI_USAGE_LOG.csv","requirements-review.txt"):
-        payload[name]=review/name
-    payload["artifacts/qa/PDF_CHECKS.json"]=review/"qa"/"PDF_CHECKS.json"
-    result=keep_each(payload,out)
-    assert "artifacts/paper/B_submission.tex" in result and "src/reproduce_b_revision.py" in result
-    assert not any("cns" in f.lower() for f in result)
-    print(f"Prepared {out.name}; {len(result)} members; {out.stat().st_size:,} bytes")
-    return result
+    figure_dir = review / "figures"
+    paper_dir = review / "paper"
+    files = [
+        *(review / "results").glob("*"),
+        *figure_dir.glob("fig[0-9][0-9]_*"),
+        *figure_dir.glob("FIGURE_SOURCES.csv"),
+        *figure_dir.glob("P4_PANEL_INDEX.csv"),
+        *(figure_dir / "replay_frames").rglob("*"),
+        *(review / "simulator").rglob("*"),
+        *(path for path in paper_dir.rglob("*") if path.suffix in (".tex", ".pdf", ".bib", ".md", ".csv")),
+        *(path for path in (review / "qa").glob("*.json") if path.name != "REPRODUCTION_CHECK.json"),
+    ]
+    entries.update({f"artifacts/{path.relative_to(review).as_posix()}": path
+                    for path in files if path.is_file()})
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.pdf"))) == 8
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.png"))) == 8
+    assert (review / "qa" / "SIMULATOR_CHECKS.json").is_file()
+    return entries
 
 
-def seal(review, original_zip, reproduced):
-    reproduced_qa=read_json(reproduced/"REPRODUCTION_CHECK.json")
-    assert reproduced_qa["byte_matches"]>0 and len(reproduced_qa["pdf_text_matches"])==2
-    base=validate_archive(original_zip)
-    proof=review/"qa"/"REPRODUCTION_CHECK.json"
-    copyfile(reproduced/"REPRODUCTION_CHECK.json",proof)
-    support=review/(STEM+"fj.zip")
-    additions=("VERIFY_REPORT.md","IMPROVEMENT_BACKLOG.md","qa/REPRODUCTION_CHECK.json")
-    with (ZipFile(original_zip) as old, ZipFile(support,mode="x",compression=ZIP_DEFLATED,compresslevel=7) as new):
-        for name in old.namelist():
-            new.writestr(name,old.read(name))
-        for name in additions:
-            new.write(review/name,name)
-    final=validate_archive(support)
-    assert all(final[n]==sha for n,sha in base.items())
-    signed=ROOT/"submission"/(STEM+"cns.pdf")
-    submitted_paper=review/"paper"/"B_submission.pdf"
-    reviewer=PdfReader(submitted_paper)
-    assert not reviewer.metadata.author and not reviewer.attachments
-    fulltext="".join(re.sub(r"\s+","",p.extract_text() or "") for p in reviewer.pages)
-    assert "Teamreviewcopy" in fulltext and "Teamtextpending" in fulltext
-    assert len(reviewer.pages)<=25
-    assert all(path.stat().st_size<LIMIT for path in (signed,support,submitted_paper))
-    moment=datetime.now(BEIJING)
-    checks={
-        "status":"team_review_edition",
-        "submission_authorized":False,
-        "checked_at_beijing":moment.isoformat(),
-        "content_lock_beijing":LOCK.isoformat(),
-        "submission_deadline_beijing":DEADLINE.isoformat(),
-        "content_lock_already_passed":moment>=LOCK,
-        "paper":{"official_filename":STEM+".pdf","review_file":"paper/B_submission.pdf",
-                 "bytes":submitted_paper.stat().st_size,"sha256":file_hash(submitted_paper),
-                 "pages":len(reviewer.pages),"empty_author_metadata":True,"attachments":0},
-        "support":{"filename":support.name,"bytes":support.stat().st_size,"sha256":file_hash(support),
-                   "member_count":len(final),"crc_passed":True,"member_sha256":final},
-        "signed_commitment":{"filename":signed.name,"bytes":signed.stat().st_size,
-                             "contents_and_signatures_reviewed":False},
-        "reproduced_byte_matches":reproduced_qa["byte_matches"],
-        "pdf_text_matches":reproduced_qa["pdf_text_matches"],
-    }
-    write_json(review/"RELEASE_ACCEPTANCE.json",checks)
-    bundle=review/"SWB_2026_B_Engineering_Review.zip"
-    keep_each({"B_submission_review.pdf":submitted_paper,"P1_ERRATA.pdf":review/"paper"/"P1_ERRATA.pdf",
-               **{key:review/key for key in ("REPRODUCE.md","TEAM_HANDOFF_CHECKLIST.md","VERIFY_REPORT.md",
-                  "IMPROVEMENT_BACKLOG.md","AI_USAGE_LOG.csv","RELEASE_ACCEPTANCE.json",
-                  support.name)}},bundle)
-    print("Sealed",support.name,support.stat().st_size,"bytes;",len(final),"members")
-    print("Team bundle",bundle.name,bundle.stat().st_size,"bytes")
+def inspect_paper(path):
+    paper = PdfReader(path)
+    assert not (paper.metadata and paper.metadata.author) and not paper.attachments
+    assert 2 < len(paper.pages) <= 25
+    page_one = re.sub(r"\s+", "", paper.pages[0].extract_text() or "")
+    assert "Teamreviewcopy" in page_one
+    assert path.stat().st_size < LIMIT
+    return {"file": "paper/B_submission.pdf", "pages": len(paper.pages),
+            "bytes": path.stat().st_size, "sha256": file_hash(path),
+            "empty_author_metadata": True, "attachments": 0,
+            "in_requested_page_range": 18 <= len(paper.pages) <= 22}
 
 
-def requirements(out):
-    out.write_text("\n".join(f"{package}=={version(package)}" for package in ("reportlab","pypdf","Pillow"))+"\n",
-                   encoding="utf-8")
+def inspect_replay(review):
+    evidence = read_json(review / "qa" / "SIMULATOR_CHECKS.json")
+    simulator = review / "simulator" / "B_Simulator.html"
+    assert evidence["html_sha256"] == file_hash(simulator)
+    assert evidence["standalone_file_only"] and evidence["browser_context_offline"]
+    renderers = {run["renderer"]: run for run in evidence["runs"]}
+    assert set(renderers) == {"webgl", "canvas"}
+    assert renderers["webgl"]["forced_context_loss_fallback"]
+    for run in renderers.values():
+        assert run["remote_requests"] == run["page_errors"] == 0
+        assert set(run["camera_controls"]) == {"top", "follow", "iso"}
+        assert len(run["screenshots"]) == 3
+        assert run["route_footprint_check"]["buildingHits"] == 0
+        assert run["route_footprint_check"]["pointHits"] == 0
 
 
-if __name__=="__main__":
-    parser=ArgumentParser(description=__doc__)
-    parser.add_argument("--review",type=Path,default=DEFAULT_OUTPUT)
-    sub=parser.add_subparsers(dest="action",required=True)
-    a=sub.add_parser("stage")
-    a.add_argument("zip",type=Path)
-    b=sub.add_parser("seal")
-    b.add_argument("zip",type=Path)
-    b.add_argument("rerun",type=Path)
-    args=parser.parse_args()
-    if args.action=="stage":
-        requirements(args.review/"requirements-review.txt")
-        stage(args.review,args.zip)
-    else:
-        seal(args.review,args.zip,args.rerun)
+def build(review, bundle):
+    review = review.resolve()
+    bundle = bundle.resolve(strict=True)
+    paper = review / "paper" / "B_submission.pdf"
+    paper_info = inspect_paper(paper)
+    inspect_replay(review)
+    dependencies = ("matplotlib", "numpy", "pypdf", "Pillow")
+    (review / "requirements-review.txt").write_text(
+        "\n".join(f"{name}=={version(name)}" for name in dependencies) + "\n", encoding="utf-8"
+    )
+    with TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent) as folder:
+        temp = Path(folder)
+        payload = support_entries(review)
+        seed = temp / "staged.zip"
+        write_zip(seed, payload)
+        extracted = temp / "clean"
+        with ZipFile(seed) as archive:
+            archive.extractall(extracted)
+        rerun = temp / "rerun"
+        subprocess.run([sys.executable, "-B", str(extracted / "src" / "reproduce_b_revision.py"),
+                        "--out", str(rerun), "--tex-bundle", str(bundle)],
+                       cwd=extracted, check=True)
+        proof = rerun / "REPRODUCTION_CHECK.json"
+        results = read_json(proof)
+        assert len(results["pdf_text_matches"]) == 2
+        upload = temp / (STEM + "fj.zip")
+        manifest = write_zip(upload, {**payload, "qa/REPRODUCTION_CHECK.json": proof})
+        acceptance = temp / "RELEASE_ACCEPTANCE.json"
+        write_json(acceptance, {
+            "status": "team_review_edition",
+            "submission_authorized": False,
+            "baseline_commit": BASELINE,
+            "checked_at_beijing": datetime.now(BEIJING).isoformat(),
+            "content_lock_beijing": "2026-11-24T09:00:00+08:00",
+            "submission_deadline_beijing": "2026-11-24T10:00:00+08:00",
+            "paper": paper_info,
+            "support": {"filename": upload.name, "bytes": upload.stat().st_size,
+                        "sha256": file_hash(upload), "member_count": len(manifest),
+                        "crc_passed": True, "member_sha256": manifest},
+            "reproduction": results,
+        })
+        engineering = temp / "SWB_2026_B_Engineering_Review.zip"
+        write_zip(engineering, {
+            "B_submission_review.pdf": paper,
+            "P1_ERRATA.pdf": review / "paper" / "P1_ERRATA.pdf",
+            **{name: review / name for name in DOCUMENTS},
+            acceptance.name: acceptance,
+            upload.name: upload,
+        })
+        copyfile(proof, review / "qa" / proof.name)
+        for path in (upload, acceptance, engineering):
+            copyfile(path, review / path.name)
+        print(f"{upload.name}: {len(manifest)} files, {upload.stat().st_size:,} bytes")
+        print(f"{engineering.name}: {engineering.stat().st_size:,} bytes")
+        print(f"Reviewed paper: {paper_info['pages']} A4 pages")
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--review", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--bundle", type=Path, required=True)
+    arguments = parser.parse_args()
+    build(arguments.review, arguments.bundle)

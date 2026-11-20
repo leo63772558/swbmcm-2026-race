@@ -24,7 +24,6 @@ def digest(file):
 def fresh_reproduction(archive_path):
     tracked = [
         *(f"results/{name}" for name in PROTOTYPE_RESULTS),
-        "paper/B_prototype.tex",
         *(f"figures/{name}" for name in PROTOTYPE_FIGURES),
     ]
     commands = ["solve_problem_b.py", "check_problem_b.py", "render_problem_b.py"]
@@ -32,6 +31,8 @@ def fresh_reproduction(archive_path):
         target = Path(directory)
         with ZipFile(archive_path) as archive:
             filenames = archive.namelist()
+            if "paper/B_prototype.tex" in filenames:
+                tracked.append("paper/B_prototype.tex")
             assert all(not Path(name).is_absolute() and ".." not in Path(name).parts for name in filenames)
             tracked.extend(f"figures/{name}" for name in PROTOTYPE_PREVIEWS if f"figures/{name}" in filenames)
             for script, outputs in PROTOTYPE_AUDITS:
@@ -124,7 +125,7 @@ def main():
         "并核对每个扰动案例的事件、失效车辆与评分。参见 results/B_validation.csv。\n"
         "- **结论范围。** P2(2) 和 P4 是有限候选上的可行调度，尚无连续空间全局最优性证明。"
         "P4 的结果针对列出的案例和断联口径。\n"
-        "- **交接状态。** 本目录是队内工作包，承诺书另行保管。\n\n"
+        "- **交接状态。** 上述为技术验收结果。队员核查和 AI 申报由队伍负责，承诺书另行保管。\n\n"
         "验收结构参考 [HowToCompeteBetter 的 Codex 指南](https://github.com/Rain-dust/HowToCompeteBetter/blob/main/book/04-用Codex完成数模.md)。\n",
         encoding="utf-8",
     )

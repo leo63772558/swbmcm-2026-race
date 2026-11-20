@@ -21,7 +21,6 @@ SUBMISSION = ROOT / "submission"
 TEAM = "SWBMCM2613050"
 STEM = "B" + TEAM
 MAX_BYTES = 20_000_000
-DRAFT_DISCLOSURE = "this version records the ai-produced draft"
 PROTOTYPE_RESULTS = (
     "B_P1.csv", "B_P2_localization.csv", "B_P2_schedules.csv", "B_P3.csv",
     "B_P3_coverage.csv", "B_P4.csv", "B_validation.csv", "B_timelines.json",
@@ -112,8 +111,8 @@ def verify_manuscript(path, *, prototype):
     report_pages = [" ".join(text.split()) for text in page_texts[2:]]
     if not any("AI Tool Usage Report" in text for text in report_pages):
         raise ValueError("The manuscript is missing the AI Tool Usage Report.")
-    if not prototype and any(DRAFT_DISCLOSURE in text.casefold() for text in report_pages):
-        raise ValueError("The manuscript identifies itself as the AI-produced prototype.")
+    if not prototype and "Internal Working Draft" in page_texts[0]:
+        raise ValueError("The cover still carries the internal working-draft label.")
 
 
 def run_pdf_qa(path, report_dir, counted_pages):

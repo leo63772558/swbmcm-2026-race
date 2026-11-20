@@ -109,6 +109,24 @@ def verify_browser(browser, path, renderer, pictures):
         assert field.get_attribute("data-camera") == camera
         page.wait_for_function("(mode) => field.dataset.drawnCamera===mode", arg=camera)
         assert pixels(field.screenshot())["colored_pixel_fraction"] > .025
+    # Verify one-click Auto-Tour: V5 Fault & Dual-Strategy Demo
+    tour_btn = page.locator("#autoTourBtn")
+    assert tour_btn.is_visible()
+    assert "Auto-Tour" in tour_btn.inner_text()
+    tour_btn.click()
+    page.wait_for_function(
+        "() => field.dataset.case==='failure_V5' && field.dataset.policy==='reschedule' && field.dataset.camera==='iso'"
+    )
+    page.wait_for_function(
+        "() => field.dataset.autotour==='fault_highlight' || field.dataset.autotour==='recovery' || field.dataset.autotour==='complete'",
+        timeout=12000,
+    )
+    assert page.locator("#tourCaption").get_attribute("data-active") == "true"
+    assert page.locator("#faultBanner").get_attribute("data-active") == "true"
+    if page.locator("#autoTourBtn").get_attribute("data-active") == "true":
+        tour_btn.click()
+        page.wait_for_function("() => field.dataset.autotour==='idle'")
+
     if renderer == "webgl":
         page.evaluate("""() => {
           const canvas = document.querySelector("#plot3d .gl-container canvas");
@@ -126,6 +144,7 @@ def verify_browser(browser, path, renderer, pictures):
     assert not external and not errors, {"external": external, "page_errors": errors}
     context.close()
     return {"renderer": renderer, "screenshots": captures, "camera_controls": cameras,
+            "auto_tour_verified": True,
             "event_marker_count": 10, "remote_requests": len(external), "page_errors": len(errors),
             "forced_context_loss_fallback": renderer == "webgl", "route_footprint_check": routes}
 

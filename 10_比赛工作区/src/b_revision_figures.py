@@ -260,7 +260,7 @@ def p1_geometry(results):
                         (deg[1],losses[1]),xytext=(-85,30),textcoords="offset points",
                         arrowprops={"arrowstyle":"->","color":ORANGE},color=ORANGE,fontsize=10.5,
                         bbox={"fc":"white","ec":"none","pad":1.4})
-    sensitivity.set(xlabel="Pitch ceiling (degrees)",ylabel="Loss of quality (%)",ylim=(-3,max(losses)+8))
+    sensitivity.set(xlabel=r"Pitch ceiling $\beta_{\max}$ (deg)", ylabel="Relative quality loss (%)", ylim=(-3, max(losses)+8))
     return fig
 
 
@@ -483,7 +483,7 @@ def dispatch(results):
     scene(map_ax,nominal,model.TARGETS)
     vehicle_legend(map_ax,loc="lower center",bbox_to_anchor=(.5,-.02),columnspacing=.9)
     clock = fig.add_subplot(gs[0,2:])
-    panel(clock,"B",f"Executed phases at shared k = {summary['shared_k']}")
+    panel(clock,"B",rf"Executed phases at shared $k = {summary['shared_k']}$")
     gantt(clock,nominal,max(i["end_s"] for i in nominal if i["phase"]!="idle")*1.08,
           summary["P2_latest_starts_s"]["beam"])
     segment_cols = (
@@ -501,7 +501,7 @@ def dispatch(results):
         bottleneck = int(trial["critical_vehicle"])
         evidence = next(row for row in chains if (row["routing"],row["k"],row["policy"],row["beam_width"])==("rounded",k,policy,shared_width))
         assert isclose(float(evidence["latest_start_s"]),latest)
-        panel(ax,"CDEF"[j],f"k = {k}  ·  {policy.title()}")
+        panel(ax,"CDEF"[j],rf"$k = {k}$  ·  {policy.title()}")
         accum = defaultdict(float)
         for v in (item for item in visits if (item["routing"],item["k"],item["policy"],item["beam_width"])==("rounded",k,policy,shared_width)):
             for first,last,phase in segment_cols:
@@ -574,7 +574,7 @@ def p3_risk(results):
             ax.errorbar(s,p,yerr=[[p-lo],[hi-p]],color=BLUE,fmt="o",mfc="white",
                         capsize=3.2,zorder=6,label="MC simultaneous 95% CI" if i==0 else None)
         ax.yaxis.set_major_formatter(PercentFormatter(xmax=1,decimals=1))
-        ax.set(xlabel="Travel distance (m)",ylabel="Coverage")
+        ax.set(xlabel=r"Travel distance $s$ (m)",ylabel=r"Coverage probability $P(s)$")
     panel(broad,"B","Coverage by travel distance")
     broad.set(xlim=(0,max(float(row["distance_m"]) for row in mc)*1.18),ylim=(.86,1.004))
     broad.legend(loc="lower left",fontsize=8.6)
@@ -587,7 +587,7 @@ def p3_risk(results):
                               hi-lo+.0032, fill=False, ec=MUTED, lw=.8, zorder=8))
     zoom.set(xlim=bounds_x,
              ylim=(lo-.0016,hi+.0016))
-    zoom.annotate(f"{crossing:.6f} m", (crossing,requirement),xytext=(7,32),
+    zoom.annotate(rf"$s_{{\max}} = {crossing:.6f}$ m", (crossing,requirement),xytext=(7,32),
                   textcoords="offset points",arrowprops={"arrowstyle":"->","color":MUTED},weight="bold")
     zoom.text(.97,.95,f"{int(mc[0]['samples']):,} trials per probe",
               transform=zoom.transAxes,ha="right",va="top",fontsize=9.5)
@@ -595,14 +595,14 @@ def p3_risk(results):
     equal = sorted([r for r in boundary if r["case"]=="on_crossing"],key=lambda r:float(r["a_m"]))
     a = [float(r["a_m"]) for r in equal]
     b = [float(r["b_m_per_m"]) for r in equal]
-    bounds.fill_between(a,0,b,facecolor="#B7E0D4",alpha=.8,label="At or above requirement")
-    bounds.plot(a,b,color=TEAL,label=f"Boundary at {float(equal[0]['distance_m']):g} m")
+    bounds.fill_between(a,0,b,facecolor="#B7E0D4",alpha=.8,label="At or above 95% requirement")
+    bounds.plot(a,b,color=TEAL,label=rf"Boundary at $s = {float(equal[0]['distance_m']):g}$ m")
     for group,mark,c in (("inside","o",TEAL),("outside","x",ORANGE)):
         rows = [r for r in boundary if r["case"]==group]
         bounds.scatter([float(r["a_m"]) for r in rows],[float(r["b_m_per_m"]) for r in rows],
                        marker=mark,s=28,color=c,label=group.capitalize()+" checks",zorder=4)
     bounds.set(xlim=(-.035,max(a)*1.19),ylim=(-.001,max(b)*1.19),
-               xlabel="Intercept a (m)",ylabel="Distance coefficient b (m/m)")
+               xlabel=r"Base position std $a$ (m)",ylabel=r"Drift slope $b$ (m/m)")
     bounds.legend(loc="upper right",fontsize=8.3)
     return fig
 
@@ -639,10 +639,10 @@ def p4_resilience(results):
     time_map.set_bad("#D4DCE3")
     score_map = ListedColormap(["#E6A754","#E1E9F0","#48A799"])
     image_rows = [
-        ("Keep completion", mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
-        ("Reschedule completion",mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
-        ("Start difference (s)", time_map,TwoSlopeNorm(vmin=-norm_time,vcenter=0,vmax=norm_time)),
-        ("Score winner", score_map,BoundaryNorm([-1.5,-.5,.5,1.5],score_map.N)),
+        (r"Keep completion $\eta$", mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
+        (r"Reschedule completion $\eta$",mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
+        (r"Start diff. $\Delta t_{\mathrm{last}}$ (s)", time_map,TwoSlopeNorm(vmin=-norm_time,vcenter=0,vmax=norm_time)),
+        ("Lexicographic winner", score_map,BoundaryNorm([-1.5,-.5,.5,1.5],score_map.N)),
     ]
     chunks = np.array_split(values,3)
     for p,rows in enumerate(chunks):
@@ -816,33 +816,37 @@ def p2_paths(results):
             col = COLORS[vid - 1]
             sx, sy = model.VEHICLES[vid - 1]
             ax.scatter([sx], [sy], marker="s", s=42, color=col, edgecolor=INK, linewidth=0.8, zorder=7)
-            s_off = (4, -10) if vid != 2 else (-28, -2)
+            s_off = {1: (6, -4), 2: (-28, -2), 3: (6, -3), 4: (4, -10), 5: (6, 2)}.get(vid, (5, -8))
             ax.annotate(f"V{vid}(0)", (sx, sy), xytext=s_off, textcoords="offset points", fontsize=8, fontweight="bold", color=col)
             for item in near_plan:
-                if item["vehicle"] == vid and item.get("path"):
+                if item["vehicle"] == vid - 1 and item.get("path"):
                     pts = np.asarray(item["path"], float)
                     ax.plot(pts[:, 0], pts[:, 1], linestyle="--", linewidth=1.7, color=MUTED, alpha=0.85, zorder=4)
                     ax.scatter([pts[-1, 0]], [pts[-1, 1]], marker="^", s=34, color=MUTED, zorder=5)
+            grouped_beam = defaultdict(list)
             for item in beam_plan:
-                if item["vehicle"] == vid and item.get("path"):
+                if item["vehicle"] == vid - 1 and item.get("path"):
                     pts = np.asarray(item["path"], float)
                     ax.plot(pts[:, 0], pts[:, 1], linestyle="-", linewidth=2.4, color=col, zorder=5)
                     ax.scatter([pts[-1, 0]], [pts[-1, 1]], marker="o", s=40, color=col, edgecolor="white", linewidth=0.8, zorder=6)
-                    e_off = (-28, 6) if vid == 1 else (4, 5)
-                    ax.annotate(f"V{vid}->{item['alert']}", (pts[-1, 0], pts[-1, 1]),
-                                xytext=e_off, textcoords="offset points", fontsize=7.5, color=INK)
+                    grouped_beam[(round(pts[-1, 0], 3), round(pts[-1, 1], 3))].append(item["alert"])
+            for (ex, ey), alerts in grouped_beam.items():
+                e_off = {1: (5, 5), 2: (-34, -4), 3: (5, 4), 4: (-30, 6), 5: (6, -9)}.get(vid, (5, 4))
+                ax.annotate(f"V{vid} → {','.join(alerts)}", (ex, ey),
+                            xytext=e_off, textcoords="offset points", fontsize=7.5, fontweight="bold", color=INK)
 
-    draw_vehicle_panel(fig.add_subplot(gs[0, 0]), "a", "Reused vehicle V3 (T1 -> T3, zero wait)", [3])
+    draw_vehicle_panel(fig.add_subplot(gs[0, 0]), "a", r"Reused vehicle V3 ($\mathrm{T1}\to\mathrm{T3}$, zero wait)", [3])
     draw_vehicle_panel(fig.add_subplot(gs[0, 1]), "b", "Vehicles V4 & V5 station assignments", [4, 5])
-    draw_vehicle_panel(fig.add_subplot(gs[1, 0]), "c", "Vehicles V1 & V2 (k=8 unlocked stations)", [1, 2])
+    draw_vehicle_panel(fig.add_subplot(gs[1, 0]), "c", r"Vehicles V1 & V2 ($k=8$ unlocked stations)", [1, 2])
     ax_all = fig.add_subplot(gs[1, 1])
-    draw_vehicle_panel(ax_all, "d", "Global 5-vehicle routing (k=8 vs Nearest)", [1, 2, 3, 4, 5])
+    draw_vehicle_panel(ax_all, "d", r"Global 5-vehicle routing ($k=8$ vs. Nearest)", [1, 2, 3, 4, 5])
     handles = [
-        Line2D([0], [0], color=INK, lw=2.2, linestyle="-", label="Beam Search (k=8)"),
+        Line2D([0], [0], color=INK, lw=2.2, linestyle="-", label=r"Beam Search ($k=8$)"),
         Line2D([0], [0], color=MUTED, lw=1.7, linestyle="--", label="Nearest Baseline"),
         Line2D([0], [0], marker="D", color="none", markerfacecolor=ORANGE, markeredgecolor=INK, markersize=6, label="UAV Alert"),
     ]
-    ax_all.legend(handles=handles, loc="lower left", frameon=True, facecolor="white", framealpha=0.92, fontsize=7.8)
+    ax_all.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.48, 0.56),
+                  frameon=True, facecolor="white", framealpha=0.94, fontsize=7.6)
     return fig
 
 
@@ -976,8 +980,8 @@ def pareto_and_3d(results, directory):
     if nom:
         nx, ny = float(nom["latest_start_s"]), float(nom["total_travel_m"])
         ax.scatter([nx], [ny], s=140, marker="*", color=CORAL, edgecolor=INK, linewidth=0.9,
-                   label="Nominal plan (k=8, bw=20)", zorder=7)
-        ax.annotate(f"Nominal k=8 ({nx:.3f} s, {ny:.1f} m)", (nx, ny),
+                   label=r"Nominal plan ($k=8$, $w=20$)", zorder=7)
+        ax.annotate(rf"Nominal $k=8$ ({nx:.3f} s, {ny:.1f} m)", (nx, ny),
                     xytext=(12, 10), textcoords="offset points", fontsize=8.5, fontweight="bold", color=CORAL,
                     arrowprops=dict(arrowstyle="->", color=CORAL, lw=1.0))
     base = next((r for r in pareto if r["tag"] == "nearest_baseline"), None)
@@ -988,16 +992,17 @@ def pareto_and_3d(results, directory):
                     arrowprops=dict(arrowstyle="->", color=GOLD, lw=1.0))
     ax.set_xlabel(r"Latest paired observation start $t_{\mathrm{last}}$ (s)")
     ax.set_ylabel("Total fleet travel distance (m)")
-    ax.legend(loc="upper right", fontsize=8.5, frameon=True, facecolor="white", ncol=2)
+    ax.set_ylim(19.2, 46.5)
+    ax.legend(loc="upper right", fontsize=8.4, frameon=True, facecolor="white", framealpha=0.95, ncol=2)
 
-    # Bottom row: (b) Three-panel dark 3D digital twin keyframe triptych
-    sub = outer[1, 0].subgridspec(1, 3, wspace=0.06)
+    # Bottom row: (b) Three-panel dark 3D digital twin keyframe triptych with print-ready framing
+    sub = outer[1, 0].subgridspec(1, 3, wspace=0.07)
     captures = directory / "replay_frames" / "browser_captures"
     fallbacks = directory / "replay_frames"
     triplets = [
-        ("b1", "Nominal cooperation (t = 3.093 s)", captures / "webgl_1_nominal_beam.png", fallbacks / "normal_coordination.png"),
-        ("b2", "V5 fault trigger (t = 5.000 s)", captures / "webgl_2_failure_V5_keep.png", fallbacks / "v5_fault_trigger.png"),
-        ("b3", "V5 recovery compare (t = 12.927 s)", captures / "webgl_3_failure_V5_reschedule.png", fallbacks / "v5_recovery_compare.png"),
+        ("b1", r"Normal Coordination ($t = 3.093$ s)", captures / "webgl_1_nominal_beam.png", fallbacks / "normal_coordination.png"),
+        ("b2", r"V5 Fault Trigger ($t = 5.000$ s)", captures / "webgl_2_failure_V5_keep.png", fallbacks / "v5_fault_trigger.png"),
+        ("b3", r"Reschedule Recovery ($t = 12.927$ s)", captures / "webgl_3_failure_V5_reschedule.png", fallbacks / "v5_recovery_compare.png"),
     ]
     for col_i, (tag, subtitle, primary_img, fallback_img) in enumerate(triplets):
         ax3 = fig.add_subplot(sub[0, col_i])
@@ -1008,13 +1013,17 @@ def pareto_and_3d(results, directory):
                 w_px, h_px = im.size
                 box = (int(w_px * 0.14), int(h_px * 0.08), int(w_px * 0.86), int(h_px * 0.92))
                 ax3.imshow(im.crop(box))
-        ax3.set_title(f"({tag}) {subtitle}", fontsize=9.5, fontweight="bold", color=INK, pad=4)
+        ax3.set_title(
+            f"({tag}) {subtitle}",
+            fontsize=9.2, fontweight="bold", color=INK, pad=6,
+            bbox=dict(boxstyle="square,pad=0.28", facecolor="#FFFFFF", edgecolor="#CBD5E1", linewidth=0.6),
+        )
         ax3.set_xticks([])
         ax3.set_yticks([])
         for sp in ax3.spines.values():
             sp.set_visible(True)
-            sp.set_color("#38BDF8")
-            sp.set_linewidth(1.0)
+            sp.set_color("#64748B")
+            sp.set_linewidth(0.6)
     return fig
 
 

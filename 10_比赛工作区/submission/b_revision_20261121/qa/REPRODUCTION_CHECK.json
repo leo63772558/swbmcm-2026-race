@@ -84,12 +84,12 @@
     "P1_ERRATA.pdf"
   ],
   "wall_seconds": {
-    "1_correctness": 0.532,
-    "2_validation": 8.949,
-    "3_experiments": 4.381,
-    "3b_sensitivity_pareto": 8.372,
-    "4_visuals": 11.314,
-    "5_pdf": 12.695
+    "1_correctness": 0.586,
+    "2_validation": 9.401,
+    "3_experiments": 4.52,
+    "3b_sensitivity_pareto": 9.006,
+    "4_visuals": 11.91,
+    "5_pdf": 17.354
   },
   "plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab"
 }

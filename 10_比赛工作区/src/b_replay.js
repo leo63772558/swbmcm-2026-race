@@ -14,6 +14,10 @@ let playbackSpeed = 1.0;
 let lastDraw = 0;
 let drawInProgress = null;
 let drawPending = false;
+let autoTourActive = false;
+let autoTourTimer = null;
+let autoTourStage = "idle";
+let tourFaultPulse = false;
 
 function fmt(x, places = 2) { return Number(x).toFixed(places); }
 function positionPath(path, length) {
@@ -218,6 +222,7 @@ async function drawOnce() {
       (frame.branch.length ? " · alternate policy dashed" : "") : "Nominal corridor active";
   if ($("faultBanner")) {
     $("faultBanner").dataset.active = String(afterEvent);
+    $("faultBanner").dataset.pulse = String(Boolean(afterEvent && tourFaultPulse));
     $("faultBanner").textContent = afterEvent ? "ALERT · " + eventLabel + " @ t = " + fmt(record.disturbance_s, 2) + " s" : "";
   }
   if ($("hudScenario")) {
@@ -312,7 +317,7 @@ for (const [title, id, policy, at] of bookmarks) {
   const button = node("button", title);
   button.type = "button";
   button.title = fmt(at, 3) + " s";
-  button.addEventListener("click", () => setCase(id, policy, at));
+  button.addEventListener("click", () => { stopAutoTour(true); setCase(id, policy, at); });
   $("bookmarks").append(button);
 }
 for (const [label, color] of Object.values(data.phases)) {
@@ -321,17 +326,121 @@ for (const [label, color] of Object.values(data.phases)) {
   const chip = node("i"); chip.style.backgroundColor = color;
   span.append(chip, document.createTextNode(label)); $("phases").append(span);
 }
-$("case").addEventListener("change", e => setCase(e.target.value));
+function stopAutoTour(clearCaption = true) {
+  autoTourActive = false;
+  tourFaultPulse = false;
+  autoTourStage = "idle";
+  if (autoTourTimer !== null) { clearTimeout(autoTourTimer); autoTourTimer = null; }
+  const btn = $("autoTourBtn");
+  if (btn) {
+    btn.dataset.active = "false";
+    btn.setAttribute("aria-pressed", "false");
+    btn.textContent = "▶ Auto-Tour: V5 Fault & Dual-Strategy Demo";
+  }
+  const cap = $("tourCaption");
+  if (cap && clearCaption) { cap.dataset.active = "false"; cap.textContent = ""; }
+  $("field").dataset.autotour = "idle";
+  if ($("faultBanner")) $("faultBanner").dataset.pulse = "false";
+}
+
+function setTourCaption(text) {
+  const cap = $("tourCaption");
+  if (!cap) return;
+  cap.dataset.active = "true";
+  cap.textContent = text;
+}
+
+async function startAutoTour() {
+  if (autoTourActive) { stopAutoTour(true); await draw(); return; }
+  stopAutoTour(false);
+  autoTourActive = true;
+  playing = false;
+  $("play").textContent = "Play";
+  const btn = $("autoTourBtn");
+  if (btn) {
+    btn.dataset.active = "true";
+    btn.setAttribute("aria-pressed", "true");
+    btn.textContent = "⏹ Stop Auto-Tour";
+  }
+  $("field").dataset.autotour = "active";
+  if ($("dualOverlay")) $("dualOverlay").checked = true;
+  if ($("los")) $("los").checked = true;
+  if ($("bldgTrans")) $("bldgTrans").checked = true;
+  const v5Case = data.cases.failure_V5;
+  const tFault = v5Case.disturbance_s;
+  const tKeep = v5Case.scores.keep.latest_start_s;
+  const tReplan = v5Case.scores.reschedule.latest_start_s;
+  cameraMode = "iso";
+  cameraRevision++;
+  for (const view of ["iso", "top", "follow"]) $(view).setAttribute("aria-pressed", String(view === "iso"));
+  $("field").dataset.camera = "iso";
+  await setCase("failure_V5", "reschedule", 0);
+  if (!autoTourActive) return;
+  autoTourStage = "approach";
+  setTourCaption("Phase 1/3 · Nominal approach (45° urban view): T1 paired observation locks at 3.093 s.");
+
+  const stepMs = 110;
+  const simStep = 0.45;
+  const advance = async () => {
+    if (!autoTourActive) return;
+    if (autoTourStage === "approach") {
+      const nextT = Math.min(tFault, time + simStep);
+      await setTime(nextT);
+      if (!autoTourActive) return;
+      if (nextT >= tFault - 1e-6) {
+        autoTourStage = "fault_pause";
+        tourFaultPulse = true;
+        $("field").dataset.autotour = "fault_highlight";
+        setTourCaption("Phase 2/3 · V5 FAULT @ t = 5.000 s! Red pulse alert & diverging dashed trajectories (Keep vs. Reschedule).");
+        await draw();
+        if (!autoTourActive) return;
+        autoTourTimer = setTimeout(() => {
+          if (!autoTourActive) return;
+          autoTourStage = "recovery";
+          $("field").dataset.autotour = "recovery";
+          setTourCaption("Phase 3/3 · Dual-strategy divergence: Keep finishes T3 @ " + fmt(tKeep, 3) +
+            " s vs. Reschedule T2 @ " + fmt(tReplan, 3) + " s (+" + fmt(tReplan - tKeep, 3) + " s cancel-reset penalty).");
+          autoTourTimer = setTimeout(advance, stepMs);
+        }, 1600);
+        return;
+      }
+      autoTourTimer = setTimeout(advance, stepMs);
+    } else if (autoTourStage === "recovery") {
+      const nextT = Math.min(tReplan, time + simStep);
+      await setTime(nextT);
+      if (!autoTourActive) return;
+      if (nextT >= tReplan - 1e-6) {
+        autoTourStage = "complete";
+        $("field").dataset.autotour = "complete";
+        setTourCaption("Demo complete · Keep " + fmt(tKeep, 3) + " s vs. Reschedule " + fmt(tReplan, 3) +
+          " s (+" + fmt(tReplan - tKeep, 3) + " s). Dashed slate tracks show Keep alternative.");
+        autoTourActive = false;
+        if (btn) {
+          btn.dataset.active = "false";
+          btn.setAttribute("aria-pressed", "false");
+          btn.textContent = "▶ Auto-Tour: V5 Fault & Dual-Strategy Demo";
+        }
+        return;
+      }
+      autoTourTimer = setTimeout(advance, stepMs);
+    }
+  };
+  autoTourTimer = setTimeout(advance, stepMs);
+}
+
+$("case").addEventListener("change", e => { stopAutoTour(true); setCase(e.target.value); });
 for (const mode of ["iso", "top", "follow"]) $(mode).addEventListener("click", () => setCamera(mode));
 $("tracked").addEventListener("change", () => setCamera("follow"));
-$("policy").addEventListener("change", e => { currentPolicy = e.target.value; draw(); });
-$("time").addEventListener("input", e => setTime(Number(e.target.value)));
+$("policy").addEventListener("change", e => { stopAutoTour(true); currentPolicy = e.target.value; draw(); });
+$("time").addEventListener("input", e => { stopAutoTour(true); setTime(Number(e.target.value)); });
 $("los").addEventListener("change", draw);
 if ($("p1layer")) $("p1layer").addEventListener("change", draw);
 if ($("dualOverlay")) $("dualOverlay").addEventListener("change", draw);
 if ($("bldgTrans")) $("bldgTrans").addEventListener("change", draw);
 if ($("speed")) $("speed").addEventListener("change", e => { playbackSpeed = Number(e.target.value) || 1.0; });
+if ($("autoTourBtn")) $("autoTourBtn").addEventListener("click", startAutoTour);
 $("play").addEventListener("click", () => {
+  stopAutoTour(true);
   if (!playing && time === data.field.horizon) time = 0;
   playing = !playing; lastDraw = 0;
   $("play").textContent = playing ? "Pause" : "Play";
@@ -367,6 +476,6 @@ if ($("hudMetrics") && data.p1_overlay) {
 }
 $("provenance").textContent = "Source: verified event intervals · nominal plan " + data.plan_id.slice(0, 12) +
   " · field parameter SHA-256 " + data.input_sha256.slice(0, 12) + " · dark digital twin v2";
-window.BReplay = { stateFor, setCase, setCamera, hitBuilding, checkedKeyframes: data.keyframes, bookmarks };
+window.BReplay = { stateFor, setCase, setCamera, hitBuilding, startAutoTour, stopAutoTour, checkedKeyframes: data.keyframes, bookmarks };
 $("field").dataset.camera = "iso";
 setCase(selected, currentPolicy, time);

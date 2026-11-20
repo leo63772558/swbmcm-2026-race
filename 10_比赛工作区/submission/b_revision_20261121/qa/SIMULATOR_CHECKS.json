@@ -2,8 +2,8 @@
   "browser": "Headless Chromium 156.0.8078.4",
   "standalone_file_only": true,
   "browser_context_offline": true,
-  "html_bytes": 3079399,
-  "html_sha256": "a2e2bcdd39349a38410db074199f5ca4e401036267956bf56af14ce9c75429ae",
+  "html_bytes": 3085727,
+  "html_sha256": "25ae5782fd2be68e384286aee44895385f93dda98e28ce33c81b7314b22457d6",
   "runs": [
     {
       "renderer": "webgl",
@@ -41,6 +41,7 @@
         "follow",
         "iso"
       ],
+      "auto_tour_verified": true,
       "event_marker_count": 10,
       "remote_requests": 0,
       "page_errors": 0,
@@ -80,7 +81,7 @@
           "time_s": 12.927041371995326,
           "width_px": 1800,
           "height_px": 1250,
-          "colored_pixel_fraction": 0.3405
+          "colored_pixel_fraction": 0.3406
         }
       ],
       "camera_controls": [
@@ -88,6 +89,7 @@
         "follow",
         "iso"
       ],
+      "auto_tour_verified": true,
       "event_marker_count": 10,
       "remote_requests": 0,
       "page_errors": 0,

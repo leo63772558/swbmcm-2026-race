@@ -311,8 +311,11 @@ function buildTraces(frame) {
       }
     }
     if (v.failed) {
-      traces.push(lineTrace(circleRing(v.point[0], v.point[1], 0.35, 4.2, 24), BLOCKED, 3));
-      traces.push(lineTrace(circleRing(v.point[0], v.point[1], 0.35, 7.2, 24), "rgba(244,63,94,0.45)", 2, "dash"));
+      traces.push(lineTrace(circleRing(v.point[0], v.point[1], 0.35, 4.2, 24), BLOCKED, 3.5));
+      traces.push(lineTrace(circleRing(v.point[0], v.point[1], 0.35, 7.2, 24), "rgba(244,63,94,0.55)", 2.2, "dash"));
+      if (typeof tourFaultPulse !== "undefined" && tourFaultPulse) {
+        traces.push(lineTrace(circleRing(v.point[0], v.point[1], 0.45, 11.2, 30), "rgba(251,113,133,0.85)", 3.0, "dot"));
+      }
     }
   }
 
@@ -494,8 +497,11 @@ function drawCanvas(canvas, frame, width, height, scale) {
     if (v.heading) shape(v.heading, v.color, 2.6);
     if (v.hasAim) shape([v.camera, v.aim], "#E0F2FE", 2.2);
     if (v.failed) {
-      shape(circleRing(v.point[0], v.point[1], 0.35, 4.2, 24), BLOCKED, 2.0);
-      shape(circleRing(v.point[0], v.point[1], 0.35, 7.2, 24), "rgba(244,63,94,0.45)", 1.3, [4, 4]);
+      shape(circleRing(v.point[0], v.point[1], 0.35, 4.2, 24), BLOCKED, 2.2);
+      shape(circleRing(v.point[0], v.point[1], 0.35, 7.2, 24), "rgba(244,63,94,0.55)", 1.5, [4, 4]);
+      if (typeof tourFaultPulse !== "undefined" && tourFaultPulse) {
+        shape(circleRing(v.point[0], v.point[1], 0.45, 11.2, 30), "rgba(251,113,133,0.9)", 2.0, [2, 3]);
+      }
     }
   }
 

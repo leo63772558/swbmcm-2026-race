@@ -1,6 +1,59 @@
-\textit{[Team Drafting Blueprint --- Write the formal proof of Theorem~\ref{thm:p3-monotone} and interpret Table~\ref{tab:p3} and Figure~\ref{fig:p3} in the team's own words.]}
-\begin{itemize}
-\item \textbf{Error propagation model:} Express $\Delta\psi = \operatorname{atan2}(\sigma Z_y, D + \sigma Z_x) + \epsilon_g$ with $Z_x,Z_y \stackrel{\mathrm{i.i.d.}}{\sim}\mathcal{N}(0,1)$ and $\epsilon_g \sim \mathcal{N}(0,\sigma_g^2)$ \cite{jcgm2008}.
-\item \textbf{Proof blueprint for Theorem~\ref{thm:p3-monotone}:} (1) Condition on $(Z_x, \epsilon_g)$ and write the conditional lateral acceptance probability via $\Phi(u_+(D/\sigma + Z_x)) - \Phi(u_-(D/\sigma + Z_x))$ with $u_\pm = \tan(\pm\Delta_{\max}-\epsilon_g)$; (2) Differentiate under the integral sign with respect to $\kappa = D/\sigma > 0$ using Gaussian symmetry and unimodality to show $\partial P/\partial \kappa > 0$, hence $\mathrm{d}P/\mathrm{d}\sigma < 0$; (3) Apply the Intermediate Value Theorem on $\sigma(s)=a+bs$ to establish unique $s_{\max}$.
-\item \textbf{Numerical cross-check:} Independent quadrature yields $s_{\max}=\BIntegratedCrossing{}$ m (bracket [\BBracketLow{}, \BBracketHigh{}] m, $\sigma=\BSigmaCrossing{}$ m); 3$\times$2,000,000 Monte Carlo simultaneous Bonferroni--Wilson intervals \cite{wilson1927,brown2001} strictly bracket 0.95 on opposite sides (Table~\ref{tab:p3}), with far-tail bound \BFarBound{} for $s\ge 240$ m.
-\end{itemize}
+In open-loop urban navigation without continuous external localization corrections, odometry drift accumulates linearly with cumulative travel distance $s$, progressively corrupting the vehicle's computed line-of-sight bearing toward a target at fixed horizontal distance $D=40$ m. Problem 3 requires determining the maximum travel distance $s_{\max}$ that preserves at least 95\% probability of keeping the wrapped horizontal azimuth pointing error within $\pm\Delta_{\max}=\pm 5^\circ$ (Eq.~\eqref{eq:p3-prob}), and characterizing the feasible sensor-specification region in $(a,b)$ space at $s=80$ m \cite{jcgm2008}.
+
+\subsection{Wrapped Error Propagation Model and Strict Monotonicity Theorem}
+By rotational invariance of the isotropic bivariate Gaussian ground-position error $(\delta x,\delta y)\sim\mathcal{N}(0,\sigma(s)^2 I_2)$ with $\sigma(s)=a+bs$ ($a=0.3$ m, $b=0.02$ m/m), we align the $+x$ axis with the true vehicle-to-target vector $(D,0)$. Writing $(\delta x,\delta y)=\sigma(s)(-Z_x,-Z_y)$ with $Z_x,Z_y\stackrel{\mathrm{i.i.d.}}{\sim}\mathcal{N}(0,1)$, the displaced vehicle-to-target vector becomes $(D+\sigma Z_x,\,\sigma Z_y)$, inducing the exact geometric bearing error $\Theta=\operatorname{atan2}(\sigma Z_y,\,D+\sigma Z_x)\in(-\pi,\pi]$. Adding the independent zero-mean Gaussian gimbal zero-offset ($\sigma_{\mathrm{off}}=0.8^\circ$) and control ($\sigma_{\mathrm{ctrl}}=0.6^\circ$) errors yields a combined gimbal perturbation $\epsilon_g\sim\mathcal{N}(0,\sigma_g^2)$ with $\sigma_g=\sqrt{0.8^2+0.6^2}=1.0^\circ$, and total wrapped horizontal pointing error
+\[
+\Delta\psi = \operatorname{wrap}_{[-\pi,\pi)}\!\bigl(\Theta + \epsilon_g\bigr).
+\]
+Before solving numerically for $s_{\max}$, one must establish mathematically that the coverage function $P(\sigma(s))=\mathbb{P}(|\Delta\psi|\le\Delta_{\max})$ cannot oscillate or cross $0.95$ multiple times—otherwise a local root-finder could return a spurious threshold. We resolve this rigorously in Theorem~\ref{thm:p3-monotone}.
+
+\begin{keybox}
+\begin{theorem}[Strict Monotonicity and Uniqueness of Maximum Admissible Travel Distance]
+\label{thm:p3-monotone}
+Let the ground position error be isotropic Gaussian $(\delta x, \delta y) \sim \mathcal{N}(0, \sigma^2 I_2)$ with $\sigma(s) = a + bs > 0$ ($a, b > 0$) at fixed target range $D > 0$, and let the independent gimbal pointing error be $\epsilon_g \sim \mathcal{N}(0, \sigma_g^2)$ with $\sigma_g = \sqrt{\sigma_{\mathrm{off}}^2 + \sigma_{\mathrm{ctrl}}^2} > 0$. Under any forward-wedge tolerance $0 < \Delta_{\max} < \pi/2$, the exact wrapped coverage probability $P(\sigma) = \mathbb{P}\!\left(|\operatorname{wrap}_{[-\pi,\pi)}(\Theta+\epsilon_g)| \le \Delta_{\max}\right)$ is strictly decreasing in $\sigma$ on $(0, \infty)$. Consequently, whenever $P(a) \ge 0.95 > \Delta_{\max}/\pi$, there exists a unique maximum admissible travel distance $s_{\max} > 0$ solving $P(a + b s_{\max}) = 0.95$.
+\end{theorem}
+\end{keybox}
+
+\begin{keybox}[top=4pt,bottom=4pt]
+\small\setlength{\abovedisplayskip}{4pt}\setlength{\belowdisplayskip}{4pt}
+\begin{proof}
+Define the dimensionless signal-to-noise ratio $\kappa = D/\sigma > 0$, so that $\Theta = \operatorname{atan2}(Z_y,\, \kappa + Z_x)$ has distribution depending on $(D,\sigma)$ solely through $\kappa$. Let $\varphi(u)=(2\pi)^{-1/2}e^{-u^2/2}$ and $\Phi(u)=\int_{-\infty}^u\varphi(t)\,\mathrm{d}t$ denote the standard normal density and distribution function.
+
+\emph{Step 1 (Strict stochastic monotonicity of $|\Theta|$ in $\kappa$).} For every angle $\alpha\in(0,\pi)$, the symmetric wedge $W_\alpha=\{(x,y)\in\mathbb{R}^2 : |\operatorname{atan2}(y,x)|\le\alpha\}$ satisfies $(x,y)\in W_\alpha \iff x \ge |y|\cot\alpha$ for all $y\neq 0$ (verified uniformly across acute, right, and obtuse $\alpha\in(0,\pi)$). Hence the cumulative distribution function $F_\Theta(\alpha;\kappa)=\mathbb{P}(|\Theta|\le\alpha)$ takes the exact slice integral form
+\[
+F_\Theta(\alpha;\kappa) = \int_{-\infty}^{\infty}\left(\int_{|y|\cot\alpha}^{\infty}\varphi(x-\kappa)\,\mathrm{d}x\right)\varphi(y)\,\mathrm{d}y.
+\]
+On any compact interval $[\kappa_1,\kappa_2]\subset(0,\infty)$, $|\partial_\kappa \varphi(x-\kappa)| = |x-\kappa|\varphi(x-\kappa)$ is dominated by an integrable envelope in $(x,y)$. Applying Leibniz's rule under the integral sign and noting $\partial_\kappa \varphi(x-\kappa)=-\partial_x \varphi(x-\kappa)$ yields
+\[
+\frac{\partial F_\Theta(\alpha;\kappa)}{\partial \kappa}
+= \int_{-\infty}^{\infty} \varphi(|y|\cot\alpha - \kappa)\,\varphi(y)\,\mathrm{d}y
+= 2\int_0^\infty \varphi(y\cot\alpha - \kappa)\,\varphi(y)\,\mathrm{d}y.
+\]
+Completing the square via $(y\cot\alpha-\kappa)^2+y^2 = (y\csc\alpha-\kappa\cos\alpha)^2+\kappa^2\sin^2\alpha$ and substituting $u=y\csc\alpha-\kappa\cos\alpha$ ($\mathrm{d}y=\sin\alpha\,\mathrm{d}u$) gives the closed-form strictly positive derivative
+\[
+\frac{\partial F_\Theta(\alpha;\kappa)}{\partial \kappa}
+= \sqrt{\frac{2}{\pi}}\,\sin\alpha\,e^{-\frac{1}{2}\kappa^2\sin^2\alpha}\,\Phi(\kappa\cos\alpha) > 0
+\qquad \forall\,\alpha\in(0,\pi),\;\kappa>0.
+\]
+
+\emph{Step 2 (Unimodal wrapped gimbal acceptance kernel).} Let $g_W(\phi)=\sum_{m\in\mathbb{Z}}\sigma_g^{-1}\varphi((\phi+2\pi m)/\sigma_g)$ be the wrapped normal density of $\epsilon_g$ on $[-\pi,\pi]$, which is even ($g_W(-\phi)=g_W(\phi)$) and strictly decreasing on $[0,\pi]$ (a standard property of the heat kernel on $S^1$). Define the conditional acceptance kernel $I(\theta)=\mathbb{P}_{\epsilon_g}(|\operatorname{wrap}(\theta+\epsilon_g)|\le\Delta_{\max})=\int_{-\Delta_{\max}}^{\Delta_{\max}}g_W(\theta-\phi)\,\mathrm{d}\phi$. Because $g_W$ is even and $2\pi$-periodic, $I(\theta)$ is even and continuously differentiable with $I'(\theta)=g_W(\theta-\Delta_{\max})-g_W(\theta+\Delta_{\max})$. For every $\theta\in(0,\pi)$ and $\Delta_{\max}\in(0,\pi/2)$, the circular distance from $\theta$ to $+\Delta_{\max}$ is strictly smaller than to $-\Delta_{\max}$ (both when $\theta+\Delta_{\max}\le\pi$, where $|\theta-\Delta_{\max}|<\theta+\Delta_{\max}$, and when $\theta+\Delta_{\max}>\pi$, where $2\pi-\theta-\Delta_{\max}-(\theta-\Delta_{\max})=2(\pi-\theta)>0$). Strict monotonicity of $g_W$ on $[0,\pi]$ therefore implies $I'(\theta)<0$ for all $\theta\in(0,\pi)$.
+
+\emph{Step 3 (Chain rule and unique threshold).} Conditioning on $|\Theta|$ and integrating by parts on $[0,\pi]$ (using $F_\Theta(0;\kappa)=0$ and $F_\Theta(\pi;\kappa)=1$) expresses the exact coverage as
+\[
+P(\sigma) = \int_0^\pi I(\theta)\,\mathrm{d}F_\Theta(\theta;\kappa)
+= I(\pi) + \int_0^\pi \bigl(-I'(\theta)\bigr)\,F_\Theta(\theta;\kappa)\,\mathrm{d}\theta.
+\]
+Since $0 < \partial_\kappa F_\Theta(\theta;\kappa) \le \sqrt{2/\pi}$ uniformly and $-I'(\theta)>0$ is continuous on $[0,\pi]$, differentiating under the integral sign yields $\mathrm{d}P/\mathrm{d}\kappa = \int_0^\pi (-I'(\theta))(\partial_\kappa F_\Theta(\theta;\kappa))\,\mathrm{d}\theta > 0$. By the chain rule with $\kappa(s)=D/\sigma(s)$ and $\sigma'(s)=b>0$,
+\[
+\frac{\mathrm{d}P}{\mathrm{d}s} = \frac{\mathrm{d}P}{\mathrm{d}\kappa}\cdot\left(-\frac{Db}{\sigma(s)^2}\right) < 0 \qquad \forall\,s\ge 0.
+\]
+Finally, as $s\to\infty$, $\kappa(s)\to 0^+$ so $\Theta$ converges weakly to $\mathrm{Uniform}(-\pi,\pi]$ and $P(\sigma(s))\to\Delta_{\max}/\pi$. Given $P(a)\ge 0.95>\Delta_{\max}/\pi$, continuity and strict monotonicity guarantee a unique root $s_{\max}>0$ by the Intermediate Value Theorem.
+\end{proof}
+\end{keybox}
+
+\subsection{Analytical-Statistical Dual Closure and Sensor Specification Domain}
+With global uniqueness guaranteed by Theorem~\ref{thm:p3-monotone}, we compute $s_{\max}$ via independent conditional Simpson quadrature (96 nodes truncated at $\pm 10\sigma$, tail mass $<10^{-22}$), yielding $s_{\max}=\BIntegratedCrossing{}$ m (closely matching the archived $\BTravelThreshold{}$ m) at critical position spread $\sigma_{\mathrm{loc}}(s_{\max})=\BSigmaCrossing{}$ m, strictly bracketed within $[\BBracketLow{},\,\BBracketHigh{}]$ m (width $2\times 10^{-4}$ m). For large distances ($s\ge 240$ m), an explicit union bound certifies $P(\sigma(s))\le \BFarBound{}$, further confirming asymptotic decay far below 0.95.
+
+To close the loop statistically without relying on quadrature alone, we executed three fixed-seed Monte Carlo probes ($n=\BMCBeforeSamples{}$ independent trials per probe, $6\times 10^6$ trials total) and constructed simultaneous $\BMCConfidence\%$ Wilson score confidence intervals \cite{wilson1927,brown2001} with Bonferroni multiplicity correction ($\alpha/3$). As listed in Table~\ref{tab:p3} and plotted in Figure~\ref{fig:p3}b and Figure~\ref{fig:p3}d, the lower probe at $\BMCBeforeDistance{}$ m achieves empirical coverage $\BMCBeforeEstimate{}$ with simultaneous interval $[\BMCBeforeLow{},\,\BMCBeforeHigh{}]$ lying strictly above $0.95$, whereas the upper probe at $\BMCAfterDistance{}$ m drops to $\BMCAfterEstimate{}$ with interval $[\BMCAfterLow{},\,\BMCAfterHigh{}]$ lying strictly below $0.95$. At the benchmark check distance of $s=\BMCLimitDistance{}$ m, coverage degrades to $\BMCLimitEstimate{}$ ($[\BMCLimitLow{},\,\BMCLimitHigh{}]$), confirming that nominal hardware ($a=0.3$ m, $b=0.02$ m/m) fails the 95\% requirement at 80 m.
+
+Variance ablation clarifies the dominant physical driver: at $s=0$ m, position error accounts for only $15.59\%$ of total angular variance (zero-offset $54.02\%$, control $30.39\%$), whereas by $s_{\max}=\BIntegratedCrossing{}$ m, self-localization drift accounts for $84.61\%$ of angular variance ($88.10\%$ at 80 m), and removing position error alone restores coverage to $0.9999994$. Consequently, meeting the 95\% specification at $s=80$ m requires constraining the combined position spread to $a + 80b \le \BSigmaCrossing{}$ m (Figure~\ref{fig:p3}c)—defining the exact linear admissible domain in $(a,b)$ space for urban odometry procurement.

@@ -17,7 +17,8 @@
 
 - 浏览器验证（暗黑 3D 数字孪生指挥大屏 v2）：Headless Chromium 156 独立离线打开 `file://` 单文件 `B_Simulator.html`（3.08 MB），WebGL（SwiftShader）与禁用 WebGL 的暗黑 Canvas 2.5D 回退模式分别渲染并导出 3 组 `1800×1250` 高清关键帧（含三视角切换、强制 WebGL 上下文丢失回退、P1 地面叠加与双策略路径对比）。零外部网络请求、零页面报错；892 段行车路径与 4,503 个静止点均与建筑底面零穿模；Node.js 770 条状态断言全部通过。
 - 图件与新增计算验证：新增 `b_revision_sensitivity_pareto.py` 实跑生成全局敏感性（OAT/龙卷风/6×6 交互矩阵）与 16 组多目标 Pareto 权衡数据（`Global_sensitivity_oat.csv`、`Global_sensitivity_interaction.csv`、`Pareto_tradeoff.csv`），不改动既有 P1–P4 基线结果。全套 **10 组多面板科研图（`fig01`–`fig10`）** 与 3 组独立关键帧均以矢量 PDF + 320 dpi PNG 输出，色板与 3D 指挥大屏完全统一（V1–V5：`#0EA5E9/#38BDF8`、`#F59E0B`、`#10B981`、`#A855F7`、`#F43F5E`）。
-- 论文排版与合规交接：重构 `B_submission.tex`（XeLaTeX 实编译 16 页 A4 + 1 页 `P1_ERRATA.pdf`，12 pt Times New Roman，首页无页眉，第 2 页 `Content`，第 2–16 页统一匿名页眉 `Team#SWBMCM2613050` + `Page N of M`），移除文末冗长原始数据附表（保留在支撑 ZIP CSV），整合为各章精简 `booktabs` 三线汇总表，嵌入全部 10 组新图与 15 条可核验 IEEE 文献（含 12 篇带 DOI 权威学术文献），绑定 72 个数值宏。遵守 `AGENTS.md` 红线（不代写终稿正文），13 个 `paper/team/*.tex` 均已落盘结构化写作蓝图、Theorem 1 证明步骤与句式框架，供队员用自主语言改写后一键重编译定稿。
+- 论文排版与合规交接：重构 `B_submission.tex`（XeLaTeX 实编译 17 页 A4 + 1 页 `P1_ERRATA.pdf`，12 pt Times New Roman，首页无页眉，第 2 页 `Content`，第 2–17 页统一匿名页眉 `Team#SWBMCM2613050` + `Page N of M`），移除文末冗长原始数据附表（保留在支撑 ZIP CSV），整合为各章精简 `booktabs` 三线汇总表（新增 P2(2) 精确分支定界零间隙表、P4 73 场景 7 类汇总表与工程部署推荐表），嵌入全部 10 组新图与 15 条可核验 IEEE 文献（正文中 15/15 全覆盖 `\cite{}`），绑定 72 个数值宏。遵守 `AGENTS.md` 红线（不代写终稿正文），13 个 `paper/team/*.tex` 为结构化写作蓝图，供队员亲笔改写为 22–24 页自主英文成稿后一键重编译定稿。
+- 六项底层硬核审计与 30 问评委反向审计（`b_hardcore_audit.py`、`results/HARDCORE_AUDIT_REPORT.json`、`FINAL_JUDGE_REVIEW.md`）：(1) 585 候选站、20 路网点、6,215 轨迹点全部严格落于 $[1.5, 98.5]^2$（0 越界）；(2) 882 执行段与 4,451 静止点连续欧氏圆角净距余量最小 `+1.122154 m`（2,925 审计路线最小 `+0.000447 m`），名义双车间距 `38.425493 m >> 3.0 m`；(3) 全求解器统一就绪优先平局规则；(4) 独立零截断精确分支定界覆盖全部 360 拓扑，证成 `11.034062 s` 在 `k=8` 池与全 585 站离散池上均为精确全局最优（gap = `0.000000 s`）；(5) 全局敏感性交互矩阵严格对称（0 偏差）；(6) 72 宏与 15 条文献三方 100% 一致。
 
 | 指标 | 原基线 | 工程复核 |
 |---|---|---|

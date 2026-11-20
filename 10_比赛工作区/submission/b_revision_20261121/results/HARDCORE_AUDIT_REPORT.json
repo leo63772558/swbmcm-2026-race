@@ -1,0 +1,97 @@
+{
+  "audit_1_field_inset": {
+    "passed": true,
+    "bounds_m": [
+      1.5,
+      98.5,
+      1.5,
+      98.5
+    ],
+    "checked_stations": 585,
+    "checked_waypoints": 20,
+    "checked_trajectory_points": 6215,
+    "violations": []
+  },
+  "audit_2_minkowski_clearance": {
+    "passed": true,
+    "segments_checked": 882,
+    "stationary_points_checked": 4451,
+    "min_continuous_segment_margin_m": 1.122153612,
+    "min_stationary_point_margin_m": 1.122153612,
+    "min_nominal_pair_separation_m": 38.425493,
+    "audited_routes_count": 2925,
+    "audited_min_route_margin_m": 0.00044710363518452034,
+    "detour_caveat": "Direct legs are exact Euclidean shortest paths; multi-segment detours are continuous-clearance-verified feasible upper bounds on the corner waypoint graph.",
+    "violations": []
+  },
+  "audit_3_tie_break_uniqueness": {
+    "passed": true,
+    "primary_p1_tie_break": "readiness_first (V4 ready at 5.064533 s, drive 2.397866 s)",
+    "secondary_documented_contrast": "arrival_first witness (1.224247 s drive, 6.198580 s ready)",
+    "solver_station_options_ready_first": true,
+    "paper_references_readiness": true
+  },
+  "audit_4_p2_exact_bnb": {
+    "passed": true,
+    "beam_k8_incumbent_s": 11.034062,
+    "exact_k8_bnb": {
+      "shortlist_k": 8,
+      "topologies_checked": 360,
+      "pruned_branches": 67,
+      "exact_discrete_optimum_s": 11.034062,
+      "witness": {
+        "reused_vehicle": 3,
+        "reuse_order": "T1->T3",
+        "solo_alert": "T2",
+        "solo_vehicles": [
+          1,
+          4
+        ],
+        "partner_a1": 5,
+        "partner_a2": 2,
+        "t_solo_s": 8.889889,
+        "t_a1_s": 3.092627,
+        "t_a2_s": 11.034062
+      }
+    },
+    "gap_vs_exact_k8_s": -0.0,
+    "exact_full_discrete_pool_bnb": {
+      "shortlist_k": "FULL_DISCRETE_POOL",
+      "topologies_checked": 360,
+      "pruned_branches": 67,
+      "exact_discrete_optimum_s": 11.034062,
+      "witness": {
+        "reused_vehicle": 3,
+        "reuse_order": "T1->T3",
+        "solo_alert": "T2",
+        "solo_vehicles": [
+          1,
+          4
+        ],
+        "partner_a1": 5,
+        "partner_a2": 2,
+        "t_solo_s": 8.889889,
+        "t_a1_s": 3.092627,
+        "t_a2_s": 11.034062
+      }
+    },
+    "gap_vs_full_discrete_pool_s": -0.0
+  },
+  "audit_5_sensitivity_pareto": {
+    "passed": true,
+    "oat_count": 6,
+    "interaction_entries": 36,
+    "interaction_max_asymmetry": 0.0,
+    "main_share_sum_pct": 99.99,
+    "pareto_configs": 16,
+    "pareto_front_count": 6
+  },
+  "audit_6_three_way_consistency": {
+    "passed": true,
+    "bound_macros": 72,
+    "missing_macros": [],
+    "missing_in_pdf": [],
+    "bibitems_total": 15,
+    "uncited_bibitems": []
+  }
+}

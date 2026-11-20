@@ -12,6 +12,7 @@ from time import perf_counter
 
 from pypdf import PdfReader
 
+import b_hardcore_audit
 import b_revision_correctness
 import b_revision_experiments
 import b_revision_figures
@@ -96,6 +97,7 @@ def main(out, reference, bundle):
         if team_src.is_dir():
             copytree(team_src, dest/"team", dirs_exist_ok=True)
         b_revision_paper.generate(out,bundle)
+        b_hardcore_audit.main(out)
         times["5_pdf"]=round(perf_counter()-tick,3)
     matches,text_matches=compare(reference,out,compile_pdf)
     qa={"byte_matches":len(matches),"matched_artifacts":matches,"pdf_text_matches":text_matches,

@@ -28,14 +28,14 @@ BEIJING = timezone(timedelta(hours=8))
 SOURCE_NAMES = (
     "problem_b_geometry.py", "solve_problem_b.py", "check_problem_b.py",
     "check_b_p4_cross.py", "reproduce_b_revision.py",
-    "package_b_revision.py",
+    "package_b_revision.py", "b_hardcore_audit.py",
 )
 REFERENCE_NAMES = (
     "B_P1.csv", "B_P2_localization.csv", "B_P2_fairness.csv", "B_P3.csv", "B_P4.csv",
 )
 DOCUMENTS = (
     "TEAM_HANDOFF_CHECKLIST.md", "VERIFY_REPORT.md", "IMPROVEMENT_BACKLOG.md",
-    "REPRODUCE.md", "AI_USAGE_LOG.csv", "requirements-review.txt",
+    "FINAL_JUDGE_REVIEW.md", "REPRODUCE.md", "AI_USAGE_LOG.csv", "requirements-review.txt",
 )
 PRIVATE_PATH = re.compile(r"cns|signed|签名|参赛信息|payment|\.library-transfer", re.IGNORECASE)
 

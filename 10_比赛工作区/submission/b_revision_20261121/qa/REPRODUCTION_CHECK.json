@@ -1,10 +1,11 @@
 {
-  "byte_matches": 76,
+  "byte_matches": 77,
   "matched_artifacts": [
     "results/Executed_timeline.json",
     "results/Global_sensitivity_interaction.csv",
     "results/Global_sensitivity_oat.csv",
     "results/Global_sensitivity_summary.json",
+    "results/HARDCORE_AUDIT_REPORT.json",
     "results/P1_arc.csv",
     "results/P1_area.csv",
     "results/P1_geometry.json",
@@ -83,12 +84,12 @@
     "P1_ERRATA.pdf"
   ],
   "wall_seconds": {
-    "1_correctness": 0.525,
-    "2_validation": 9.123,
-    "3_experiments": 4.625,
-    "3b_sensitivity_pareto": 9.15,
-    "4_visuals": 12.169,
-    "5_pdf": 10.967
+    "1_correctness": 0.532,
+    "2_validation": 8.949,
+    "3_experiments": 4.381,
+    "3b_sensitivity_pareto": 8.372,
+    "4_visuals": 11.314,
+    "5_pdf": 12.695
   },
   "plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab"
 }

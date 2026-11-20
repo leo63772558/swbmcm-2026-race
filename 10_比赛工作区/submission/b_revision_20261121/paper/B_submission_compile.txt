@@ -81,23 +81,25 @@ For additional information on amsmath, use the `?' option.
 (B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex)
 Underfull \hbox (badness 1975) in paragraph at lines 120--121
 []\TU/TimesNewRoman(0)/m/n/12 deg, deg, m,
-[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex) [6]
-(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10])
-(team/v5.tex [11]) (team/sensitivity.tex [12]) [13] (team/limits.tex)
-(team/conclusion.tex) [14]
-Underfull \hbox (badness 4441) in paragraph at lines 346--347
+[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex [6])
+(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10]) [11]
+(team/v5.tex) [12] (team/sensitivity.tex) [13] [14]
+Underfull \hbox (badness 1342) in paragraph at lines 369--370
+[]\TU/TimesNewRoman(0)/m/n/10.95 Preserves 68/73 wins while avoiding V5
+(team/limits.tex [15]) (team/conclusion.tex)
+Underfull \hbox (badness 4441) in paragraph at lines 392--393
 []\TU/TimesNewRoman(0)/m/n/12 E. B. Wilson, “Probable inference, the law of suc
 cession, and statistical infer-
 
-Underfull \hbox (badness 3049) in paragraph at lines 346--347
+Underfull \hbox (badness 3049) in paragraph at lines 392--393
 \TU/TimesNewRoman(0)/m/n/12 ence,” \TU/TimesNewRoman(0)/m/it/12 J. Amer. Statis
 t. Assoc.\TU/TimesNewRoman(0)/m/n/12 , vol. 22, no. 158, pp. 209–212, Jun. 1927
 , doi:
-[15] 
+[16] 
 AED: lastpage setting LastPage
-[16] (B_submission.aux) )
+[17] (B_submission.aux) )
 (see the transcript file for additional information)
-Output written on B_submission.pdf (16 pages).
+Output written on B_submission.pdf (17 pages).
 Transcript written on B_submission.log.
 
 This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
@@ -183,21 +185,23 @@ For additional information on amsmath, use the `?' option.
 (B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex)
 Underfull \hbox (badness 1975) in paragraph at lines 120--121
 []\TU/TimesNewRoman(0)/m/n/12 deg, deg, m,
-[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex) [6]
-(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10])
-(team/v5.tex [11]) (team/sensitivity.tex [12]) [13] (team/limits.tex)
-(team/conclusion.tex) [14]
-Underfull \hbox (badness 4441) in paragraph at lines 346--347
+[3] (team/framework.tex) [4] (team/p1.tex) [5] (team/p2-precision.tex [6])
+(team/p2-dispatch.tex) [7] [8] (team/p3.tex) [9] (team/p4.tex [10]) [11]
+(team/v5.tex) [12] (team/sensitivity.tex) [13] [14]
+Underfull \hbox (badness 1342) in paragraph at lines 369--370
+[]\TU/TimesNewRoman(0)/m/n/10.95 Preserves 68/73 wins while avoiding V5
+(team/limits.tex [15]) (team/conclusion.tex)
+Underfull \hbox (badness 4441) in paragraph at lines 392--393
 []\TU/TimesNewRoman(0)/m/n/12 E. B. Wilson, “Probable inference, the law of suc
 cession, and statistical infer-
 
-Underfull \hbox (badness 3049) in paragraph at lines 346--347
+Underfull \hbox (badness 3049) in paragraph at lines 392--393
 \TU/TimesNewRoman(0)/m/n/12 ence,” \TU/TimesNewRoman(0)/m/it/12 J. Amer. Statis
 t. Assoc.\TU/TimesNewRoman(0)/m/n/12 , vol. 22, no. 158, pp. 209–212, Jun. 1927
 , doi:
-[15] 
+[16] 
 AED: lastpage setting LastPage
-[16] (B_submission.aux) )
+[17] (B_submission.aux) )
 (see the transcript file for additional information)
-Output written on B_submission.pdf (16 pages).
+Output written on B_submission.pdf (17 pages).
 Transcript written on B_submission.log.

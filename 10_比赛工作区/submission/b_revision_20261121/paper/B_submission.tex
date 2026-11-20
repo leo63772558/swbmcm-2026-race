@@ -140,7 +140,7 @@ $\eta, t_{\mathrm{last}}, N, k$ & Completion fraction, latest paired start, tota
 \TeamText{p1}{Derive the vehicle-center observable set, Euclidean rounded Minkowski safety boundary \cite{lozano1983,shewchuk1997}, boundary tangency closure, optimal arc attainment, and readiness-first tie-breaking (referring to the separate P1 errata).}
 
 \begin{equation}
-Q(r) = \frac{1}{r}, \qquad r \ge r_{\min} = \frac{H - h_c}{\tan \beta_{\max}}.
+Q(r) = \frac{1}{r}, \qquad r \ge r_{\min}(\beta_{\max}) = \frac{H - h_c}{\tan \beta_{\max}}, \qquad \frac{\mathrm{d}Q_{\max}}{\mathrm{d}\beta_{\max}} = \frac{\sec^2 \beta_{\max}}{H - h_c}.
 \label{eq:p1-quality}
 \end{equation}
 
@@ -172,7 +172,9 @@ Pitch sensitivity (80° $\to$ 79° quality loss) & \BPitchLoss{}\%\\
 \TeamText{p2-precision}{Derive the first-order bearing-intersection Jacobian, covariance matrix, local horizontal RMS \cite{bishop2010}, 30 s reachability constraint via shortest-path routing \cite{dijkstra1959,hart1968}, and angular degeneracy analysis.}
 
 \begin{equation}
-\mathrm{RMS}_{\mathrm{local}} = \frac{\sigma_\theta \sqrt{r_1^2 + r_2^2}}{|\sin \gamma|}.
+J = \begin{bmatrix} -\frac{\sin\alpha_1}{r_1} & \frac{\cos\alpha_1}{r_1} \\ -\frac{\sin\alpha_2}{r_2} & \frac{\cos\alpha_2}{r_2} \end{bmatrix}, \qquad
+\Sigma_p = \sigma_\theta^2 (J^\top J)^{-1}, \qquad
+\mathrm{RMS}_{\mathrm{local}} = \sqrt{\operatorname{tr}(\Sigma_p)} = \frac{\sigma_\theta \sqrt{r_1^2 + r_2^2}}{|\sin \gamma|}.
 \label{eq:p2-rms}
 \end{equation}
 
@@ -205,15 +207,18 @@ t_a^{\mathrm{start}} = \max\!\left(t_{i_1}^{\mathrm{slew}},\, t_{i_2}^{\mathrm{s
 \end{equation}
 
 \begin{table}[H]
-\centering
-\caption{Matched shared-shortlist dispatch comparison (rounded clearance, beam width 20).}
+\centering\footnotesize
+\caption{Matched shared-shortlist dispatch comparison and exact Branch-and-Bound (B\&B) verification (rounded clearance, all 360 vehicle-alert topologies).}
 \label{tab:p22}
-\begin{tabular}{@{}cccc@{}}
+\begin{tabular}{@{}lccc@{}}
 \toprule
-Shortlist Size $k_{\mathrm{cand}}$ & Beam Search $t_{\mathrm{last}}$ (s) & Nearest Baseline $t_{\mathrm{last}}$ (s) & Beam Advantage (s)\\
+Solver Configuration & $t_{\mathrm{last}}$ (s) & Gap vs. B\&B (s) & Reused / Bottleneck\\
 \midrule
-3 & \BBeamThree{} & \BNearestThree{} & $-1.345$ (reversal)\\
-8 & \BBeamEight{} & \BNearestEight{} & $+0.690$ (faster)\\
+Beam Search ($k_{\mathrm{cand}}=3$, bw=20) & \BBeamThree{} & $+2.035$ & V3 (T3$\to$T1, 1.063 s wait)\\
+Nearest Baseline ($k_{\mathrm{cand}}=3$ or $8$) & \BNearestEight{} & $+0.690$ & V5 (T1$\to$T3)\\
+Beam Search ($k_{\mathrm{cand}}=8$, bw=20) & \BBeamEight{} & $0.000$ & V3 (T1$\to$T3, 0 s wait)\\
+Exact B\&B ($k_{\mathrm{cand}}=8$, 360 topologies) & \BBeamEight{} & $0.000$ (exact) & V3 (T1$\to$T3, T2 V1/V4)\\
+Exact B\&B (Full 585-station pool) & \BBeamEight{} & $0.000$ (exact) & Identical discrete optimum\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -266,9 +271,33 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \TeamText{p4}{Formulate the discrete-event disturbance replay model \cite{stentz1994,vantendeloo2018}, distinguish absolute recovery clocks from outage durations and cached-instruction semantics, and summarize all \BCaseCount{} disturbance cases.}
 
 \begin{equation}
-\eta = \frac{k}{N}, \qquad \mathrm{Score} = \left(\eta,\,-t_{\mathrm{last}}\right) \quad (\text{lexicographic order}).
+\begin{aligned}
+\eta = \frac{k}{N}, \qquad \mathrm{Score} &= \left(\eta,\,-t_{\mathrm{last}}\right), \\
+\text{Trigger Replan} \iff \eta_{\mathrm{replan}} > \eta_{\mathrm{keep}} &\;\lor\; \left(t_{\mathrm{last}}^{\mathrm{keep}} - t_{\mathrm{last}}^{\mathrm{replan}} > \delta_{\mathrm{hyst}}\right).
+\end{aligned}
 \label{eq:p4-score}
 \end{equation}
+
+\begin{table}[H]
+\centering\small
+\caption{Categorized performance summary across all \BCaseCount{} verified Problem 4 disturbance scenarios (raw 73-case ledger archived in \texttt{results/P4\_cases.csv}).}
+\label{tab:p4cat}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Disturbance Category & Cases & Mean $\eta$ (Keep) & Mean $\eta$ (Reschedule) & Replan / Keep / Tie\\
+\midrule
+Vehicle Failure Only & 5 & 0.733 & 1.000 & 4 / 1 / 0\\
+New Alert Only & 3 & 0.750 & 1.000 & 3 / 0 / 0\\
+Comms Outage Only (cached) & 3 & 1.000 & 1.000 & 0 / 0 / 3\\
+Failure + New Alert & 20 & 0.550 & 1.000 & 20 / 0 / 0\\
+Failure + Comms Outage & 5 & 0.733 & 1.000 & 4 / 0 / 1\\
+New Alert + Comms Outage & 1 & 0.750 & 1.000 & 1 / 0 / 0\\
+All Three Combined & 36 & 0.549 & 1.000 & 36 / 0 / 0\\
+\midrule
+\textbf{Total Verified Suite} & \textbf{\BCaseCount{}} & \textbf{0.604} & \textbf{1.000} & \textbf{68 / 1 / 4}\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \ReviewFigure{fig07_p4_resilience.pdf}{150mm}
 {Paired completion fraction, censoring-aware timing contrast, and lexicographic score matrix across all \BCaseCount{} disturbance cases with event-driven rescheduling flow.}
@@ -324,6 +353,23 @@ Vehicle ground speed $v$ (m/s) & 3.0 & 2.4--3.6 & 1.57 & 100.00\\
 \ReviewFigure{fig10_pareto_and_3d.pdf}{142mm}
 {(a) Multi-objective Pareto frontier across \BParetoConfigs{} verified solver configurations (\BParetoFrontCount{} non-dominated); (b) dark 3D digital twin command dashboard keyframes verified offline in Chromium.}
 {fig:pareto3d}
+
+\subsection{Operational Deployment Recommendations}
+\begin{table}[H]
+\centering\small
+\caption{Actionable deployment configurations derived from Pareto frontier, P3 drift bounds, and P4 resilience analysis.}
+\label{tab:deploy}
+\begin{tabular}{@{}p{0.24\linewidth}p{0.28\linewidth}p{0.42\linewidth}@{}}
+\toprule
+Operational Priority & Recommended Setting & Verified Engineering Basis\\
+\midrule
+Rapid Interception & Beam $k=8$, bw=20 & Exact discrete optimum \BBeamEight{} s; 0 s wait on V3\\
+Low-Drift / Energy & Nearest baseline or $k=5$ & Cuts fleet travel from 38.2 m to 21.1--36.1 m\\
+Sensor Spec (80 m) & $a + 80b \le \BSigmaCrossing{}$ m & Guarantees $\ge 95\%$ pointing coverage (Theorem~\ref{thm:p3-monotone})\\
+Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & Preserves 68/73 wins while avoiding V5 $+\BVFiveDelay{}$ s penalty\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ===================== SECTION 10 =====================
 \section{Model Evaluation: Strengths, Weaknesses, and Generalization}

@@ -1,0 +1,29 @@
+scenario,failed_vehicle,alert_xyz_m,recovery_s,success_gain,latest_start_change_s,comparison,failure_and_new_alert
+new_1,,80.0/50.0/50.0,5.0,1,-40.22030011834069,completion win,0
+new_2,,50.0/100.0/50.0,5.0,1,-42.021918784034998,completion win,0
+new_3,,15.358983848622458/29.999999999999996/50.0,5.0,1,-40.385092698337917,completion win,0
+failure_V1,1,,5.0,1,-45.516401288361482,completion win,0
+failure_V2,2,,5.0,1,-45.516401288361482,completion win,0
+failure_V3,3,,5.0,1,-45.516401288361482,completion win,0
+failure_V4,4,,5.0,1,-46.77248193754322,completion win,0
+failure_V5,5,,5.0,0,3.960846730406736,timing loss,0
+outage_interior,,,17.5,0,0E-15,tie,0
+outage_upper_time,,,30.0,0,0E-15,tie,0
+outage_upper_duration,,,35.0,0,0E-15,tie,0
+new_failure_V1,1,80.0/50.0/50.0,5.0,2,-37.563630361464956,completion win,1
+failure_outage_V1,1,,30.0,1,-24.03776408097579,completion win,0
+all_V1,1,80.0/50.0/50.0,30.0,2,-24.03776408097579,completion win,1
+new_failure_V2,2,50.0/100.0/50.0,5.0,2,-40.496119887339887,completion win,1
+failure_outage_V2,2,,30.0,1,-27.0064482168185,completion win,0
+all_V2,2,50.0/100.0/50.0,30.0,2,-24.579772213807296,completion win,1
+new_failure_V3,3,15.358983848622458/29.999999999999996/50.0,5.0,2,-34.678335809853827,completion win,1
+failure_outage_V3,3,,30.0,1,-25.795008208154776,completion win,0
+all_V3,3,15.358983848622458/29.999999999999996/50.0,30.0,2,-24.579772213807296,completion win,1
+new_failure_V4,4,80.0/50.0/50.0,5.0,2,-37.563630361464956,completion win,1
+failure_outage_V4,4,,30.0,1,-25.995273727168126,completion win,0
+all_V4,4,80.0/50.0/50.0,30.0,2,-24.03776408097579,completion win,1
+new_failure_V5,5,50.0/100.0/50.0,5.0,1,-37.404864269426273,completion win,1
+failure_outage_V5,5,,30.0,0,0E-15,tie,0
+all_V5,5,50.0/100.0/50.0,30.0,1,-26.73771765869426,completion win,1
+new_outage,,50.0/100.0/50.0,30.0,1,-26.73771765869426,completion win,0
+all_duration_sensitivity,2,50.0/100.0/50.0,35.0,2,-19.579772213807296,completion win,1

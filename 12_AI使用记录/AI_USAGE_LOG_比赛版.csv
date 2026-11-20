@@ -12,3 +12,4 @@ ChatGPT（Codex）,GPT-6,OpenAI,2026-11-20,开赛准备度审查,读取 AGENTS.m
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","LaTeX 和科研可视化","按主办方格式精排论文并重做六张科研图","实编译、页序和字体核对，重绘图表并打包","工作稿已采用","待队员复核","paper/B_prototype.tex、figures、submission","Codex（应队员请求）"
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","交接验收","参考 HowToCompeteBetter 指南完善交付","新增验收报告、版本与哈希清单，解压后独立重跑验证","验收文件已归档","待队员复核","submission/VERIFY_REPORT.md、submission/RUN_MANIFEST.json","Codex（应队员请求）"
 "ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","B题原型复核","继续提高可行解质量、最优性证据和扰动对照","连续站位精修、连续松弛下界、成对场景复核与矢量图","实验分支待队员审阅","待队员复核","10_比赛工作区/results/B_评审复核.md","Codex（应队员请求）"
+"ChatGPT（Codex）","GPT-6 系列","OpenAI","2026-11-20","已有结果与交接件的复核","继续提高 B 题证据质量","核对场景配对、胜负来源、时间线疑点及 PDF 和 ZIP 完整性","评审复核材料","待队员复核","10_比赛工作区/results/B_评审证据核对.md","Codex（应队员请求）"

@@ -1,0 +1,15 @@
+name,value,unit,note
+field_side,100.0,m,场地为 100 m × 100 m 正方形，原点在西南角
+dispatch_center_x,50.0,m,"调度中心 O = (50, 50)"
+dispatch_center_y,50.0,m,"调度中心 O = (50, 50)"
+vehicle_radius,1.5,m,观测车等效半径 1.5 m，不得越界、不得进入建筑内部
+vehicle_speed,3.0,m/s,匀速 3 m/s，忽略加减速、转向与避碰时间
+camera_height,2.0,m,相机安装于等效圆盘几何中心，离地 2 m
+gimbal_elev_min,-10.0,deg,云台可行俯仰角范围下界
+gimbal_elev_max,80.0,deg,云台可行俯仰角范围上界
+gimbal_max_rate,30.0,deg/s,方位轴与俯仰轴最大角速度，两轴可同时转动
+joint_observation,5.0,s,两车到位并完成指向后的联合观测时长
+travel_limit_P2,30.0,s,P2(1) 中单车从初始位置到观测站的行程上限
+azimuth_sigma,1.0,deg,"P2 两车方位角测量误差独立同分布 N(0, 1°²)"
+eval_window_P4,60.0,s,"P4 评价窗口 t ∈ [0, 60] s"
+disturbance_time_P4,5.0,s,P4 扰动发生时刻 t = 5 s

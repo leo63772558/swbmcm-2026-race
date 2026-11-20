@@ -1,0 +1,72 @@
+# ============================================================
+# 数维杯 2026 秋季赛 B 题 · 过滤规则
+# 原则：只提交「协作需要的文本、代码、结果、图」，私人信息与大文件绝不入库
+# ============================================================
+
+# ---------- 1. 个人信息与签名（绝不入库）----------
+# 含学号/手机/邮箱/地址的参赛信息文件
+*参赛信息*
+*个人信息*
+*payment*
+*支付凭证*
+*电子凭证*
+*付款截图*
+# 带签名的承诺书（含手写签名，只提交空白模板与最终 PDF 前的扫描件由队长本地保管）
+07_submission/*cns-signed*
+07_submission/*签名*
+
+# ---------- 2. 本地运行状态与缓存 ----------
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# ---------- 3. 大文件与中间产物 ----------
+# 原始数据（几十 MB~GB 级）放本地，仓库只放处理后的结果
+01_problem/raw/*
+!01_problem/raw/README.md
+data_cache/
+*.h5
+*.hdf5
+*.parquet
+*.npy
+*.npz
+*.pkl
+*.joblib
+*.sqlite
+*.db
+
+# ---------- 4. LaTeX / Office 编译中间产物 ----------
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.xdv
+# 注意：论文最终 PDF 要提交（07_submission/），只在编译目录里忽略中间 PDF
+06_paper/build/
+!*.pdf
+
+# ---------- 5. 系统与临时文件 ----------
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+*.tmp
+*.bak
+*.swp
+*~

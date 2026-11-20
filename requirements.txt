@@ -1,0 +1,20 @@
+# 数维杯 2026 秋季赛 B 题 · 依赖清单
+# 生成方式：pip freeze 后手工筛出实际用到的，钉版本以便队友复现
+# 安装：python -m pip install -r requirements.txt
+
+numpy==2.3.4
+scipy==1.16.2
+pandas==2.3.3
+matplotlib==3.10.7
+
+# 优化（P2(2) 车辆复用的 MILP / CP）
+pulp==3.2.2
+
+# 几何与遮挡判定（P1 视线-长方体求交），按需启用
+shapely==2.1.2
+
+# PDF 与题图处理
+pymupdf==1.28.2
+
+# 测试
+pytest==8.4.2

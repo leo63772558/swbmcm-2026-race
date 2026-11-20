@@ -1,0 +1,24 @@
+# 统一换行，避免 Windows/macOS 队友之间产生整文件 diff
+* text=auto eol=lf
+
+# 明确标记为二进制，防止 git 尝试做文本 diff
+*.pdf   binary
+*.docx  binary
+*.doc   binary
+*.xlsx  binary
+*.pptx  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.zip   binary
+*.rar   binary
+
+# CSV 用文本模式，但保留原换行以便 GitHub 表格预览
+*.csv   text eol=lf
+*.md    text eol=lf
+*.py    text eol=lf
+*.tex   text eol=lf
+
+# 论文 PDF 不做 diff
+06_paper/**/*.pdf linguist-documentation

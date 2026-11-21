@@ -52,7 +52,7 @@ cd swbmcm-2026-race
 | P1–P4 求解器与 6 项硬核审计 | ✅ 已完成（6/6 PASS） | `10_比赛工作区/src/b_revision_*.py`、`b_hardcore_audit.py`（1,000 配对 / 4,200 顺序精确 B&B 零间隙） |
 | 敏感性、Pareto 与四项研究对照 | 实测结果 | `results/` 下的 36°/s 云台、30° 交角、局部绕角和 P4 阈值对照 |
 | 11 组图与离线回放 | 已验收 | `figures/fig01`–`fig11`（PDF + PNG）、`simulator/B_Simulator.html` |
-| 英文论文候选稿 | 24 页 A4 | `paper/B_submission.pdf`，93 项数值溯源、15 条参考文献、11 张图 |
+| 英文论文候选稿 | 24 页 A4 | `paper/B_submission.pdf`，125 项数值溯源、17 条参考文献、11 张图 |
 | 自动化测试和 AI 使用披露 | 随候选稿保存 | `tests/`、`AI_USAGE_LOG.csv`（11 列）、`AI_Usage_Report.md` |
 | 支撑材料与复现 | 查验封包 | `BSWBMCM2613050fj.zip`、`REPRODUCIBILITY_MANIFEST.json`、`RELEASE_ACCEPTANCE.json`、`REPRODUCE.md` |
 
@@ -91,7 +91,7 @@ python -m pytest tests/ -v                   # 运行全部 9 文件单元测试
 ## 六、硬约束（违反 = 取消评奖资格）
 
 - 全文 **12 pt Times New Roman**，全英文，**≤ 25 页**（含摘要页 + 目录页），A4
-- 正文页眉 `Team# BSWBMCM2613050` 与 `Page N of M`，从物理第 3 页起编号
+- 正文页眉 `Team# BSWBMCM2613050` 与 `Page N of M`，物理第 3 页起显示 `Page 3 of 24` 至 `Page 24 of 24`
 - **正文与附录均不得出现姓名、学校、指导老师**（匿名评审，代码注释里也不行）
 - AI 工具**必须申报**：论文内声明 + References 列工具 + 附《AI 工具使用情况报告》+ 台账见 `08_ai-log/`
 - 全文疑似 AIGC > 30% 或总相似比 > 50% → 判雷同，取消资格

@@ -101,5 +101,19 @@
         "pointHits": 0
       }
     }
-  ]
+  ],
+  "vehicle_clearance": {
+    "checked_replays": 148,
+    "minimum": {
+      "case": "new_1_V3_recovery_5",
+      "policy": "reschedule",
+      "distance_m": 23.999999999999996,
+      "time_s": 14.515238646417963,
+      "vehicle_1": 3,
+      "vehicle_2": 5,
+      "margin_m": 20.999999999999996
+    },
+    "replays_below_diameter": 0,
+    "method": "continuous piecewise linear relative-motion minimization"
+  }
 }

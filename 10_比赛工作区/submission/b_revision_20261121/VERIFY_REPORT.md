@@ -38,3 +38,18 @@
 ## 封包复跑
 
 最新封包的成员哈希、文件大小与独立解压复跑证明见 `RELEASE_ACCEPTANCE.json` 和 `qa/REPRODUCTION_CHECK.json`。复现命令见 `REPRODUCE.md`。论文和台账保留实际 AI 参与记录。队伍需按[官方 AI 规定](https://www.nmmcm.org.cn/News/220.html)完成独立核心工作、核验改写和签核。
+
+
+## d0f82c3 后续四阶段复核
+
+1. 基线 `babe285`。轻量标签 `checkpoint-d0f82c3` 指向原基线。38 项测试通过，源文件零改动。P3 的 Step 1 未给出显式包络，Step 2 省略包裹正态密度的单调性证明，Step 3 可直接用可积的一致包络控制对 sigma 求导。高斯像距离的大小关系不足以决定导数对的符号。
+2. 补强 `9226d78`。16 文件，新增 1,172 行、删除 23 行。39 项测试通过。新证据见 `P4_equal_completion_sweep.csv`、`P4_monte_carlo_summary.json`、`P4_vehicle_clearance.csv` 及 `HARDCORE_AUDIT_REPORT.json`。115 个既有压力场景中，等完成率且纯时间改善的案例为 0。21 个对照病例通过预设发车等待刻画阈值作用。
+3. 排版 `6b781be`。43 文件，新增 183 行、删除 93 行。三遍 XeLaTeX 与 24 页 Poppler 栅格检查通过。首末页版心占用率 94.9% 与 93.8%。17 个引用依首次使用排序，125 项数值绑定通过。38 项非封包测试通过，封包一致性测试归入末阶段。
+4. 封包。解压交付 ZIP 到新目录后，以根入口 `python 03_code/run_all.py` 实跑。哈希、耗时、全套验收状态见 `RELEASE_ACCEPTANCE.md` 及机器可读凭证。
+
+基线位置索引（以 `d0f82c3` 的 `paper/team/` 行号为准）。
+
+- 离散最优与绕角证据见 `summary.tex:5`、`conclusion.tex:3`、`p2-dispatch.tex:4,26,28`、`p2-precision.tex:32,42`、`limits.tex:2`，并对照 `p1.tex:23` 的内圈几何。
+- 两种 P4 评分口径见 `summary.tex:9`、`p4.tex:11–15`、`conclusion.tex:7`。
+- 建筑与车辆分层见 `summary.tex:11`、`sensitivity.tex:23`、`limits.tex:5`。
+- 原 `conclusion.tex:1–7` 由四段逐题复述组成。此次结论聚焦离散证书、覆盖界和重规划阈值。AI 使用情况按实际披露。

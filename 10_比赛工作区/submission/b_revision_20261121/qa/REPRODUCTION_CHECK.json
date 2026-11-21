@@ -1,5 +1,5 @@
 {
-  "byte_matches": 88,
+  "byte_matches": 94,
   "matched_artifacts": [
     "figures/FIGURE_SOURCES.csv",
     "figures/P4_PANEL_INDEX.csv",
@@ -75,9 +75,15 @@
     "results/P4_category_summary_expanded.csv",
     "results/P4_clock_checks.json",
     "results/P4_dedup_expanded_cases.csv",
+    "results/P4_equal_completion_cases.csv",
+    "results/P4_equal_completion_sweep.csv",
     "results/P4_extended_summary.json",
     "results/P4_hysteresis_sweep.csv",
     "results/P4_instruction_sensitivity.csv",
+    "results/P4_monte_carlo.csv",
+    "results/P4_monte_carlo_summary.json",
+    "results/P4_vehicle_clearance.csv",
+    "results/P4_vehicle_clearance.json",
     "results/Pareto_tradeoff.csv",
     "results/Pareto_tradeoff_3d.csv",
     "results/Route_clearance_comparison.csv",
@@ -112,15 +118,15 @@
     "simulator/assets/plotly-gl3d.min.js"
   ],
   "wall_seconds": {
-    "1_correctness": 0.503,
-    "2_validation": 9.164,
-    "3_experiments": 4.854,
-    "3b_sensitivity_pareto": 148.539,
-    "3c_p4_extended": 15.668,
-    "3d_corner_routes": 0.001,
-    "3e_dispatch_tradeoffs": 9.888,
-    "4_visuals": 11.611,
-    "5_pdf": 18.986
+    "1_correctness": 0.56,
+    "2_validation": 17.031,
+    "3_experiments": 9.566,
+    "3b_sensitivity_pareto": 148.828,
+    "3c_p4_extended": 38.388999999999996,
+    "3d_corner_routes": 0.002,
+    "3e_dispatch_tradeoffs": 10.918,
+    "4_visuals": 13.907,
+    "5_pdf": 22.618
   },
   "plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab"
 }

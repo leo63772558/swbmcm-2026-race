@@ -1,19 +1,19 @@
 macro,rendered,source_file,record,field,raw
-MinRange,7.582060,results/P1_station.csv,tie=ready,range_m,7.582060170463998
+MinRange,7.582,results/P1_station.csv,tie=ready,range_m,7.582060170463998
 MaxPitch,80,results/P1_station.csv,tie=ready,elevation_deg,80.0
-Quality,0.131890,results/P1_station.csv,tie=ready,quality_m_inv,0.13189027487483038
-ReadyTime,5.064533,results/P1_station.csv,tie=ready,ready_s,5.06453312743745
-StationX,83.324405,results/P1_station.csv,tie=ready,x_m,83.32440521981547
-StationY,62.533128,results/P1_station.csv,tie=ready,y_m,62.53312836032199
-ArrivalTime,2.397866,results/P1_station.csv,tie=ready,arrival_s,2.397866460770781
-ReadyAngle,260.000,results/P1_station.csv,tie=ready,azimuth_deg,260.0
-AltArrival,1.224247,results/P1_station.csv,tie=arrival,arrival_s,1.2242471655165759
-ArcStart,236.896047,results/P1_arc.csv,first row,start_deg,236.8960468538305
-ArcEnd,520.747873,results/P1_arc.csv,first row,end_deg,520.7478733283226
-ArcLength,37.562656,results/P1_arc.csv,first row,length_m,37.56265550648976
+Quality,0.1319,results/P1_station.csv,tie=ready,quality_m_inv,0.13189027487483038
+ReadyTime,5.065,results/P1_station.csv,tie=ready,ready_s,5.06453312743745
+StationX,83.32,results/P1_station.csv,tie=ready,x_m,83.32440521981547
+StationY,62.53,results/P1_station.csv,tie=ready,y_m,62.53312836032199
+ArrivalTime,2.398,results/P1_station.csv,tie=ready,arrival_s,2.397866460770781
+ReadyAngle,260,results/P1_station.csv,tie=ready,azimuth_deg,260.0
+AltArrival,1.224,results/P1_station.csv,tie=arrival,arrival_s,1.2242471655165759
+ArcStart,236.9,results/P1_arc.csv,first row,start_deg,236.8960468538305
+ArcEnd,520.7,results/P1_arc.csv,first row,end_deg,520.7478733283226
+ArcLength,37.56,results/P1_arc.csv,first row,length_m,37.56265550648976
 ArcGap,76.15,results/P1_arc.csv,first row,360-(end_deg-start_deg),76.1481735255079
-GridArea,5610.4,results/P1_area.csv,step_m=0.1 phase=0.5,intersection_area_m2,5610.4000000000015
-PitchLoss,9.2876,results/P1_pitch_checks.csv,ceiling=79.0,100*relative_quality_loss,9.287632327234718
+GridArea,5610,results/P1_area.csv,step_m=0.1 phase=0.5,intersection_area_m2,5610.4000000000015
+PitchLoss,9.288,results/P1_pitch_checks.csv,ceiling=79.0,100*relative_quality_loss,9.287632327234718
 FromA,236.896,results/P1_ready_branches.csv,from_deg=236.8960468538305,from_deg,236.8960468538305
 ToA,260.000,results/P1_ready_branches.csv,from_deg=236.8960468538305,to_deg,260.0
 BranchBestA,5.064533,results/P1_ready_branches.csv,from_deg=236.8960468538305,feasible_ready_s,5.06453312743745
@@ -30,16 +30,16 @@ FromD,460.000,results/P1_ready_branches.csv,from_deg=460.0,from_deg,460.0
 ToD,520.748,results/P1_ready_branches.csv,from_deg=460.0,to_deg,520.7478733283226
 BranchBestD,6.186181,results/P1_ready_branches.csv,from_deg=460.0,feasible_ready_s,6.186181235319385
 AtD,460.000,results/P1_ready_branches.csv,from_deg=460.0,argmin_grid_deg,460.0
-FirstRMS,0.143623,results/P2_precision.csv,first row,horizontal_rms_m,0.1436233579232133
+FirstRMS,0.1436,results/P2_precision.csv,first row,horizontal_rms_m,0.1436233579232133
 BaseLength,8.229,results/P2_precision.csv,first row,baseline_m,8.229012248496929
 Crossing,90,results/P2_precision.csv,first row,crossing_deg,89.9999999999999
 TravelFirst,6.459,results/P2_precision.csv,first row,rounded_travel_1_s,6.458717206745608
 TravelSecond,15.365,results/P2_precision.csv,first row,rounded_travel_2_s,15.365392516536396
-PrecisionTightRange,6.4146,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,minimum_radius_m,6.414550201544714
-PrecisionTightRMS,0.15833,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,horizontal_rms_m,0.15832830914668486
+PrecisionTightRange,6.415,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,minimum_radius_m,6.414550201544714
+PrecisionTightRMS,0.1583,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,horizontal_rms_m,0.15832830914668486
 PrecisionTightIncrease,10.24,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,rms_increase_pct,10.23855133044127
-CornerGraphLength,19.3762,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,graph_length_m,19.376151620236826
-CornerArcLength,19.2215,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,tangent_arc_length_m,19.221467482372113
+CornerGraphLength,19.38,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,graph_length_m,19.376151620236826
+CornerArcLength,19.22,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,tangent_arc_length_m,19.221467482372113
 CornerAbsoluteGap,0.1547,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,absolute_gap_m,0.15468413786471302
 CornerRelativeGap,0.805,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,relative_gap_pct,0.8047467655972307
 PanFixed,10.71,results/P2_pan_speed_benchmark.csv,fixed_nominal_plan,latest_start_s,10.707896
@@ -55,8 +55,8 @@ NearestThree,11.724,results/P2_trials.csv,rounded; k=3; nearest,latest_start_s,1
 BeamEight,11.034,results/P2_trials.csv,rounded; k=8; beam,latest_start_s,11.034061764620652
 NearestEight,11.724,results/P2_trials.csv,rounded; k=8; nearest,latest_start_s,11.724421648941432
 TravelThreshold,66.837,results/P3_verification.json,root,archived_distance_m,66.83717727661133
-IntegratedCrossing,66.837258,results/P3_verification.json,root,independent_crossing_m,66.83725842856802
-SigmaCrossing,1.636745,results/P3_verification.json,root,sigma_at_crossing_m,1.6367451685713605
+IntegratedCrossing,66.84,results/P3_verification.json,root,independent_crossing_m,66.83725842856802
+SigmaCrossing,1.637,results/P3_verification.json,root,sigma_at_crossing_m,1.6367451685713605
 FarBound,0.87652,results/P3_verification.json,root,tail_probability_upper_bound,0.8765168902004593
 BracketLow,66.837158,results/P3_verification.json,root,bracket_m[0],66.83715842856802
 BracketHigh,66.837358,results/P3_verification.json,root,bracket_m[1],66.83735842856802
@@ -88,7 +88,7 @@ ReplanLast,12.927,results/priority_3.json,V5_scores.reschedule,latest_start_s,12
 RouteCount,2925,results/Route_summary.json,root,compared_routes,2925
 ShortenedCount,100,results/Route_summary.json,root,shorter_paths,100
 RestoredCount,5,results/Route_summary.json,root,restored_endpoints,5
-SavingsMax,0.03193,results/Route_summary.json,root,maximum_saving_m,0.03192622815850399
+SavingsMax,0.0319,results/Route_summary.json,root,maximum_saving_m,0.03192622815850399
 GlobalTopSwing,11.67,results/Global_sensitivity_summary.json,root,top_swing_pct,11.6704
 ParetoConfigs,16,results/Global_sensitivity_summary.json,root,pareto_configs,16
 ParetoFrontCount,8,results/Global_sensitivity_summary.json,root,pareto_front_count,8

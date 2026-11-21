@@ -1,4 +1,4 @@
-"""Render eight Matplotlib review figures from the frozen B evidence.
+"""Render the Matplotlib review figures from the frozen B evidence.
 
 AI assistance: ChatGPT (Codex, GPT-6), OpenAI, 2026-11-21.
 Assistance: presentation, archived event visualization, and visual checks.
@@ -70,9 +70,9 @@ FIGURE_MAP = (
     ("fig09_global_sensitivity", "Global_sensitivity_oat.csv; Global_sensitivity_fixed_vs_reopt.csv; Global_sensitivity_interaction.csv; Global_sensitivity_weight_check.csv",
      "Parameter perturbation & pairwise interaction analysis: re-optimized vs fixed-plan, tornado, 6x6 interactions, and 5-scheme weight stability"),
     ("fig10_pareto_3d", "Pareto_tradeoff_3d.csv",
-     "Three-objective Pareto non-dominated frontier (time, travel, observation quality) and 2D projections proving k=5 and k=8 non-dominance"),
-    ("fig11_3d_dashboard", "Executed_timeline.json; browser_captures/webgl_*.png",
-     "Dedicated print-enhanced dark 3D digital twin three-stage keyframe triptych verified offline in Chromium"),
+     "Three-objective Pareto frontier with overlapping nearest-baseline settings marked in the objective projections"),
+    ("fig11_3d_dashboard", "Executed_timeline.json; qa/SIMULATOR_CHECKS.json; browser_captures/webgl_*.png",
+     "Three offline replay keyframes and the travel-centerline building-footprint check"),
 )
 PLOT_METADATA = {
     "Creator": "Matplotlib",
@@ -1021,102 +1021,83 @@ def global_sensitivity(results):
 
 
 def pareto_3d(results):
-    """Fig. 10: True 3D Multi-Objective Pareto Frontier (Time, Travel, Observation Quality) + 2D Projections."""
-    pareto = read_csv(results / "Pareto_tradeoff_3d.csv")
-    fig = plt.figure(figsize=(11.4, 5.2), layout="constrained")
+    """Show the distinct objective vectors and mark the overlapping Nearest configurations."""
+    rows = read_csv(results / "Pareto_tradeoff_3d.csv")
+
+    def objectives(row):
+        return (float(row["latest_start_s"]), float(row["total_travel_m"]),
+                1e3 * float(row["mean_quality_m_inv"]))
+
+    nondominated = [row for row in rows if row["is_pareto_3d"] == "True"]
+    front = list(dict.fromkeys(map(objectives, nondominated)))
+    dominated = list(dict.fromkeys(objectives(row) for row in rows if row["is_pareto_3d"] != "True"))
+    k5 = objectives(next(row for row in nondominated if row["policy"] == "beam" and row["k"] == "5"))
+    k8 = objectives(next(row for row in nondominated if row["tag"] == "nominal_recommended"))
+    high_quality = max(front, key=lambda point: point[2])
+    nearest_rows = sorted((row for row in nondominated if row["policy"] == "nearest"),
+                          key=lambda row: int(row["k"]))
+    nearest, = {objectives(row) for row in nearest_rows}
+    nearest_k = ", ".join(row["k"] for row in nearest_rows)
+    nearest_count = len(nearest_rows)
+
+    fig = plt.figure(figsize=(11.4, 4.65), layout="constrained")
     fig.suptitle(
-        r"Three-objective Pareto frontier: latency $t_{\mathrm{last}}$, travel $D_{\mathrm{tot}}$, and quality $\bar{Q}$ (16 configs, 8 3D non-dominated)",
-        x=0.02, ha="left", fontsize=12.6, fontweight="bold", color=INK,
+        f"Dispatch tradeoffs  |  {len(nondominated)} nondominated configurations, {len(front)} distinct vectors",
+        x=.02, ha="left", fontsize=14, fontweight="bold", color=INK,
     )
-    gs = fig.add_gridspec(1, 3, width_ratios=(1.25, 1.0, 1.0), wspace=0.22)
-
-    p3d = [r for r in pareto if r["is_pareto_3d"] == "True"]
-    dom = [r for r in pareto if r["is_pareto_3d"] != "True"]
-    k5 = next(r for r in pareto if r["policy"] == "beam" and r["k"] == "5" and r["beam_width"] == "20")
-    k8 = next(r for r in pareto if r["tag"] == "nominal_recommended")
-    near = next(r for r in pareto if r["tag"] == "nearest_baseline")
-    k3w5 = next(r for r in pareto if r["policy"] == "beam" and r["k"] == "3" and r["beam_width"] == "5")
-
-    # (a) 3D Scatter of all 16 configs highlighting the 3D non-dominated front
+    gs = fig.add_gridspec(1, 3, width_ratios=(1.2, 1.0, 1.0), wspace=.14)
     ax3 = fig.add_subplot(gs[0, 0], projection="3d")
-    ax3.set_title("a   3D objective space", loc="left", fontsize=10.8, fontweight="bold", pad=4)
-    ax3.scatter(
-        [float(r["latest_start_s"]) for r in dom],
-        [float(r["total_travel_m"]) for r in dom],
-        [float(r["mean_quality_m_inv"]) * 1e3 for r in dom],
-        s=36, color="#94A3B8", alpha=0.65, label="Dominated (8)",
-    )
-    ax3.scatter(
-        [float(r["latest_start_s"]) for r in p3d],
-        [float(r["total_travel_m"]) for r in p3d],
-        [float(r["mean_quality_m_inv"]) * 1e3 for r in p3d],
-        s=58, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto front (8)",
-    )
-    ax3.scatter([float(k8["latest_start_s"])], [float(k8["total_travel_m"])], [float(k8["mean_quality_m_inv"]) * 1e3],
-                s=130, marker="*", color=CORAL, edgecolor=INK, lw=0.8, label=r"Nominal $k=8$", zorder=8)
-    ax3.scatter([float(k5["latest_start_s"])], [float(k5["total_travel_m"])], [float(k5["mean_quality_m_inv"]) * 1e3],
-                s=75, marker="D", color=BLUE, edgecolor=INK, lw=0.8, label=r"Low-travel $k=5$", zorder=7)
-    ax3.set_xlabel(r"$t_{\mathrm{last}}$ (s)", fontsize=8.5, labelpad=4)
-    ax3.set_ylabel(r"Travel $D_{\mathrm{tot}}$ (m)", fontsize=8.5, labelpad=4)
-    ax3.set_zlabel(r"$\bar{Q}$ ($10^{-3}\ \mathrm{m}^{-1}$)", fontsize=8.5, labelpad=4)
-    ax3.tick_params(labelsize=7.5)
-    ax3.view_init(elev=22, azim=-52)
-    ax3.legend(loc="upper left", fontsize=7.4, frameon=True, facecolor="white")
-
-    # (b) 2D Projection: t_last vs Total Travel
     ax_b = fig.add_subplot(gs[0, 1])
-    panel(ax_b, "b", r"Projection: latency vs. travel")
-    ax_b.scatter([float(r["latest_start_s"]) for r in dom], [float(r["total_travel_m"]) for r in dom],
-                 s=42, color="#94A3B8", alpha=0.7, label="Dominated")
-    ax_b.scatter([float(r["latest_start_s"]) for r in p3d], [float(r["total_travel_m"]) for r in p3d],
-                 s=62, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto")
-    ax_b.scatter([float(k8["latest_start_s"])], [float(k8["total_travel_m"])],
-                 s=135, marker="*", color=CORAL, edgecolor=INK, lw=0.8, zorder=7)
-    ax_b.scatter([float(k5["latest_start_s"])], [float(k5["total_travel_m"])],
-                 s=70, marker="D", color=BLUE, edgecolor=INK, lw=0.8, zorder=6)
-    ax_b.annotate(r"Nominal $k=8$" + "\n(11.034 s, 38.2 m)", (float(k8["latest_start_s"]), float(k8["total_travel_m"])),
-                  xytext=(16, 12), textcoords="offset points", fontsize=7.8, fontweight="bold", color=CORAL,
-                  arrowprops={"arrowstyle": "->", "color": CORAL, "lw": 0.9})
-    ax_b.annotate(r"$k=5$ (36.1 m)", (float(k5["latest_start_s"]), float(k5["total_travel_m"])),
-                  xytext=(18, -14), textcoords="offset points", fontsize=7.8, fontweight="bold", color=BLUE,
-                  arrowprops={"arrowstyle": "->", "color": BLUE, "lw": 0.9})
-    ax_b.annotate(r"Nearest (11.724 s, 21.1 m)", (float(near["latest_start_s"]), float(near["total_travel_m"])),
-                  xytext=(10, 8), textcoords="offset points", fontsize=7.6, fontweight="bold", color=GOLD,
-                  arrowprops={"arrowstyle": "->", "color": GOLD, "lw": 0.9})
+    ax_c = fig.add_subplot(gs[0, 2])
+    panel(ax3, "a", "Three objectives")
+    panel(ax_b, "b", "Latency and travel")
+    panel(ax_c, "c", "Travel and quality")
+
+    nearest_color = "#8A5206"
+
+    def scatter(ax, points, axes, **style):
+        projected = list(dict.fromkeys(tuple(point[index] for index in axes) for point in points))
+        ax.scatter(*zip(*projected), **style)
+
+    for ax, axes in ((ax3, (0, 1, 2)), (ax_b, (0, 1)), (ax_c, (1, 2))):
+        scatter(ax, dominated, axes, s=43, color="#94A3B8", alpha=.68, label="Dominated")
+        scatter(ax, front, axes, s=55, color=TEAL, edgecolor=INK, lw=.7, label="Nondominated")
+        scatter(ax, (k8,), axes, s=126, marker="*", color=CORAL, edgecolor=INK, lw=.8,
+                label=r"Nominal $k=8$", zorder=8)
+        scatter(ax, (k5,), axes, s=62, marker="D", color=BLUE, edgecolor=INK, lw=.8,
+                label=r"Low-travel $k=5$", zorder=7)
+        scatter(ax, (nearest,), axes, s=110, facecolors="none", edgecolor=nearest_color, lw=1.55,
+                label=f"Nearest ({nearest_count} settings)", zorder=8)
+
+    ax3.set_xlabel(r"$t_{\mathrm{last}}$ (s)", fontsize=9, labelpad=4)
+    ax3.set_ylabel(r"$D_{\mathrm{tot}}$ (m)", fontsize=9, labelpad=4)
+    ax3.set_zlabel(r"$\bar{Q}$ ($10^{-3}\ \mathrm{m}^{-1}$)", fontsize=9, labelpad=3)
+    ax3.tick_params(labelsize=8)
+    for axis in (ax3.xaxis, ax3.yaxis, ax3.zaxis):
+        axis.set_major_locator(MaxNLocator(5))
+    ax3.view_init(elev=22, azim=-52)
+    ax3.legend(loc="upper left", fontsize=8.5, frameon=True, facecolor="white")
+
+    def callout(ax, text, point, shift, color):
+        ax.annotate(text, point, xytext=shift, textcoords="offset points", fontsize=9.2,
+                    fontweight="bold", color=color,
+                    arrowprops={"arrowstyle": "->", "color": color, "lw": 0.85})
+
+    callout(ax_b, rf"Nearest ({nearest_count} settings)" + "\n" + rf"$k={nearest_k}$",
+            nearest[:2], (19, 12), nearest_color)
     ax_b.set_xlabel(r"Latest paired start $t_{\mathrm{last}}$ (s)")
     ax_b.set_ylabel(r"Total fleet travel $D_{\mathrm{tot}}$ (m)")
-    ax_b.set_ylim(19.0, 44.5)
+    ax_b.set_ylim(18.6, 43.5)
 
-    # (c) 2D Projection: Total Travel vs Mean Observation Quality (proving k=8 beats k=5 on quality!)
-    ax_c = fig.add_subplot(gs[0, 2])
-    panel(ax_c, "c", r"Projection: travel vs. quality $\bar{Q}$")
-    ax_c.scatter([float(r["total_travel_m"]) for r in dom], [float(r["mean_quality_m_inv"]) * 1e3 for r in dom],
-                 s=42, color="#94A3B8", alpha=0.7, label="Dominated")
-    ax_c.scatter([float(r["total_travel_m"]) for r in p3d], [float(r["mean_quality_m_inv"]) * 1e3 for r in p3d],
-                 s=62, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto")
-    # Connect the tied 11.034 s tradeoff branch (k=5 -> k=6 -> k=8)
-    tied = sorted([r for r in pareto if abs(float(r["latest_start_s"]) - 11.034062) < 1e-4],
-                  key=lambda r: float(r["total_travel_m"]))
-    ax_c.plot([float(r["total_travel_m"]) for r in tied],
-              [float(r["mean_quality_m_inv"]) * 1e3 for r in tied],
-              color=CORAL, lw=2.0, ls="-", zorder=5, label=r"$t_{\mathrm{last}}=11.034$ s ridge")
-    ax_c.scatter([float(k8["total_travel_m"])], [float(k8["mean_quality_m_inv"]) * 1e3],
-                 s=135, marker="*", color=CORAL, edgecolor=INK, lw=0.8, zorder=7)
-    ax_c.scatter([float(k5["total_travel_m"])], [float(k5["mean_quality_m_inv"]) * 1e3],
-                 s=70, marker="D", color=BLUE, edgecolor=INK, lw=0.8, zorder=6)
-    ax_c.annotate(r"$k=8$: $\bar{Q}=20.08$" + "\n(59.9 m range)", (float(k8["total_travel_m"]), float(k8["mean_quality_m_inv"]) * 1e3),
-                  xytext=(-65, 16), textcoords="offset points", fontsize=7.6, fontweight="bold", color=CORAL,
-                  arrowprops={"arrowstyle": "->", "color": CORAL, "lw": 0.9})
-    ax_c.annotate(r"$k=5$: $\bar{Q}=19.37$" + "\n(62.5 m range)", (float(k5["total_travel_m"]), float(k5["mean_quality_m_inv"]) * 1e3),
-                  xytext=(-62, -26), textcoords="offset points", fontsize=7.6, fontweight="bold", color=BLUE,
-                  arrowprops={"arrowstyle": "->", "color": BLUE, "lw": 0.9})
-    ax_c.annotate(r"$k=3,w=5$" + "\n(11.496 s)", (float(k3w5["total_travel_m"]), float(k3w5["mean_quality_m_inv"]) * 1e3),
-                  xytext=(-52, -16), textcoords="offset points", fontsize=7.4, color=TEAL, fontweight="bold",
-                  arrowprops={"arrowstyle": "->", "color": TEAL, "lw": 0.9})
+    tied = sorted((point for point in front if point[0] == k8[0]), key=lambda point: point[1])
+    ax_c.plot([point[1] for point in tied], [point[2] for point in tied],
+              color=CORAL, lw=1.45, zorder=5)
+    callout(ax_c, r"$k=8$", k8[1:], (-12, 18), INK)
+    callout(ax_c, r"$k=5$", k5[1:], (-17, -26), INK)
+    callout(ax_c, r"$k=3,\ w=5$", high_quality[1:], (-47, -23), INK)
     ax_c.set_xlabel(r"Total fleet travel $D_{\mathrm{tot}}$ (m)")
     ax_c.set_ylabel(r"Mean quality $\bar{Q}$ ($10^{-3}\ \mathrm{m}^{-1}$)")
-    ax_c.set_ylim(12.5, 31.5)
-    ax_c.legend(loc="lower left", fontsize=7.6, frameon=True, facecolor="white")
+    ax_c.set_ylim(12.4, 31.3)
     return fig
 
 
@@ -1126,7 +1107,7 @@ def dashboard_3d(directory):
 
     fig = plt.figure(figsize=(11.6, 4.35), layout="constrained")
     fig.suptitle(
-        "Offline 3D digital twin command dashboard  |  Verified Chromium keyframes (0/892 segment collisions)",
+        "Offline 3D replay  |  Building-footprint intersections: 0 of 892 travel centerline segments",
         x=0.02, ha="left", fontsize=12.4, fontweight="bold", color=INK,
     )
     gs = fig.add_gridspec(1, 3, wspace=0.06)

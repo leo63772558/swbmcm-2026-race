@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import re
 import subprocess
 import sys
 import zipfile
@@ -30,28 +31,38 @@ FORBIDDEN_PAPER_TOKENS = [
     "[FILL",
     "TODO",
     "Sobol",
+    "??",
+    "Missing section file",
 ]
 
 
 def test_submission_pdf_format_figures_and_anonymity():
-    """B_submission.pdf obeys <=25 pages A4, Page 1 no header, Page 2 Content, 11 figures, zero leaks."""
+    """Verify the 24-page paper, official page structure, and anonymity."""
     assert PDF_PATH.is_file()
     reader = PdfReader(PDF_PATH)
-    assert 1 <= len(reader.pages) <= 25
+    assert len(reader.pages) == 24
     assert not (reader.metadata and reader.metadata.get("/Author")), "PDF Author metadata must be empty"
 
     pages_text = [p.extract_text() or "" for p in reader.pages]
-    for idx, txt in enumerate(pages_text, start=1):
+    for idx, (page, txt) in enumerate(zip(reader.pages, pages_text, strict=True), start=1):
+        assert abs(float(page.mediabox.width) - 595.28) < 1, f"Page {idx} width must be A4"
+        assert abs(float(page.mediabox.height) - 841.89) < 1, f"Page {idx} height must be A4"
         assert len(txt.strip()) > 80, f"Page {idx} appears empty or nearly blank"
 
-    assert "Team#SWBMCM2613050" not in pages_text[0], "Page 1 Summary Sheet must not have Team# header"
-    assert "Summary" in pages_text[0]
+    header = "Team#BSWBMCM2613050"
+    compact_pages = [re.sub(r"\s+", "", page) for page in pages_text]
+    assert all(header not in page for page in compact_pages[:2])
+    for label in ("Problem Chosen", "2026", "ShuWei Cup", "Summary Sheet", "Team Control Number", "SWBMCM2613050", "Keywords"):
+        assert label in " ".join(pages_text[0].split())
     assert "Content" in pages_text[1]
-    assert "Team#SWBMCM2613050" in pages_text[1]
+    assert not re.search(r"Station-\s*ing|Admissi-\s*ble", pages_text[1], re.IGNORECASE)
+    for number, page in enumerate(compact_pages[2:], start=1):
+        assert header in page and f"Page{number}of22" in page
 
     full_text = "\n".join(pages_text)
     for fig_idx in range(1, 12):
         assert f"Figure {fig_idx}." in full_text, f"Missing Figure {fig_idx}. in B_submission.pdf"
+    assert "AI Tool Usage Report" in " ".join(pages_text[-1].split())
 
     for bad in FORBIDDEN_PAPER_TOKENS:
         assert bad not in full_text, f"Forbidden draft/inaccurate token found in PDF: {bad}"

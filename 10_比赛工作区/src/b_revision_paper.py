@@ -29,23 +29,24 @@ def metrics(root):
         source.append({"macro":name,"rendered":rendered,"source_file":"results/"+from_file,
                        "record":key,"field":field,"raw":value})
     p1 = {x["tie"]:x for x in read_csv(results/"P1_station.csv")}
-    for macro,field,num in (("MinRange","range_m",6),("MaxPitch","elevation_deg",0),
-                            ("Quality","quality_m_inv",6),("ReadyTime","ready_s",6),
-                            ("StationX","x_m",6),("StationY","y_m",6),
-                            ("ArrivalTime","arrival_s",6),("ReadyAngle","azimuth_deg",3)):
+    for macro,field,num in (("MinRange","range_m",3),("MaxPitch","elevation_deg",0),
+                            ("Quality","quality_m_inv",4),("ReadyTime","ready_s",3),
+                            ("StationX","x_m",2),("StationY","y_m",2),
+                            ("ArrivalTime","arrival_s",3),("ReadyAngle","azimuth_deg",0)):
         add(macro,p1["ready"][field],"P1_station.csv","tie=ready",field,num)
-    add("AltArrival",p1["arrival"]["arrival_s"],"P1_station.csv","tie=arrival","arrival_s",6)
+    add("AltArrival",p1["arrival"]["arrival_s"],"P1_station.csv","tie=arrival","arrival_s",3)
     arc, = read_csv(results/"P1_arc.csv")
-    for macro,field in (("ArcStart","start_deg"),("ArcEnd","end_deg"),("ArcLength","length_m")):
-        add(macro,arc[field],"P1_arc.csv","first row",field,6)
+    for macro,field,digits in (("ArcStart","start_deg",1),("ArcEnd","end_deg",1),
+                               ("ArcLength","length_m",2)):
+        add(macro,arc[field],"P1_arc.csv","first row",field,digits)
     add("ArcGap", 360 - (float(arc["end_deg"]) - float(arc["start_deg"])),
         "P1_arc.csv", "first row", "360-(end_deg-start_deg)", 2)
     areas = read_csv(results/"P1_area.csv")
     a = next(r for r in areas if r["step_m"]=="0.1")
-    add("GridArea",a["intersection_area_m2"],"P1_area.csv","step_m=0.1 phase=0.5","intersection_area_m2",1)
+    add("GridArea",a["intersection_area_m2"],"P1_area.csv","step_m=0.1 phase=0.5","intersection_area_m2",0)
     loss = read_csv(results/"P1_pitch_checks.csv")[1]
     add("PitchLoss",100*float(loss["relative_quality_loss"]),"P1_pitch_checks.csv",
-        f'ceiling={loss["elevation_ceiling_deg"]}',"100*relative_quality_loss",4)
+        f'ceiling={loss["elevation_ceiling_deg"]}',"100*relative_quality_loss",3)
     branches=read_csv(results/"P1_ready_branches.csv")
     for letter,row in zip("ABCD",branches,strict=True):
         sel=f'from_deg={row["from_deg"]}'
@@ -53,7 +54,7 @@ def metrics(root):
                                      ("BranchBest","feasible_ready_s",6),("At","argmin_grid_deg",3)):
             add(macro+letter,row[field],"P1_ready_branches.csv",sel,field,digits)
     p2, = read_csv(results/"P2_precision.csv")
-    for macro,field,digits in (("FirstRMS","horizontal_rms_m",6),("BaseLength","baseline_m",3),
+    for macro,field,digits in (("FirstRMS","horizontal_rms_m",4),("BaseLength","baseline_m",3),
                                ("Crossing","crossing_deg",0),("TravelFirst","rounded_travel_1_s",3),
                                ("TravelSecond","rounded_travel_2_s",3)):
         add(macro,p2[field],"P2_precision.csv","first row",field,digits)
@@ -61,16 +62,16 @@ def metrics(root):
     pitch = next(row for row in read_csv(results / pitch_file)
                  if float(row["elevation_ceiling_deg"]) == 79)
     for macro, field, digits in (
-        ("PrecisionTightRange", "minimum_radius_m", 4),
-        ("PrecisionTightRMS", "horizontal_rms_m", 5),
+        ("PrecisionTightRange", "minimum_radius_m", 3),
+        ("PrecisionTightRMS", "horizontal_rms_m", 4),
         ("PrecisionTightIncrease", "rms_increase_pct", 2),
     ):
         add(macro, pitch[field], pitch_file, "elevation_ceiling_deg=79", field, digits)
     corner_file = "P2_corner_arc_comparison.csv"
     corner, = read_csv(results / corner_file)
     for macro, field, digits in (
-        ("CornerGraphLength", "graph_length_m", 4),
-        ("CornerArcLength", "tangent_arc_length_m", 4),
+        ("CornerGraphLength", "graph_length_m", 2),
+        ("CornerArcLength", "tangent_arc_length_m", 2),
         ("CornerAbsoluteGap", "absolute_gap_m", 4),
         ("CornerRelativeGap", "relative_gap_pct", 3),
     ):
@@ -100,8 +101,8 @@ def metrics(root):
             add(name+label,r["latest_start_s"],"P2_trials.csv",f"rounded; k={k}; {policy}","latest_start_s",3)
     p3=read_json(results/"P3_verification.json")
     for name,field,digits in (("TravelThreshold","archived_distance_m",3),
-                              ("IntegratedCrossing","independent_crossing_m",6),
-                              ("SigmaCrossing","sigma_at_crossing_m",6)):
+                              ("IntegratedCrossing","independent_crossing_m",2),
+                              ("SigmaCrossing","sigma_at_crossing_m",3)):
         add(name,p3[field],"P3_verification.json","root",field,digits)
     tail = p3["tail_probability_upper_bound"]
     add("FarBound", tail, "P3_verification.json", "root", "tail_probability_upper_bound")
@@ -143,7 +144,7 @@ def metrics(root):
     routing = read_json(results/"Route_summary.json")
     for name, field, places in (("RouteCount","compared_routes",None),("ShortenedCount","shorter_paths",None),
                                 ("RestoredCount","restored_endpoints",None),
-                                ("SavingsMax","maximum_saving_m",5)):
+                                ("SavingsMax","maximum_saving_m",4)):
         add(name,routing[field],"Route_summary.json","root",field,places)
     sens_path = results / "Global_sensitivity_summary.json"
     if sens_path.is_file():
@@ -337,7 +338,8 @@ def compile_tex(path, bundle):
 
 def inspect_pdf(path, qa, *, paper=True):
     reader = PdfReader(path)
-    assert 0<len(reader.pages)<=25 and not reader.attachments
+    assert (len(reader.pages) == 24 if paper else 0 < len(reader.pages) <= 25)
+    assert not reader.attachments
     assert not (reader.metadata.author if reader.metadata else None)
     qa.mkdir(parents=True,exist_ok=True)
     for prior_render in qa.glob(path.stem+"-*.png"):
@@ -355,13 +357,17 @@ def inspect_pdf(path, qa, *, paper=True):
         cleaned = re.sub(r"\s+","",text)
         assert len(cleaned)>60 and "\ufffd" not in text and not re.search(r"[\u3400-\u9fff]",text), i
         if paper:
-            assert (f"Team#{TEAM_NUMBER}" in cleaned) == (i>1)
-            if i>1:
-                assert f"Page{i}of{len(reader.pages)}" in cleaned, (i,cleaned[:100])
-            if i==1:
-                assert "Summary" in text and "Keywords" in text
-            if i==2:
-                assert "Content" in text
+            assert ("Team#" in cleaned) == (i > 2), (i, cleaned[:100])
+            if i > 2:
+                assert f"Team#B{TEAM_NUMBER}" in cleaned, (i, cleaned[:100])
+                assert f"Page{i - 2}of{len(reader.pages) - 2}" in cleaned, (i, cleaned[:100])
+            elif i == 1:
+                for label in ("ProblemChosen", "2026ShuWeiCupSummarySheet", "TeamControlNumber",
+                              TEAM_NUMBER, "Summary", "Keywords"):
+                    assert label in cleaned, (i, label)
+            else:
+                assert cleaned.startswith("Content"), cleaned[:100]
+                assert not re.search(r"\b\w+-\s*\n\s*[a-z]+", text), text
         fonts = page["/Resources"]["/Font"].get_object()
         names = sorted({str(font.get_object().get("/BaseFont","")) for font in fonts.values()})
         assert any("TimesNewRoman" in name for name in names), (i,names)
@@ -373,15 +379,15 @@ def inspect_pdf(path, qa, *, paper=True):
         text_pages.append(cleaned)
     if paper:
         all_text = "".join(text_pages)
-        assert all(section in all_text for section in ("References", "AIUsageDisclosure"))
-        assert "[FILL" not in all_text
+        assert all(section in all_text for section in ("References", "AIToolUsageReport"))
+        assert "[FILL" not in all_text and "??" not in all_text
         assert set(re.findall(r"Figure(\d+)\.", all_text)) == set(map(str, range(1, 12)))
         numbers = read_csv(path.parent/"NUMBER_PROVENANCE.csv")
         linked = [r for r in numbers if not r["macro"].startswith(("From","To","At","Branch"))]
         omitted = [r["macro"] for r in linked if r["rendered"] not in all_text]
         assert not omitted, ("Review evidence absent from typeset paper", omitted)
     texlog=path.with_suffix(".log").read_text(encoding="utf-8",errors="replace")
-    assert not re.search(r"Overfull \\[hv]box|Missing character:|LaTeX Warning: (?:Reference|Citation).*undefined",
+    assert not re.search(r"(?:Overfull|Underfull) \\[hv]box|Missing character:|LaTeX Warning: (?:Reference|Citation).*undefined",
                          texlog), f"Formatting report requires attention for {path.name}"
     return {"file":path.name,"page_count":len(reader.pages),"pages":logs}
 

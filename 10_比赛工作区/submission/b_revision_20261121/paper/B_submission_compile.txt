@@ -130,86 +130,344 @@ ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
 (E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
 (E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
 (E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
-(B_review_metrics.tex) (B_submission.aux)
+(B_review_metrics.tex)
+No file B_submission.aux.
 (E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
-(B_submission.out) (B_submission.out)
+
+Package hyperref Warning: Rerun to get /PageLabels entry.
+
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
-(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
-Underfull \hbox (badness 7273) in paragraph at lines 181--182
-[]|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
-(team/framework.tex [4]) (team/p1.tex
-Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
-mobile vehicle can legally station itself
-[5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
-[11]) (team/p3.tex
-Underfull \hbox (badness 1264) in paragraph at lines 4--5
-\TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
- Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
-T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
-[12] [13] [14]) (team/p4.tex [15] [16]) (team/v5.tex [17] [18])
-(team/sensitivity.tex [19]
-Underfull \hbox (badness 2012) in paragraph at lines 6--7
-\TU/TimesNewRoman(0)/m/n/12 preference profiles—\TU/TimesNewRoman(0)/m/it/12 Eq
-ual $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \
-OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr
-/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
- 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/TimesNewRoman(0)/m/n/12 , \TU/Times
-NewRoman(0)/m/it/12 Time Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr
-/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12
- 45\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML
-/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/Times
-NewRoman(0)/m/n/12 , \TU/TimesNewRoman(0)/m/it/12 Preci-
+No file B_submission.toc.
+[2] (team/scope.tex
 
-Underfull \hbox (badness 1881) in paragraph at lines 6--7
-\TU/TimesNewRoman(0)/m/it/12 sion Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 
-:\OT1/cmr/m/n/12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/c
-mr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/
-12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15)$
-\TU/TimesNewRoman(0)/m/n/12 , and \TU/TimesNewRoman(0)/m/it/12 Resilience Prior
-ity $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \
-OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 20\OML/cmm/m/it/12 ; \OT1/cmr
-/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
- 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 50)$\TU/TimesNewRoman(0)/m/n/12 —logged in
+LaTeX Warning: Citation `problem' on page 1 undefined on input line 1.
 
-Underfull \hbox (badness 1092) in paragraph at lines 15--16
-\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
-2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
-(0)/m/n/12 resolves this tension cleanly
-[20] [21]) (team/limits.tex [22]) (team/conclusion.tex [23])
-Underfull \hbox (badness 1584) in paragraph at lines 474--475
-\TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
-5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
- pp. 100–107, Jul. 1968, doi:
-[24]
-Underfull \hbox (badness 5359) in paragraph at lines 481--482
-[]\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
-g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 
-Underfull \hbox (badness 1590) in paragraph at lines 481--482
-\TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
-wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
+LaTeX Warning: Citation `bishop2010' on page 1 undefined on input line 1.
 
-Underfull \hbox (badness 1147) in paragraph at lines 482--483
-[]\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
-vent system specification modeling and simula-
 
-Underfull \hbox (badness 1490) in paragraph at lines 482--483
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc. 
-Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
-ec. 2018, pp. 162–176, doi:
+LaTeX Warning: Citation `lozano1983' on page 1 undefined on input line 3.
+
+
+LaTeX Warning: Reference `sec:ai-usage' on page 1 undefined on input line 7.
+
+) (team/assumptions.tex
+
+LaTeX Warning: Reference `tab:notation' on page 1 undefined on input line 1.
+
+
+LaTeX Warning: Citation `problem' on page 1 undefined on input line 1.
+
+
+LaTeX Warning: Citation `lozano1983' on page 1 undefined on input line 3.
+
+)
+
+LaTeX Warning: Reference `LastPage' on page 1 undefined on input line 155.
+
+[1] (team/framework.tex
+
+LaTeX Warning: Reference `fig:framework' on page 2 undefined on input line 1.
+
+
+LaTeX Warning: Citation `vantendeloo2018' on page 2 undefined on input line 5.
+
+) (team/p1.tex
+
+LaTeX Warning: Citation `lozano1983' on page 2 undefined on input line 4.
+
+
+LaTeX Warning: Reference `LastPage' on page 2 undefined on input line 5.
+
+[2]
+
+LaTeX Warning: Citation `shewchuk1997' on page 3 undefined on input line 12.
+
+
+LaTeX Warning: Reference `tab:p1' on page 3 undefined on input line 16.
+
+
+LaTeX Warning: Reference `fig:p1' on page 3 undefined on input line 16.
+
+
+LaTeX Warning: Reference `fig:p1' on page 3 undefined on input line 23.
+
+
+LaTeX Warning: Reference `eq:p1-quality' on page 3 undefined on input line 25.
+
+
+LaTeX Warning: Reference `fig:p1' on page 3 undefined on input line 25.
+
+
+LaTeX Warning: Reference `LastPage' on page 3 undefined on input line 27.
+
+[3]
+
+LaTeX Warning: Reference `tab:p1' on page 4 undefined on input line 27.
+
+
+LaTeX Warning: Reference `fig:p1' on page 4 undefined on input line 29.
+
+) (team/p2-precision.tex
+
+LaTeX Warning: Citation `bishop2010' on page 4 undefined on input line 1.
+
+
+LaTeX Warning: Reference `LastPage' on page 4 undefined on input line 5.
+
+[4]
+
+LaTeX Warning: Reference `eq:p2-rms' on page 5 undefined on input line 9.
+
+
+LaTeX Warning: Reference `eq:p2-rms' on page 5 undefined on input line 13.
+
+
+LaTeX Warning: Citation `dijkstra1959' on page 5 undefined on input line 32.
+
+
+LaTeX Warning: Citation `hart1968' on page 5 undefined on input line 32.
+
+
+LaTeX Warning: Reference `tab:p21' on page 5 undefined on input line 32.
+
+
+LaTeX Warning: Reference `fig:p21' on page 5 undefined on input line 34.
+
+
+LaTeX Warning: Reference `fig:p21' on page 5 undefined on input line 36.
+
+
+LaTeX Warning: Reference `prop:p21-lb' on page 5 undefined on input line 36.
+
+
+LaTeX Warning: Reference `LastPage' on page 5 undefined on input line 37.
+
+[5]) (team/p2-dispatch.tex
+
+LaTeX Warning: Citation `psaraftis1980' on page 6 undefined on input line 1.
+
+
+LaTeX Warning: Citation `savelsbergh1995' on page 6 undefined on input line 1.
+
+
+LaTeX Warning: Reference `LastPage' on page 6 undefined on input line 5.
+
+[6]
+
+LaTeX Warning: Reference `eq:p2-dispatch' on page 7 undefined on input line 9.
+
+
+LaTeX Warning: Reference `alg:p2-dispatch' on page 7 undefined on input line 12
+.
+
+
+LaTeX Warning: Reference `tab:p22' on page 7 undefined on input line 12.
+
+
+LaTeX Warning: Reference `fig:p2paths' on page 7 undefined on input line 12.
+
+
+LaTeX Warning: Reference `fig:p22' on page 7 undefined on input line 12.
+
+
+LaTeX Warning: Reference `fig:p22' on page 7 undefined on input line 14.
+
+
+LaTeX Warning: Reference `LastPage' on page 7 undefined on input line 18.
+
+[7]
+
+LaTeX Warning: Reference `fig:p2paths' on page 8 undefined on input line 24.
+
+
+LaTeX Warning: Reference `fig:p2paths' on page 8 undefined on input line 24.
+
+
+LaTeX Warning: Reference `LastPage' on page 8 undefined on input line 25.
+
+[8]
+
+LaTeX Warning: Reference `alg:p2-dispatch' on page 9 undefined on input line 26
+.
+
+
+LaTeX Warning: Reference `tab:p22' on page 9 undefined on input line 26.
+
+) (team/p3.tex
+
+LaTeX Warning: Reference `eq:p3-prob' on page 9 undefined on input line 1.
+
+
+LaTeX Warning: Citation `jcgm2008' on page 9 undefined on input line 1.
+
+
+LaTeX Warning: Reference `LastPage' on page 9 undefined on input line 3.
+
+[9]
+
+LaTeX Warning: Reference `LastPage' on page 10 undefined on input line 3.
+
+[10]
+
+LaTeX Warning: Reference `thm:p3-monotone' on page 11 undefined on input line 1
+0.
+
+
+LaTeX Warning: Reference `LastPage' on page 11 undefined on input line 36.
+
+[11]
+
+LaTeX Warning: Citation `wilson1927' on page 12 undefined on input line 57.
+
+
+LaTeX Warning: Citation `brown2001' on page 12 undefined on input line 57.
+
+
+LaTeX Warning: Reference `tab:p3' on page 12 undefined on input line 57.
+
+
+LaTeX Warning: Reference `fig:p3' on page 12 undefined on input line 57.
+
+
+LaTeX Warning: Reference `thm:p3-monotone' on page 12 undefined on input line 5
+9.
+
+
+LaTeX Warning: Reference `LastPage' on page 12 undefined on input line 60.
+
+[12]
+
+LaTeX Warning: Reference `fig:p3' on page 13 undefined on input line 63.
+
+) (team/p4.tex
+
+LaTeX Warning: Reference `alg:p4-reschedule' on page 13 undefined on input line
+ 1.
+
+
+LaTeX Warning: Citation `stentz1994' on page 13 undefined on input line 1.
+
+
+LaTeX Warning: Citation `vantendeloo2018' on page 13 undefined on input line 1.
+
+
+
+LaTeX Warning: Reference `LastPage' on page 13 undefined on input line 6.
+
+[13]
+
+LaTeX Warning: Reference `tab:p4cat' on page 14 undefined on input line 11.
+
+
+LaTeX Warning: Reference `fig:p4' on page 14 undefined on input line 13.
+
+)
+
+LaTeX Warning: Reference `alg:p2-dispatch' on page 14 undefined on input line 3
+43.
+
+(team/v5.tex
+
+LaTeX Warning: Reference `tab:v5' on page 14 undefined on input line 1.
+
+
+LaTeX Warning: Reference `LastPage' on page 14 undefined on input line 3.
+
+[14]
+
+LaTeX Warning: Reference `LastPage' on page 15 undefined on input line 3.
+
+[15]
+
+LaTeX Warning: Reference `eq:p4-score' on page 16 undefined on input line 11.
+
+) (team/sensitivity.tex
+
+LaTeX Warning: Reference `eq:p2-dispatch' on page 16 undefined on input line 2.
+
+
+
+LaTeX Warning: Reference `LastPage' on page 16 undefined on input line 3.
+
+[16]
+
+LaTeX Warning: Reference `tab:sens' on page 17 undefined on input line 6.
+
+
+LaTeX Warning: Reference `fig:sens' on page 17 undefined on input line 6.
+
+
+LaTeX Warning: Reference `LastPage' on page 17 undefined on input line 12.
+
+[17]
+
+LaTeX Warning: Reference `fig:pareto' on page 18 undefined on input line 17.
+
+)
+
+LaTeX Warning: Reference `tab:deploy' on page 18 undefined on input line 411.
+
+
+LaTeX Warning: Reference `thm:p3-monotone' on page 18 undefined on input line 4
+22.
+
+
+LaTeX Warning: Reference `eq:p4-score' on page 18 undefined on input line 423.
+
+(team/limits.tex
+
+LaTeX Warning: Reference `LastPage' on page 18 undefined on input line 3.
+
+[18]
+
+LaTeX Warning: Reference `LastPage' on page 19 undefined on input line 3.
+
+[19]
+
+LaTeX Warning: Reference `fig:sens' on page 20 undefined on input line 9.
+
+) (team/conclusion.tex
+
+LaTeX Warning: Reference `LastPage' on page 20 undefined on input line 5.
+
+[20])
+
+LaTeX Warning: Reference `LastPage' on page 21 undefined on input line 455.
+
+[21] (team/ai-usage.tex
+
+LaTeX Warning: Citation `archivedai' on page 22 undefined on input line 4.
+
+
+LaTeX Warning: Citation `antigravityai' on page 22 undefined on input line 9.
+
+)
+
+Package lastpage Warning: Rerun to get the references right on input line 469.
+
 
 AED: lastpage setting LastPage
-[25] (B_submission.aux)
+
+LaTeX Warning: Reference `LastPage' on page 22 undefined on input line 469.
+
+[22] (B_submission.aux)
+
+LaTeX Warning: There were undefined references.
+
 
 LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
+
+Package rerunfilecheck Warning: File `B_submission.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
  )
-(see the transcript file for additional information)
-Output written on B_submission.pdf (25 pages).
+Output written on B_submission.pdf (24 pages).
 Transcript written on B_submission.log.
 
 This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
@@ -351,73 +609,163 @@ ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
 (B_submission.out) (B_submission.out)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
-(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
-Underfull \hbox (badness 7273) in paragraph at lines 181--182
-[]|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
-(team/framework.tex [4]) (team/p1.tex
-Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
-mobile vehicle can legally station itself
-[5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
-[11]) (team/p3.tex
-Underfull \hbox (badness 1264) in paragraph at lines 4--5
-\TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
- Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
-T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
-[12] [13] [14]) (team/p4.tex [15] [16]) (team/v5.tex [17] [18])
-(team/sensitivity.tex [19]
-Underfull \hbox (badness 2012) in paragraph at lines 6--7
-\TU/TimesNewRoman(0)/m/n/12 preference profiles—\TU/TimesNewRoman(0)/m/it/12 Eq
-ual $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \
-OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr
-/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
- 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/TimesNewRoman(0)/m/n/12 , \TU/Times
-NewRoman(0)/m/it/12 Time Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr
-/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12
- 45\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML
-/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/Times
-NewRoman(0)/m/n/12 , \TU/TimesNewRoman(0)/m/it/12 Preci-
-
-Underfull \hbox (badness 1881) in paragraph at lines 6--7
-\TU/TimesNewRoman(0)/m/it/12 sion Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 
-:\OT1/cmr/m/n/12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/c
-mr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/
-12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15)$
-\TU/TimesNewRoman(0)/m/n/12 , and \TU/TimesNewRoman(0)/m/it/12 Resilience Prior
-ity $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \
-OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 20\OML/cmm/m/it/12 ; \OT1/cmr
-/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
- 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 50)$\TU/TimesNewRoman(0)/m/n/12 —logged in
-
-Underfull \hbox (badness 1092) in paragraph at lines 15--16
-\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
-2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
-(0)/m/n/12 resolves this tension cleanly
-[20] [21]) (team/limits.tex [22]) (team/conclusion.tex [23])
-Underfull \hbox (badness 1584) in paragraph at lines 474--475
-\TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
-5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
- pp. 100–107, Jul. 1968, doi:
-[24]
-Underfull \hbox (badness 5359) in paragraph at lines 481--482
-[]\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
-g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-
-Underfull \hbox (badness 1590) in paragraph at lines 481--482
-\TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
-wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
-
-Underfull \hbox (badness 1147) in paragraph at lines 482--483
-[]\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
-vent system specification modeling and simula-
-
-Underfull \hbox (badness 1490) in paragraph at lines 482--483
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc. 
-Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
-ec. 2018, pp. 162–176, doi:
+(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex) [1]
+(team/framework.tex) (team/p1.tex [2] [3]) (team/p2-precision.tex [4] [5])
+(team/p2-dispatch.tex [6] [7] [8]) (team/p3.tex [9] [10] [11] [12])
+(team/p4.tex [13]) (team/v5.tex [14] [15]) (team/sensitivity.tex [16] [17])
+(team/limits.tex [18] [19]) (team/conclusion.tex [20]) [21] (team/ai-usage.tex)
 
 AED: lastpage setting LastPage
-[25] (B_submission.aux) )
-(see the transcript file for additional information)
-Output written on B_submission.pdf (25 pages).
+[22] (B_submission.aux) )
+Output written on B_submission.pdf (24 pages).
+Transcript written on B_submission.log.
+
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(B_submission.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(E:\python\MLP\LaTex\tex/latex/amsmath\amstext.sty
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsgen.sty))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsbsy.sty)
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsopn.sty))
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amssymb.sty
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amsfonts.sty))
+(E:\python\MLP\LaTex\tex/latex/amscls\amsthm.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics\graphicx.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\graphics.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\trig.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\graphics.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/tools\array.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+)) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
+(E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
+(E:\python\MLP\LaTex\tex/latex/float\float.sty)
+(E:\python\MLP\LaTex\tex/latex/enumitem\enumitem.sty)
+(E:\python\MLP\LaTex\tex/latex/tcolorbox\tcolorbox.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgf.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/utilities\pgfrcs.sty
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-common.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-latex.def)
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfrcs.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf\pgf.revision.tex)))
+(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgfcore.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/systemlayer\pgfsys.sty
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeys.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex)
+) (E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgf.cfg)
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-xetex.def
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-dvipdfmx.def
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def))))
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex))
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcore.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmath.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathutil.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathparser.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.t
+ex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.random.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.base.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.round.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.c
+ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfloat.code.tex))
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfint.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
+) (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorequick.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex)
+ (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex)))
+(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleshapes.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleplot.code.tex)
+(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty)
+(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty))
+(E:\python\MLP\LaTex\tex/latex/tools\verbatim.sty)
+(E:\python\MLP\LaTex\tex/latex/environ\environ.sty
+(E:\python\MLP\LaTex\tex/latex/trimspaces\trimspaces.sty))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (B_submission.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(B_submission.out) (B_submission.out)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
+(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex) [1]
+(team/framework.tex) (team/p1.tex [2] [3]) (team/p2-precision.tex [4] [5])
+(team/p2-dispatch.tex [6] [7] [8]) (team/p3.tex [9] [10] [11] [12])
+(team/p4.tex [13]) (team/v5.tex [14] [15]) (team/sensitivity.tex [16] [17])
+(team/limits.tex [18] [19]) (team/conclusion.tex [20]) [21] (team/ai-usage.tex)
+
+AED: lastpage setting LastPage
+[22] (B_submission.aux) )
+Output written on B_submission.pdf (24 pages).
 Transcript written on B_submission.log.

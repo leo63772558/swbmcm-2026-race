@@ -2,10 +2,10 @@
 \documentclass[12pt,a4paper]{article}
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
-\usepackage[a4paper,left=19.5mm,right=19.5mm,top=20mm,bottom=18.5mm,headheight=15pt]{geometry}
+\usepackage[a4paper,left=23mm,right=23mm,top=22mm,bottom=22mm,headheight=15pt]{geometry}
 \usepackage{amsmath,amssymb,amsthm,graphicx,booktabs,array,xcolor,fancyhdr,lastpage,caption,float,enumitem}
 \usepackage{tcolorbox}
-\usepackage[hidelinks]{hyperref}
+\usepackage[hypertexnames=false,colorlinks=true]{hyperref}
 
 \definecolor{paperink}{HTML}{182C40}
 \definecolor{quiet}{HTML}{455D71}
@@ -14,9 +14,10 @@
 \definecolor{boxrule}{HTML}{D6E0EB}
 
 \renewcommand{\contentsname}{Content}
+\linespread{1.08}
 \setcounter{tocdepth}{1}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{2.8pt}
+\setlength{\parskip}{3.6pt plus .5pt}
 \setlength{\intextsep}{4.5pt}
 \setlength{\textfloatsep}{5.5pt}
 \setlength{\floatsep}{4.5pt}
@@ -47,14 +48,17 @@
 
 \newcommand{\TeamID}{SWBMCM2613050}
 \newcommand{\PaperTitle}{Rapid UAV Localization via Coordinated Mobile Vehicles}
-\hypersetup{pdftitle={\PaperTitle},pdfauthor={},pdfsubject={2026 ShuWei Cup Problem B Final Paper}}
+\hypersetup{allcolors=boxbar,pdftitle={\PaperTitle},pdfauthor={},
+  pdfsubject={2026 ShuWei Cup Problem B}}
 
 \newcommand{\ReviewHead}{%
-  \fancyhf{}\fancyhead[L]{\color{paperink}Team\#\TeamID}%
+  \fancyhf{}\fancyhead[L]{\color{paperink}Team\# B\TeamID}%
   \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
   \renewcommand{\headrulewidth}{0.4pt}}
 \fancypagestyle{fancy}{\ReviewHead}
 \fancypagestyle{plain}{\ReviewHead}
+\fancypagestyle{contentpage}{%
+  \fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
 
 \newtcolorbox{keybox}[1][]{
   colback=boxbg,
@@ -111,52 +115,35 @@
 
 % ===================== PAGE 1: SUMMARY SHEET =====================
 \begin{center}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcr@{}}
-\toprule Problem Chosen & 2026 ShuWei Cup & Team Control Number\\
-\textbf{B} & \textbf{Summary Sheet} & \textbf{\TeamID}\\
-\bottomrule
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}ccc@{}}
+\parbox[t]{.30\linewidth}{\centering Problem Chosen\par\textbf{B}} &
+\parbox[t]{.30\linewidth}{\centering 2026\par ShuWei Cup\par\textbf{Summary Sheet}} &
+\parbox[t]{.30\linewidth}{\centering Team Control Number\par\textbf{\TeamID}}
 \end{tabular*}
+
+\vspace{7mm}
+{\bfseries\color{paperink}\PaperTitle\par}
+\end{center}
 \vspace{3mm}
 
-{\bfseries\color{paperink}\PaperTitle\par}
-\vspace{1mm}
-{\itshape Multi-Vehicle Cooperative UAV Localization and Dynamic Scheduling Framework}
-\end{center}
-\vspace{-2.5mm}
-
+\begingroup
+\setlength{\parskip}{6pt plus 1pt}
+\setlength{\baselineskip}{14.5pt}
 \section*{Summary}
-\vspace{-1.5mm}
 \TeamText{summary}{Summary sheet}
 
-\begin{table}[H]
-\centering\footnotesize
-\setlength{\tabcolsep}{4.5pt}
-\renewcommand{\arraystretch}{1.0}
-\vspace{-2mm}
-\caption{Verified core quantitative findings bound directly to solver outputs.}
-\label{tab:summary-metrics}
-\begin{tabular}{@{}p{0.54\linewidth}r@{}}
-\toprule
-Verified Quantitative Metric & Recorded Value\\
-\midrule
-P1: Min.\ horizontal range / pitch / quality & \BMinRange{} m / \BMaxPitch{}° / \BQuality{} m\textsuperscript{$-1$}\\
-P1: Readiness-optimal station time (V4) & \BReadyTime{} s (drive \BArrivalTime{} s)\\
-P1: Rounded vs.\ AABB clearance audit & \BShortenedCount{} shorter, \BRestoredCount{} restored / \BRouteCount{}\\
-P2(1): T2 local horizontal RMS (V3--V5) & \BFirstRMS{} m (\BCrossing{}° crossing)\\
-P2(2): Shared-shortlist $k=8$ (beam / 1,000-pair B\&B) & \BBeamEight{} s (0.000 s gap) vs.\ \BNearestEight{} s\\
-P3: Independent 95\% coverage threshold & \BIntegratedCrossing{} m ($\sigma=\BSigmaCrossing{}$ m)\\
-P4: Unique suite (115 cases; \BCaseCount{} raw) & 110W/4T/1L (0L hyst); V5 $+\BVFiveDelay{}$ s\\
-Perturbation: Top driver ($\beta_{\max}$, real P1--P4) & \BGlobalTopSwing{}\% (\BParetoFrontCount{}/\BParetoConfigs{} 3D Pareto)\\
-\bottomrule
-\end{tabular}
-\end{table}
+\vspace{2mm}
 
-\textbf{Keywords:} line-of-sight geometry; Minkowski rounded safety; bearing-only localization; cooperative vehicle dispatch; pointing uncertainty; event-driven rescheduling
+\textbf{Keywords:} line-of-sight geometry, rounded obstacle clearance, bearing-only localization, vehicle dispatch, pointing uncertainty, event-driven rescheduling\par
+\endgroup
 
 \clearpage
 % ===================== PAGE 2: CONTENTS =====================
+\addtocontents{toc}{\protect\hyphenpenalty=10000\relax\protect\exhyphenpenalty=10000\relax}
 \tableofcontents
+\thispagestyle{contentpage}
 \clearpage
+\setcounter{page}{1}
 
 % ===================== SECTION 1 =====================
 \section{Introduction and Problem Restatement}
@@ -170,7 +157,9 @@ Perturbation: Top driver ($\beta_{\max}$, real P1--P4) & \BGlobalTopSwing{}\% (\
 \centering\small
 \caption{Unified notation register shared across Problems 1--4.}
 \label{tab:notation}
-\begin{tabular}{@{}p{.22\linewidth}p{.57\linewidth}p{.14\linewidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.22\linewidth}
+  >{\raggedright\arraybackslash}p{.56\linewidth}
+  >{\raggedright\arraybackslash}p{.15\linewidth}@{}}
 \toprule
 Symbol & Physical / Mathematical Meaning & Unit\\
 \midrule
@@ -192,29 +181,12 @@ $\eta, t_{\mathrm{last}}, N, k$ & Completion fraction, latest paired start, tota
 \section{Cross-Problem Interdisciplinary Framework}
 \TeamText{framework}{Interdisciplinary framework}
 
-\ReviewFigure{fig01_framework.pdf}{76mm}
+\ReviewFigure{fig01_framework.pdf}{84mm}
 {Interdisciplinary architecture and verified data flow across Problems 1--4. The nominal $k=8$ dispatch plan is frozen prior to all P4 disturbance replays.}
 {fig:framework}
 
-\begin{table}[htbp]
-\centering\footnotesize
-\setlength{\tabcolsep}{4.5pt}
-\caption{Five-second executive overview of core models, verified quantitative metrics, independent validation methods, and key insights across Problems 1--4.}
-\label{tab:overview}
-\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.32\linewidth}@{}}
-\toprule
-Stage & Core Mathematical Model & Verified Quantitative Metric & Validation \& Core Insight\\
-\midrule
-\textbf{P1} & Minkowski rounded free space $B_i\oplus D(0,1.5)$, closed-prism LOS, Eq.~\eqref{eq:p1-quality} & $r_{\min}=\BMinRange{}$ m, $Q=\BQuality{}$ m\textsuperscript{$-1$}, V4 ready \BReadyTime{} s, \BRestoredCount{} restored / \BShortenedCount{} shorter & 0.1 m grid + 250k MC; $\sec^2\beta_{\max}$ drives \BPitchLoss{}\% loss per $1^\circ$ pitch drop\\
-\textbf{P2(1--2)} & Bearing Jacobian Eq.~\eqref{eq:p2-rms} \& Prop.~\ref{prop:p21-lb}; 5-vehicle 6-slot dispatch Eq.~\eqref{eq:p2-dispatch} \& Alg.~\ref{alg:p2-dispatch} & T2 RMS \BFirstRMS{} m ($\gamma=\BCrossing{}^\circ$); $k=8$ beam \BBeamEight{} s vs.\ nearest \BNearestEight{} s & Analytical lower bound attained; exact 1,000-pair (4,200-order) B\&B certifies 0.000 s gap on 585-station pool\\
-\textbf{P3} & Wrapped offset-normal azimuth error Eq.~\eqref{eq:p3-prob} \& Theorem~\ref{thm:p3-monotone} ($a,b\ge 0$) & Unique nominal $s_{\max}=\BIntegratedCrossing{}$ m ($\sigma=\BSigmaCrossing{}$ m) & Bonferroni--Wilson CIs at three distances; exact 80 m condition $a+80b\le\sigma^*$\\
-\textbf{P4} & Discrete-event replay, Eq.~\eqref{eq:p4-score} hysteresis gate \& Alg.~\ref{alg:p4-reschedule} & 115 unique cases (\BCaseCount{} raw$\to$62+53): 110W/4T/1L; V5 $+\BVFiveDelay{}$ s & Budget-invariant ($k=2/3/5/8$); cached plans save 22.69 s; hysteresis yields 0 losses\\
-\bottomrule
-\end{tabular}
-\end{table}
-
 % ===================== SECTION 4 =====================
-\section{Problem 1: Observable Region, Euclidean Rounded Safety Space, and Optimal Stationing}
+\section[Problem 1: Observable Region and Optimal Stationing]{Problem 1: Observable Region, Euclidean Rounded Safety Space, and Optimal Stationing}
 \TeamText{p1}{Problem 1 derivation and analysis}
 
 \begin{equation}
@@ -256,7 +228,7 @@ J = \begin{bmatrix} -\frac{\sin\alpha_1}{r_1} & \frac{\cos\alpha_1}{r_1} \\ -\fr
 \centering\small
 \caption{Verified T2 optimal dual-station bearing-intersection geometry and timing.}
 \label{tab:p21}
-\begin{tabular}{@{}p{0.58\linewidth}r@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.58\linewidth}r@{}}
 \toprule
 Diagnostic Item (Vehicles V3 and V5) & Recorded Value\\
 \midrule
@@ -267,7 +239,7 @@ Local first-order horizontal RMS (analytical \& finite-difference) & \BFirstRMS{
 \end{tabular}
 \end{table}
 
-\ReviewFigure{fig03_p2_precision.pdf}{78mm}
+\ReviewFigure{fig03_p2_precision.pdf}{86mm}
 {T2 local first-order horizontal RMS contour field, collision-checked approach routes, and optimal dual-station 95\% analytical error ellipse.}
 {fig:p21}
 
@@ -313,7 +285,7 @@ Exact B\&B (Full 585-station pool, unseeded) & \BBeamEight{} & $0.000$ (exact) &
 \end{table}
 
 % ===================== SECTION 7 =====================
-\section{Problem 3: Error Propagation, Formal Monotonicity Theorem, and Maximum Admissible Distance}
+\section[Problem 3: Error Propagation and Admissible Travel Distance]{Problem 3: Error Propagation, Formal Monotonicity Theorem, and Maximum Admissible Distance}
 \begin{equation}
 \mathbb{P}\!\left(|\Delta\psi| \le 5^\circ\right) \ge 0.95, \qquad \sigma_{\mathrm{loc}}(s) = a + b s.
 \label{eq:p3-prob}
@@ -333,17 +305,17 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \BMCAfterDistance{} & \BMCAfterSamples{} & \BMCAfterEstimate{} & [\BMCAfterLow{}, \BMCAfterHigh{}] ($<0.95$)\\
 \BMCLimitDistance{} & \BMCLimitSamples{} & \BMCLimitEstimate{} & [\BMCLimitLow{}, \BMCLimitHigh{}] ($<0.95$)\\
 \midrule
-\multicolumn{4}{@{}p{0.96\linewidth}@{}}{\footnotesize Independent crossing: \BIntegratedCrossing{} m (archived \BTravelThreshold{} m); bracket [\BBracketLow{}, \BBracketHigh{}] m; $\sigma=\BSigmaCrossing{}$ m; far-tail bound \BFarBound{}.}\\
+\multicolumn{4}{@{}>{\raggedright\arraybackslash}p{0.96\linewidth}@{}}{\footnotesize Independent crossing: \BIntegratedCrossing{} m (archived \BTravelThreshold{} m). Bracket [\BBracketLow{}, \BBracketHigh{}] m. $\sigma=\BSigmaCrossing{}$ m. Coverage upper bound $\le\BFarBound{}$ for $s\ge240$ m.}\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\ReviewFigure{fig06_p3_risk.pdf}{78mm}
+\ReviewFigure{fig06_p3_risk.pdf}{90mm}
 {Problem 3 Monte Carlo position-error diagnostic, 95\% analytical ellipse, coverage curve with zoomed inset around \BIntegratedCrossing{} m, and admissible $(a,b)$ parameter domain.}
 {fig:p3}
 
 % ===================== SECTION 8 =====================
-\section{Problem 4: Event-Driven Dynamic Rescheduling and V5 Counterexample Mechanism}
+\section[Problem 4: Event-Driven Rescheduling and the V5 Counterexample]{Problem 4: Event-Driven Dynamic Rescheduling and V5 Counterexample Mechanism}
 \TeamText{p4}{Problem 4 formulation and 73-case summary}
 
 \begin{keybox}
@@ -351,14 +323,14 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \begin{equation}
 \begin{aligned}
 \eta = \frac{k}{N}, \qquad \mathrm{Score} &= \left(\eta,\,-t_{\mathrm{last}}\right), \\
-\text{Trigger Replan} \iff \eta_{\mathrm{replan}} > \eta_{\mathrm{keep}} &\;\lor\; \left(\eta_{\mathrm{replan}} = \eta_{\mathrm{keep}} \;\land\; t_{\mathrm{last}}^{\mathrm{keep}} - t_{\mathrm{last}}^{\mathrm{replan}} > \delta_{\mathrm{hyst}}\right).
+\text{Trigger Replan} \iff \eta_{\mathrm{replan}} > \eta_{\mathrm{keep}} &\;\lor\; \left(\eta_{\mathrm{replan}} = \eta_{\mathrm{keep}} \;\land\; t_{\mathrm{last}}^{\mathrm{keep}} - t_{\mathrm{last}}^{\mathrm{replan}} > \tau_{\mathrm{hyst}}\right).
 \end{aligned}
 \label{eq:p4-score}
 \end{equation}
 \end{keybox}
 
 \begin{ieeealgo}{Hysteresis-Gated Event-Driven Dynamic Rescheduling}{alg:p4-reschedule}
-\item \textbf{Input:} Frozen nominal plan $\Pi_0$, disturbance event $\mathcal{E}$ at $t_d=5$ s (fault $v_f$, new alert $T_4$, recovery $t_{\mathrm{rec}}$), horizon $H_w=60$ s, hysteresis threshold $\delta_{\mathrm{hyst}}\ge 0$.
+\item \textbf{Input:} Frozen nominal plan $\Pi_0$, disturbance event $\mathcal{E}$ at $t_d=5$ s (fault $v_f$, new alert $T_4$, recovery $t_{\mathrm{rec}}$), horizon $H_w=60$ s, hysteresis threshold $\tau_{\mathrm{hyst}}\ge 0$.
 \item \textbf{Output:} Executed event timeline $\mathcal{L}^*$, completion ratio $\eta$, and latest paired start $t_{\mathrm{last}}$.
 \item Advance all vehicles along cached plan $\Pi_0$ from $t=0$ to $t_d$; apply vehicle failure $v_f$ and register new alert $T_4$ if present.
 \item Determine dispatch release clock $t_{\mathrm{rel}}\leftarrow t_{\mathrm{rec}}$ if communication link is interrupted, else $t_{\mathrm{rel}}\leftarrow t_d$.
@@ -369,7 +341,7 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \item \quad Compute mandatory cancellation zero-return time $\tau_{\mathrm{cancel}}(i)=\max(|\Delta\alpha_i|/\omega_{\mathrm{pan}},|\Delta\beta_i|/\omega_{\mathrm{tilt}})$ from instantaneous gimbal pose $(\alpha_i(t_{\mathrm{rel}}),\beta_i(t_{\mathrm{rel}}))$.
 \item \quad Set vehicle $i$ earliest replan availability to $t_i^{\mathrm{avail}}\leftarrow t_{\mathrm{rel}}+\tau_{\mathrm{cancel}}(i)$ (or end of locked dwell plus reset if locked).
 \item Solve residual cooperative dispatch over active vehicles and pending alerts $\mathcal{A}_{\mathrm{pend}}$ via Algorithm~\ref{alg:p2-dispatch} from states $(x_i(t_i^{\mathrm{avail}}),y_i(t_i^{\mathrm{avail}}),t_i^{\mathrm{avail}})$ to obtain candidate timeline $\mathcal{L}_{\mathrm{replan}}$ and $(\eta_{\mathrm{replan}},t_{\mathrm{last}}^{\mathrm{replan}})$.
-\item \textbf{if} $\eta_{\mathrm{replan}}>\eta_{\mathrm{keep}}$ \textbf{or} ($\eta_{\mathrm{replan}}=\eta_{\mathrm{keep}}$ \textbf{and} $t_{\mathrm{last}}^{\mathrm{keep}}-t_{\mathrm{last}}^{\mathrm{replan}}>\delta_{\mathrm{hyst}}$) \textbf{then} $\mathcal{L}^*\leftarrow\mathcal{L}_{\mathrm{replan}}$
+\item \textbf{if} $\eta_{\mathrm{replan}}>\eta_{\mathrm{keep}}$ \textbf{or} ($\eta_{\mathrm{replan}}=\eta_{\mathrm{keep}}$ \textbf{and} $t_{\mathrm{last}}^{\mathrm{keep}}-t_{\mathrm{last}}^{\mathrm{replan}}>\tau_{\mathrm{hyst}}$) \textbf{then} $\mathcal{L}^*\leftarrow\mathcal{L}_{\mathrm{replan}}$
 \item \textbf{else} $\mathcal{L}^*\leftarrow\mathcal{L}_{\mathrm{keep}}$ \hfill {\footnotesize (blocks myopic reassignment penalties such as V5 single fault)}
 \item \textbf{return} $\mathcal{L}^*$ and lexicographic performance pair $(\eta,-t_{\mathrm{last}})$.
 \end{ieeealgo}
@@ -403,7 +375,7 @@ All Three Combined & 42 & 0.560 & 1.000 & 42 / 0 / 0 & 0\\
 \centering\small
 \caption{V5 single-fault counterexample summary (failure at $t=5.000$ s, link active).}
 \label{tab:v5}
-\begin{tabular}{@{}lcccp{0.38\linewidth}@{}}
+\begin{tabular}{@{}lccc>{\raggedright\arraybackslash}p{0.38\linewidth}@{}}
 \toprule
 Policy & $\eta$ & $t_{\mathrm{last}}$ (s) & Bottleneck & Key Mechanism\\
 \midrule
@@ -461,32 +433,37 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 \section{Conclusion}
 \TeamText{conclusion}{Conclusion}
 
+\paragraph{Reproduction and supporting materials.}
+The complete source, dependency versions, input tables, and generated results accompany this paper in \path{BSWBMCM2613050fj.zip}. The validation environment used CPython 3.14.7, Node.js 24.19.0, and XeLaTeX (MiKTeX 24.1). After extracting the archive and installing the dependencies in \path{requirements.txt}, run \path{python 03_code/run_all.py} from its root directory. The reproducibility manifest identifies the required outputs and their verification methods.
+
 % ===================== REFERENCES =====================
 \addcontentsline{toc}{section}{References}
-{\small
+{\raggedright\interlinepenalty=10000
 \begin{thebibliography}{15}
 \setlength{\itemsep}{1pt}
 \setlength{\parskip}{0pt}
 \bibitem{problem} ShuWei Cup Organizing Committee, \emph{2026 ShuWei Cup Problem B: Rapid UAV Localization via Coordinated Mobile Vehicles}, Nov. 2026.
+\bibitem{bishop2010} A. N. Bishop, B. Fidan, B. D. O. Anderson, K. Do\u{g}an\c{c}ay, and P. N. Pathirana, ``Optimality analysis of sensor-target localization geometries,'' \emph{Automatica}, vol. 46, no. 3, pp. 479--492, Mar. 2010, doi: 10.1016/j.automatica.2009.12.003.
 \bibitem{lozano1983} T. Lozano-P\'{e}rez, ``Spatial planning: A configuration space approach,'' \emph{IEEE Trans. Comput.}, vol. C-32, no. 2, pp. 108--120, Feb. 1983, doi: 10.1109/TC.1983.1676196.
+\bibitem{vantendeloo2018} Y. Van Tendeloo and H. Vangheluwe, ``Discrete event system specification modeling and simulation,'' in \emph{Proc. Winter Simul. Conf. (WSC)}, Gothenburg, Sweden, Dec. 2018, pp. 162--176, doi: 10.1109/WSC.2018.8632372.
 \bibitem{shewchuk1997} J. R. Shewchuk, ``Adaptive precision floating-point arithmetic and fast robust geometric predicates,'' \emph{Discrete Comput. Geom.}, vol. 18, no. 3, pp. 305--363, Oct. 1997, doi: 10.1007/PL00009321.
 \bibitem{dijkstra1959} E. W. Dijkstra, ``A note on two problems in connexion with graphs,'' \emph{Numer. Math.}, vol. 1, no. 1, pp. 269--271, Dec. 1959, doi: 10.1007/BF01386390.
 \bibitem{hart1968} P. E. Hart, N. J. Nilsson, and B. Raphael, ``A formal basis for the heuristic determination of minimum cost paths,'' \emph{IEEE Trans. Syst. Sci. Cybern.}, vol. 4, no. 2, pp. 100--107, Jul. 1968, doi: 10.1109/TSSC.1968.300136.
-\bibitem{bishop2010} A. N. Bishop, B. Fidan, B. D. O. Anderson, K. Do\u{g}an\c{c}ay, and P. N. Pathirana, ``Optimality analysis of sensor-target localization geometries,'' \emph{Automatica}, vol. 46, no. 3, pp. 479--492, Mar. 2010, doi: 10.1016/j.automatica.2009.12.003.
+\bibitem{psaraftis1980} H. N. Psaraftis, ``A dynamic programming solution to the single vehicle many-to-many immediate request dial-a-ride problem,'' \emph{Transp. Sci.}, vol. 14, no. 2, pp. 130--154, May 1980, doi: 10.1287/trsc.14.2.130.
+\bibitem{savelsbergh1995} M. W. P. Savelsbergh and M. Sol, ``The general pickup and delivery problem,'' \emph{Transp. Sci.}, vol. 29, no. 1, pp. 17--29, Feb. 1995, doi: 10.1287/trsc.29.1.17.
 \bibitem{jcgm2008} Joint Committee for Guides in Metrology (JCGM), \emph{Evaluation of Measurement Data---Supplement 1 to the Guide to the Expression of Uncertainty in Measurement: Propagation of Distributions Using a Monte Carlo Method}, JCGM 101:2008, BIPM, 2008, doi: 10.59161/jcgm101-2008.
 \bibitem{wilson1927} E. B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist. Assoc.}, vol. 22, no. 158, pp. 209--212, Jun. 1927, doi: 10.1080/01621459.1927.10502953.
 \bibitem{brown2001} L. D. Brown, T. T. Cai, and A. DasGupta, ``Interval estimation for a binomial proportion,'' \emph{Statist. Sci.}, vol. 16, no. 2, pp. 101--133, May 2001, doi: 10.1214/ss/1009213286.
-\bibitem{psaraftis1980} H. N. Psaraftis, ``A dynamic programming solution to the single vehicle many-to-many immediate request dial-a-ride problem,'' \emph{Transp. Sci.}, vol. 14, no. 2, pp. 130--154, May 1980, doi: 10.1287/trsc.14.2.130.
-\bibitem{savelsbergh1995} M. W. P. Savelsbergh and M. Sol, ``The general pickup and delivery problem,'' \emph{Transp. Sci.}, vol. 29, no. 1, pp. 17--29, Feb. 1995, doi: 10.1287/trsc.29.1.17.
 \bibitem{stentz1994} A. Stentz, ``Optimal and efficient path planning for partially-known environments,'' in \emph{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)}, San Diego, CA, USA, May 1994, pp. 3310--3317, doi: 10.1109/ROBOT.1994.351061.
-\bibitem{vantendeloo2018} Y. Van Tendeloo and H. Vangheluwe, ``Discrete event system specification modeling and simulation,'' in \emph{Proc. Winter Simul. Conf. (WSC)}, Gothenburg, Sweden, Dec. 2018, pp. 162--176, doi: 10.1109/WSC.2018.8632372.
-\bibitem{archivedai} ChatGPT (Codex), GPT-6 series / GPT-6.2 Sol, OpenAI, used 20--21 Nov. 2026 (solver prototyping, engineering verification, replay, visualization, typesetting).
-\bibitem{antigravityai} Antigravity (Gemini), Google DeepMind, used 21 Nov. 2026 (dark 3D digital twin UI, 1,000-pair B\&B audit, real-solver sensitivity/3D Pareto/P4 expansion, 11-figure Matplotlib suite, LaTeX typesetting and editorial polishing).
+\bibitem{archivedai} ChatGPT (Codex), GPT-6 series (GPT-6.2 Sol in earlier runs, exact deployment for later runs not publicly disclosed), OpenAI, 20--21 Nov. 2026.
+\bibitem{antigravityai} Antigravity (Gemini), version not publicly disclosed, Google DeepMind, 21 Nov. 2026.
 \end{thebibliography}
 }
 
-% ===================== AI USAGE DISCLOSURE =====================
-\section*{AI Usage Disclosure}
-\addcontentsline{toc}{section}{AI Usage Disclosure}
-In accordance with the 2026 ShuWei Cup AI Tool Usage Policy, AI tools \cite{archivedai,antigravityai} were utilized for solver implementation assistance, engineering verification plumbing, exact Branch-and-Bound audit scripting, offline 3D digital twin visualization, Matplotlib publication figure generation, real-solver parameter perturbation and 3D Pareto scripts, automated \texttt{pytest} verification, LaTeX typesetting, editorial drafting/polishing, and reference DOI verification. All underlying quantitative metrics are deterministically bound to solver outputs in \texttt{results/*.csv} and \texttt{results/*.json} with full provenance tracking, and every mathematical derivation, optimality boundary, and modeling assumption has been verified against independent audit scripts. The complete chronological usage record is maintained in \texttt{AI\_USAGE\_LOG.csv} and the separate standalone report \texttt{AI\_Usage\_Report.md}.
+% ===================== AI TOOL USAGE REPORT =====================
+\section*{AI Tool Usage Report}
+\phantomsection
+\label{sec:ai-usage}
+\addcontentsline{toc}{section}{AI Tool Usage Report}
+\TeamText{ai-usage}{AI usage}
 \end{document}

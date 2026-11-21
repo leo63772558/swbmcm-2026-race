@@ -35,7 +35,8 @@ REFERENCE_NAMES = (
 )
 DOCUMENTS = (
     "TEAM_HANDOFF_CHECKLIST.md", "VERIFY_REPORT.md", "IMPROVEMENT_BACKLOG.md",
-    "FINAL_JUDGE_REVIEW.md", "REPRODUCE.md", "AI_USAGE_LOG.csv", "requirements-review.txt",
+    "FINAL_JUDGE_REVIEW.md", "REPRODUCE.md", "AI_USAGE_LOG.csv", "AI_Usage_Report.md",
+    "requirements-review.txt",
 )
 PRIVATE_PATH = re.compile(r"cns|signed|签名|参赛信息|payment|\.library-transfer", re.IGNORECASE)
 
@@ -86,8 +87,8 @@ def support_entries(review):
     ]
     entries.update({f"artifacts/{path.relative_to(review).as_posix()}": path
                     for path in files if path.is_file()})
-    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.pdf"))) == 10
-    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.png"))) == 10
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.pdf"))) == 11
+    assert len(list(figure_dir.glob("fig[0-9][0-9]_*.png"))) == 11
     assert (review / "qa" / "SIMULATOR_CHECKS.json").is_file()
     return entries
 

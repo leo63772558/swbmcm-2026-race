@@ -1,7 +1,7 @@
-parameter,label,low_param,nominal_param,high_param,j_low,j_nominal,j_high,delta_low_pct,delta_high_pct,swing_pct,interaction_sum_pct,total_effect_pct,main_share_pct,cumulative_share_pct
-pitch_ceiling,Pitch ceiling beta_max (deg),76.0,80.0,82.0,0.926802,1.0,1.063658,-7.3198,6.3658,13.6856,0.0,13.6856,34.16,34.16
-pos_error_slope,Drift slope b (m/m),0.016,0.02,0.024,1.0625,1.0,0.958333,6.25,-4.1667,10.4167,0.23378,10.6505,26.0,60.16
-outage_duration,Outage duration dt_out (s),20.0,25.0,30.0,1.05652,1.0,0.96389,5.652,-3.611,9.263,0.55117,9.8142,23.12,83.28
-pan_speed,Gimbal pan rate w_pan (deg/s),24.0,30.0,36.0,0.984536,1.0,1.013306,-1.5464,1.3306,2.877,0.5569,3.4339,7.18,90.46
-pos_error_intercept,Base pos. std a (m),0.24,0.3,0.36,1.011221,1.0,0.988779,1.1221,-1.1221,2.2443,0.23378,2.4781,5.6,96.06
-vehicle_speed,Vehicle speed v (m/s),2.4,3.0,3.6,0.991079,1.0,1.006818,-0.8921,0.6818,1.5739,0.38763,1.9615,3.93,99.99
+parameter,label,low_param,nominal_param,high_param,j_low,j_nominal,j_high,delta_low_pct,delta_high_pct,swing_pct,fixed_plan_swing_pct,interaction_sum_pct,total_effect_pct,main_share_pct,cumulative_share_pct
+pitch_ceiling,Pitch ceiling beta_max (deg),76.0,80.0,82.0,0.948794,1.0,1.065498,-5.1206,6.5498,11.6704,7.7903,0.23637,11.9068,28.52,28.52
+pos_error_slope,Drift slope b (m/m),0.016,0.02,0.024,1.0625,1.0,0.958333,6.25,-4.1667,10.4167,10.4167,0.23378,10.6505,25.46,53.98
+outage_duration,Outage duration dt_out (s),20.0,25.0,30.0,1.035064,1.0,0.974039,3.5064,-2.5961,6.1026,6.1026,0.54415,6.6467,14.91,68.89
+pan_speed,Gimbal pan rate w_pan (deg/s),24.0,30.0,36.0,0.983178,1.0,1.036025,-1.6822,3.6025,5.2848,9.0887,1.13358,6.4184,12.92,81.81
+vehicle_speed,Vehicle speed v (m/s),2.4,3.0,3.6,0.958196,1.0,1.010172,-4.1804,1.0172,5.1976,1.9389,0.89921,6.0968,12.7,94.51
+pos_error_intercept,Base pos. std a (m),0.24,0.3,0.36,1.011221,1.0,0.988779,1.1221,-1.1221,2.2443,2.2443,0.23378,2.4781,5.49,100.0

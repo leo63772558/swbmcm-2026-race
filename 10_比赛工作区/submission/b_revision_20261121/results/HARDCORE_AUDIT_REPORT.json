@@ -36,43 +36,119 @@
     "beam_k8_incumbent_s": 11.034062,
     "exact_k8_bnb": {
       "shortlist_k": 8,
-      "topologies_checked": 360,
-      "pruned_branches": 67,
+      "discrete_station_pool_size": 585,
+      "legal_pairings_total": 1000,
+      "acyclic_ordered_topologies_total": 4200,
+      "multiplicity_pattern_counts": {
+        "(2, 1, 1, 1, 1)": 180,
+        "(2, 2, 1, 1, 0)": 450,
+        "(2, 2, 2, 0, 0)": 60,
+        "(3, 1, 1, 1, 0)": 120,
+        "(3, 2, 1, 0, 0)": 180,
+        "(3, 3, 0, 0, 0)": 10
+      },
+      "initial_upper_bound_s": 11.034162,
+      "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
+      "pruned_layer0_topologies": 4133,
+      "pruned_inner_branches": 2062,
       "exact_discrete_optimum_s": 11.034062,
       "witness": {
-        "reused_vehicle": 3,
-        "reuse_order": "T1->T3",
-        "solo_alert": "T2",
-        "solo_vehicles": [
+        "pairing": {
+          "T1": [
+            3,
+            5
+          ],
+          "T2": [
+            1,
+            4
+          ],
+          "T3": [
+            2,
+            3
+          ]
+        },
+        "pattern": [
+          2,
           1,
-          4
+          1,
+          1,
+          1
         ],
-        "partner_a1": 5,
-        "partner_a2": 2,
-        "t_solo_s": 8.889889,
-        "t_a1_s": 3.092627,
-        "t_a2_s": 11.034062
+        "topo_order": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "reused_orders": {
+          "V3": [
+            "T1",
+            "T3"
+          ]
+        },
+        "starts_s": {
+          "T1": 3.092627,
+          "T2": 8.889889,
+          "T3": 11.034062
+        }
       }
     },
     "gap_vs_exact_k8_s": -0.0,
     "exact_full_discrete_pool_bnb": {
       "shortlist_k": "FULL_DISCRETE_POOL",
-      "topologies_checked": 360,
-      "pruned_branches": 67,
+      "discrete_station_pool_size": 585,
+      "legal_pairings_total": 1000,
+      "acyclic_ordered_topologies_total": 4200,
+      "multiplicity_pattern_counts": {
+        "(2, 1, 1, 1, 1)": 180,
+        "(2, 2, 1, 1, 0)": 450,
+        "(2, 2, 2, 0, 0)": 60,
+        "(3, 1, 1, 1, 0)": 120,
+        "(3, 2, 1, 0, 0)": 180,
+        "(3, 3, 0, 0, 0)": 10
+      },
+      "initial_upper_bound_s": 11.034162,
+      "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
+      "pruned_layer0_topologies": 4133,
+      "pruned_inner_branches": 5784,
       "exact_discrete_optimum_s": 11.034062,
       "witness": {
-        "reused_vehicle": 3,
-        "reuse_order": "T1->T3",
-        "solo_alert": "T2",
-        "solo_vehicles": [
+        "pairing": {
+          "T1": [
+            3,
+            5
+          ],
+          "T2": [
+            1,
+            4
+          ],
+          "T3": [
+            2,
+            3
+          ]
+        },
+        "pattern": [
+          2,
           1,
-          4
+          1,
+          1,
+          1
         ],
-        "partner_a1": 5,
-        "partner_a2": 2,
-        "t_solo_s": 8.889889,
-        "t_a1_s": 3.092627,
-        "t_a2_s": 11.034062
+        "topo_order": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "reused_orders": {
+          "V3": [
+            "T1",
+            "T3"
+          ]
+        },
+        "starts_s": {
+          "T1": 3.092627,
+          "T2": 8.889889,
+          "T3": 11.034062
+        }
       }
     },
     "gap_vs_full_discrete_pool_s": -0.0
@@ -82,9 +158,13 @@
     "oat_count": 6,
     "interaction_entries": 36,
     "interaction_max_asymmetry": 0.0,
-    "main_share_sum_pct": 99.99,
+    "weight_check_rows": 30,
+    "fixed_vs_reopt_rows": 6,
+    "main_share_sum_pct": 100.0,
     "pareto_configs": 16,
-    "pareto_front_count": 6
+    "pareto_3d_front_count": 8,
+    "k5_and_k8_both_3d_nondominated": true,
+    "p4_unique_expanded_cases": 115
   },
   "audit_6_three_way_consistency": {
     "passed": true,

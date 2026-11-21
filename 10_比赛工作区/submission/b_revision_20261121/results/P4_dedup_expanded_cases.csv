@@ -1,0 +1,116 @@
+suite,case,category,failed_vehicle,recovery_s,outage_duration_s,alerts,keep_eta,keep_latest_s,replan_eta,replan_latest_s,hyst_eta,hyst_latest_s,delta_replan_minus_keep_s,winner,hyst_winner
+baseline_unique,new_1,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,18.323821,1.0,18.323821,-41.676179,reschedule,hyst_replan
+baseline_unique,new_2,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.435824,1.0,19.435824,-40.564176,reschedule,hyst_replan
+baseline_unique,new_3,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+baseline_unique,failure_V1,Vehicle Failure Only,1,5.0,0.0,3,0.666667,60.0,1.0,13.398808,1.0,13.398808,-46.601192,reschedule,hyst_replan
+baseline_unique,failure_V2,Vehicle Failure Only,2,5.0,0.0,3,0.666667,60.0,1.0,13.398808,1.0,13.398808,-46.601192,reschedule,hyst_replan
+baseline_unique,failure_V3,Vehicle Failure Only,3,5.0,0.0,3,0.666667,60.0,1.0,13.398808,1.0,13.398808,-46.601192,reschedule,hyst_replan
+baseline_unique,failure_V4,Vehicle Failure Only,4,5.0,0.0,3,0.666667,60.0,1.0,13.398808,1.0,13.398808,-46.601192,reschedule,hyst_replan
+baseline_unique,failure_V5,Vehicle Failure Only,5,5.0,0.0,3,1.0,11.034062,1.0,12.927041,1.0,11.034062,1.89298,keep,tie
+baseline_unique,outage_interior,Comms Outage Only (cached),,17.5,12.5,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,0.0,tie,tie
+baseline_unique,outage_upper_time,Comms Outage Only (cached),,30.0,25.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,0.0,tie,tie
+baseline_unique,outage_upper_duration,Comms Outage Only (cached),,35.0,30.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,0.0,tie,tie
+baseline_unique,new_failure_V1,Failure + New Alert,1,5.0,0.0,4,0.5,60.0,1.0,24.510119,1.0,24.510119,-35.489881,reschedule,hyst_replan
+baseline_unique,failure_outage_V1,Failure + Comms Outage,1,30.0,25.0,3,0.666667,60.0,1.0,35.908465,1.0,35.908465,-24.091535,reschedule,hyst_replan
+baseline_unique,all_V1,All Three Combined,1,30.0,25.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,-23.845971,reschedule,hyst_replan
+baseline_unique,new_failure_V2,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,20.573869,1.0,20.573869,-39.426131,reschedule,hyst_replan
+baseline_unique,failure_outage_V2,Failure + Comms Outage,2,30.0,25.0,3,0.666667,60.0,1.0,33.72718,1.0,33.72718,-26.27282,reschedule,hyst_replan
+baseline_unique,all_V2,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,34.82608,1.0,34.82608,-25.17392,reschedule,hyst_replan
+baseline_unique,new_failure_V3,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,25.22872,1.0,25.22872,-34.77128,reschedule,hyst_replan
+baseline_unique,failure_outage_V3,Failure + Comms Outage,3,30.0,25.0,3,0.666667,60.0,1.0,34.11667,1.0,34.11667,-25.88333,reschedule,hyst_replan
+baseline_unique,all_V3,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,-23.538918,reschedule,hyst_replan
+baseline_unique,new_failure_V4,Failure + New Alert,4,5.0,0.0,4,0.5,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+baseline_unique,failure_outage_V4,Failure + Comms Outage,4,30.0,25.0,3,0.666667,60.0,1.0,33.095037,1.0,33.095037,-26.904963,reschedule,hyst_replan
+baseline_unique,all_V4,All Three Combined,4,30.0,25.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,-23.845971,reschedule,hyst_replan
+baseline_unique,new_failure_V5,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,20.573869,1.0,20.573869,-39.426131,reschedule,hyst_replan
+baseline_unique,failure_outage_V5,Failure + Comms Outage,5,30.0,25.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,0.0,tie,tie
+baseline_unique,all_V5,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,32.00337,1.0,32.00337,-27.99663,reschedule,hyst_replan
+baseline_unique,new_outage,New Alert + Comms Outage,,30.0,25.0,4,0.75,60.0,1.0,32.00337,1.0,32.00337,-27.99663,reschedule,hyst_replan
+baseline_unique,all_duration_sensitivity,All Three Combined,2,35.0,30.0,4,0.5,60.0,1.0,39.82608,1.0,39.82608,-20.17392,reschedule,hyst_replan
+baseline_unique,new_1_V2_recovery_5,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,22.627916,1.0,22.627916,-37.372084,reschedule,hyst_replan
+baseline_unique,new_1_V3_recovery_5,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,24.864809,1.0,24.864809,-35.135191,reschedule,hyst_replan
+baseline_unique,new_1_V5_recovery_5,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,22.124113,1.0,22.124113,-37.875887,reschedule,hyst_replan
+baseline_unique,new_2_V1_recovery_5,Failure + New Alert,1,5.0,0.0,4,0.5,60.0,1.0,24.795616,1.0,24.795616,-35.204384,reschedule,hyst_replan
+baseline_unique,new_2_V3_recovery_5,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,24.795616,1.0,24.795616,-35.204384,reschedule,hyst_replan
+baseline_unique,new_2_V4_recovery_5,Failure + New Alert,4,5.0,0.0,4,0.5,60.0,1.0,20.573869,1.0,20.573869,-39.426131,reschedule,hyst_replan
+baseline_unique,new_3_V1_recovery_5,Failure + New Alert,1,5.0,0.0,4,0.5,60.0,1.0,25.22872,1.0,25.22872,-34.77128,reschedule,hyst_replan
+baseline_unique,new_3_V2_recovery_5,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+baseline_unique,new_3_V4_recovery_5,Failure + New Alert,4,5.0,0.0,4,0.5,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+baseline_unique,new_3_V5_recovery_5,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+baseline_unique,new_1_V2_recovery_30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,34.11667,1.0,34.11667,-25.88333,reschedule,hyst_replan
+baseline_unique,new_1_V3_recovery_30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,-23.845971,reschedule,hyst_replan
+baseline_unique,new_1_V5_recovery_30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,33.291539,1.0,33.291539,-26.708461,reschedule,hyst_replan
+baseline_unique,new_2_V1_recovery_30,All Three Combined,1,30.0,25.0,4,0.5,60.0,1.0,36.171802,1.0,36.171802,-23.828198,reschedule,hyst_replan
+baseline_unique,new_2_V3_recovery_30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,35.298706,1.0,35.298706,-24.701294,reschedule,hyst_replan
+baseline_unique,new_2_V4_recovery_30,All Three Combined,4,30.0,25.0,4,0.5,60.0,1.0,36.171802,1.0,36.171802,-23.828198,reschedule,hyst_replan
+baseline_unique,new_3_V1_recovery_30,All Three Combined,1,30.0,25.0,4,0.5,60.0,1.0,35.908465,1.0,35.908465,-24.091535,reschedule,hyst_replan
+baseline_unique,new_3_V2_recovery_30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,-23.538918,reschedule,hyst_replan
+baseline_unique,new_3_V4_recovery_30,All Three Combined,4,30.0,25.0,4,0.5,60.0,1.0,35.308473,1.0,35.308473,-24.691527,reschedule,hyst_replan
+baseline_unique,new_3_V5_recovery_30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,32.89663,1.0,32.89663,-27.10337,reschedule,hyst_replan
+baseline_unique,new_1_V1_recovery_35,All Three Combined,1,35.0,30.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,-18.845971,reschedule,hyst_replan
+baseline_unique,new_1_V2_recovery_35,All Three Combined,2,35.0,30.0,4,0.5,60.0,1.0,39.11667,1.0,39.11667,-20.88333,reschedule,hyst_replan
+baseline_unique,new_1_V3_recovery_35,All Three Combined,3,35.0,30.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,-18.845971,reschedule,hyst_replan
+baseline_unique,new_1_V4_recovery_35,All Three Combined,4,35.0,30.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,-18.845971,reschedule,hyst_replan
+baseline_unique,new_1_V5_recovery_35,All Three Combined,5,35.0,30.0,4,0.75,60.0,1.0,38.291539,1.0,38.291539,-21.708461,reschedule,hyst_replan
+baseline_unique,new_2_V1_recovery_35,All Three Combined,1,35.0,30.0,4,0.5,60.0,1.0,41.171802,1.0,41.171802,-18.828198,reschedule,hyst_replan
+baseline_unique,new_2_V3_recovery_35,All Three Combined,3,35.0,30.0,4,0.5,60.0,1.0,40.298706,1.0,40.298706,-19.701294,reschedule,hyst_replan
+baseline_unique,new_2_V4_recovery_35,All Three Combined,4,35.0,30.0,4,0.5,60.0,1.0,41.171802,1.0,41.171802,-18.828198,reschedule,hyst_replan
+baseline_unique,new_2_V5_recovery_35,All Three Combined,5,35.0,30.0,4,0.75,60.0,1.0,37.00337,1.0,37.00337,-22.99663,reschedule,hyst_replan
+baseline_unique,new_3_V1_recovery_35,All Three Combined,1,35.0,30.0,4,0.5,60.0,1.0,40.908465,1.0,40.908465,-19.091535,reschedule,hyst_replan
+baseline_unique,new_3_V2_recovery_35,All Three Combined,2,35.0,30.0,4,0.5,60.0,1.0,41.461082,1.0,41.461082,-18.538918,reschedule,hyst_replan
+baseline_unique,new_3_V3_recovery_35,All Three Combined,3,35.0,30.0,4,0.5,60.0,1.0,41.461082,1.0,41.461082,-18.538918,reschedule,hyst_replan
+baseline_unique,new_3_V4_recovery_35,All Three Combined,4,35.0,30.0,4,0.5,60.0,1.0,40.308473,1.0,40.308473,-19.691527,reschedule,hyst_replan
+baseline_unique,new_3_V5_recovery_35,All Three Combined,5,35.0,30.0,4,0.75,60.0,1.0,37.89663,1.0,37.89663,-22.10337,reschedule,hyst_replan
+expanded_spatial,spatial_az000_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,17.930735,1.0,17.930735,-42.069265,reschedule,hyst_replan
+expanded_spatial,spatial_az000_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,17.787634,1.0,17.787634,-42.212366,reschedule,hyst_replan
+expanded_spatial,spatial_az045_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.116187,1.0,19.116187,-40.883813,reschedule,hyst_replan
+expanded_spatial,spatial_az045_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.092422,1.0,19.092422,-40.907578,reschedule,hyst_replan
+expanded_spatial,spatial_az045_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,18.617398,1.0,18.617398,-41.382602,reschedule,hyst_replan
+expanded_spatial,spatial_az090_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.387426,1.0,19.387426,-40.612574,reschedule,hyst_replan
+expanded_spatial,spatial_az090_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.473658,1.0,19.473658,-40.526342,reschedule,hyst_replan
+expanded_spatial,spatial_az135_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.093927,1.0,20.093927,-39.906073,reschedule,hyst_replan
+expanded_spatial,spatial_az135_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.747475,1.0,20.747475,-39.252525,reschedule,hyst_replan
+expanded_spatial,spatial_az135_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,22.069788,1.0,22.069788,-37.930212,reschedule,hyst_replan
+expanded_spatial,spatial_az180_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az180_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az180_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az225_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az225_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az225_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az270_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az270_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az270_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,20.263169,1.0,20.263169,-39.736831,reschedule,hyst_replan
+expanded_spatial,spatial_az315_r30,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.158818,1.0,19.158818,-40.841182,reschedule,hyst_replan
+expanded_spatial,spatial_az315_r40,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,17.757204,1.0,17.757204,-42.242796,reschedule,hyst_replan
+expanded_spatial,spatial_az315_r50,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,18.773083,1.0,18.773083,-41.226917,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,18.378428,1.0,18.378428,-41.621572,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_out30,New Alert + Comms Outage,,30.0,25.0,4,0.75,60.0,1.0,32.77903,1.0,32.77903,-27.22097,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V2_act,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,19.516472,1.0,19.516472,-40.483528,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V2_out30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,34.829663,1.0,34.829663,-25.170337,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V3_act,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,23.071652,1.0,23.071652,-36.928348,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V3_out30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,35.298706,1.0,35.298706,-24.701294,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V5_act,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,19.516472,1.0,19.516472,-40.483528,reschedule,hyst_replan
+expanded_hard,hard_shadow_B2_NE_V5_out30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,33.684395,1.0,33.684395,-26.315605,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_out30,New Alert + Comms Outage,,30.0,25.0,4,0.75,60.0,1.0,32.504263,1.0,32.504263,-27.495737,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V2_act,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,21.042587,1.0,21.042587,-38.957413,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V2_out30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,-23.538918,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V3_act,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,24.881449,1.0,24.881449,-35.118551,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V3_out30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,-23.538918,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V5_act,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+expanded_hard,hard_shadow_B5_SW_V5_out30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,32.504263,1.0,32.504263,-27.495737,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,19.085882,1.0,19.085882,-40.914118,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_out30,New Alert + Comms Outage,,30.0,25.0,4,0.75,60.0,1.0,33.256015,1.0,33.256015,-26.743985,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V2_act,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,21.824247,1.0,21.824247,-38.175753,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V2_out30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,33.777151,1.0,33.777151,-26.222849,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V3_act,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,24.439071,1.0,24.439071,-35.560929,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V3_out30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,34.11667,1.0,34.11667,-25.88333,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V5_act,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,21.086091,1.0,21.086091,-38.913909,reschedule,hyst_replan
+expanded_hard,hard_shadow_B4_SE_V5_out30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,33.256015,1.0,33.256015,-26.743985,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW,New Alert Only,,5.0,0.0,4,0.75,60.0,1.0,21.277266,1.0,21.277266,-38.722734,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_out30,New Alert + Comms Outage,,30.0,25.0,4,0.75,60.0,1.0,32.621602,1.0,32.621602,-27.378398,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V2_act,Failure + New Alert,2,5.0,0.0,4,0.5,60.0,1.0,22.415311,1.0,22.415311,-37.584689,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V2_out30,All Three Combined,2,30.0,25.0,4,0.5,60.0,1.0,35.946692,1.0,35.946692,-24.053308,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V3_act,Failure + New Alert,3,5.0,0.0,4,0.5,60.0,1.0,26.336116,1.0,26.336116,-33.663884,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V3_out30,All Three Combined,3,30.0,25.0,4,0.5,60.0,1.0,35.946692,1.0,35.946692,-24.053308,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V5_act,Failure + New Alert,5,5.0,0.0,4,0.75,60.0,1.0,22.415311,1.0,22.415311,-37.584689,reschedule,hyst_replan
+expanded_hard,hard_shadow_B3_NW_V5_out30,All Three Combined,5,30.0,25.0,4,0.75,60.0,1.0,32.621602,1.0,32.621602,-27.378398,reschedule,hyst_replan

@@ -1,0 +1,9 @@
+category,cases,mean_keep_eta,mean_replan_eta,mean_hyst_eta,mean_replan_tlast_s,replan_wins,keep_wins,ties,hyst_losses
+Vehicle Failure Only,5,0.7333,1.0,1.0,13.304,4,1,0,0
+New Alert Only,28,0.75,1.0,1.0,19.612,28,0,0,0
+Comms Outage Only (cached),3,1.0,1.0,1.0,11.034,0,0,3,0
+Failure + New Alert,27,0.5648,1.0,1.0,22.514,27,0,0,0
+Failure + Comms Outage,5,0.7333,1.0,1.0,29.576,4,0,1,0
+New Alert + Comms Outage,5,0.75,1.0,1.0,32.633,5,0,0,0
+All Three Combined,42,0.5595,1.0,1.0,36.778,42,0,0,0
+Total Unique Suite,115,0.642,1.0,1.0,27.064,110,1,4,0

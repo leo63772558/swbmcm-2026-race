@@ -1,0 +1,93 @@
+{
+  "raw_archived_case_count": 73,
+  "duplicates_removed": 11,
+  "dedup_baseline_unique_cases": 62,
+  "expanded_new_cases": 53,
+  "total_unique_cases": 115,
+  "dedup_total_row": {
+    "category": "Total Unique Suite",
+    "cases": 62,
+    "mean_keep_eta": 0.6142,
+    "mean_replan_eta": 1.0,
+    "mean_hyst_eta": 1.0,
+    "mean_replan_tlast_s": 29.154,
+    "replan_wins": 57,
+    "keep_wins": 1,
+    "ties": 4,
+    "hyst_losses": 0
+  },
+  "expanded_total_row": {
+    "category": "Total Unique Suite",
+    "cases": 115,
+    "mean_keep_eta": 0.642,
+    "mean_replan_eta": 1.0,
+    "mean_hyst_eta": 1.0,
+    "mean_replan_tlast_s": 27.064,
+    "replan_wins": 110,
+    "keep_wins": 1,
+    "ties": 4,
+    "hyst_losses": 0
+  },
+  "budget_stability": [
+    {
+      "budget_label": "archived_k2_bw3",
+      "stations_k": 2,
+      "beam_width": 3,
+      "unique_cases": 62,
+      "mean_replan_eta": 1.0,
+      "mean_replan_tlast_s": 29.1537,
+      "mean_hyst_tlast_s": 29.1232,
+      "replan_wins": 57,
+      "keep_wins": 1,
+      "ties": 4,
+      "hyst_losses": 0,
+      "v5_replan_tlast_s": 12.927041,
+      "v5_delta_vs_keep_s": 1.89298
+    },
+    {
+      "budget_label": "budget_k3_bw5",
+      "stations_k": 3,
+      "beam_width": 5,
+      "unique_cases": 62,
+      "mean_replan_eta": 1.0,
+      "mean_replan_tlast_s": 29.0866,
+      "mean_hyst_tlast_s": 29.0561,
+      "replan_wins": 57,
+      "keep_wins": 1,
+      "ties": 4,
+      "hyst_losses": 0,
+      "v5_replan_tlast_s": 12.927041,
+      "v5_delta_vs_keep_s": 1.89298
+    },
+    {
+      "budget_label": "budget_k5_bw10",
+      "stations_k": 5,
+      "beam_width": 10,
+      "unique_cases": 62,
+      "mean_replan_eta": 1.0,
+      "mean_replan_tlast_s": 29.0866,
+      "mean_hyst_tlast_s": 29.0561,
+      "replan_wins": 57,
+      "keep_wins": 1,
+      "ties": 4,
+      "hyst_losses": 0,
+      "v5_replan_tlast_s": 12.927041,
+      "v5_delta_vs_keep_s": 1.89298
+    },
+    {
+      "budget_label": "budget_k8_bw20",
+      "stations_k": 8,
+      "beam_width": 20,
+      "unique_cases": 62,
+      "mean_replan_eta": 1.0,
+      "mean_replan_tlast_s": 29.1011,
+      "mean_hyst_tlast_s": 29.0705,
+      "replan_wins": 57,
+      "keep_wins": 1,
+      "ties": 4,
+      "hyst_losses": 0,
+      "v5_replan_tlast_s": 12.927041,
+      "v5_delta_vs_keep_s": 1.89298
+    }
+  ]
+}

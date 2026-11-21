@@ -1,0 +1,5 @@
+budget_label,stations_k,beam_width,unique_cases,mean_replan_eta,mean_replan_tlast_s,mean_hyst_tlast_s,replan_wins,keep_wins,ties,hyst_losses,v5_replan_tlast_s,v5_delta_vs_keep_s
+archived_k2_bw3,2,3,62,1.0,29.1537,29.1232,57,1,4,0,12.927041,1.89298
+budget_k3_bw5,3,5,62,1.0,29.0866,29.0561,57,1,4,0,12.927041,1.89298
+budget_k5_bw10,5,10,62,1.0,29.0866,29.0561,57,1,4,0,12.927041,1.89298
+budget_k8_bw20,8,20,62,1.0,29.1011,29.0705,57,1,4,0,12.927041,1.89298

@@ -46,16 +46,15 @@ cd swbmcm-2026-race
 
 | 阶段 | 状态 | 产物 |
 |---|---|---|
-| 定题 | ✅ 已完成（11-20 14:20 定 B 题） | `01_problem/B-problem.pdf` |
-| 题面提取 | ✅ 已完成 | `01_problem/B-problem.md`、`01_problem/data/*.csv` |
-| 拆题（四问分解） | ⏳ 进行中 | `02_model/00-decomposition.md` |
-| 符号表 | ⬜ 未开始 | `02_model/02-notation.md` |
-| P1–P4 建模 | ⬜ 未开始 | `02_model/P1.md` … `P4.md` |
-| 代码实现 | ⬜ 未开始 | `03_code/` |
-| 论文初稿 | ⬜ 未开始（目标 11-23 晚出完整 PDF） | `06_paper/` |
-| 提交 | ⬜ 未开始 | `07_submission/` |
+| 定题与题面提取 | ✅ 已完成 | `01_problem/B-problem.pdf`、`01_problem/data/*.csv`、`10_比赛工作区/data/B题题面参数.csv` |
+| P1–P4 求解器与 6 项硬核审计 | ✅ 已完成（6/6 PASS） | `10_比赛工作区/src/b_revision_*.py`、`b_hardcore_audit.py`（1,000 配对 / 4,200 顺序精确 B&B 零间隙） |
+| 真实求解器敏感性 / 3D Pareto / P4 115 场景 | ✅ 已完成 | `results/Global_sensitivity_*.csv`、`Pareto_tradeoff_3d.csv`、`P4_dedup_expanded_cases.csv` |
+| 11 组顶刊图 + 离线 3D 数字孪生大屏 | ✅ 已完成 | `figures/fig01`–`fig11`（PDF+PNG）、`simulator/B_Simulator.html`（含 Auto-Tour 一键演示） |
+| 完整英文论文成稿（A4, ≤25 页） | ✅ 已完成（零告警） | `10_比赛工作区/submission/b_revision_20261121/paper/B_submission.pdf`（72 宏 / 15 文献 / 11 图全绑定） |
+| 自动化测试套件与 AI 合规报告 | ✅ 已完成（9/9 PASS） | `tests/test_*.py`（9 文件）、`AI_USAGE_LOG.csv`（11 列）、`AI_Usage_Report.md` |
+| 洁净室复跑与支撑材料包 | ✅ 已完成 | `BSWBMCM2613050fj.zip`（< 20 MB，洁净室全链路复跑通过） |
 
-> 这张表由队长手动更新，别信 git 提交时间推断进度。
+> 最终官网上传与签字承诺书由队员人工核验后完成。
 
 ---
 
@@ -74,8 +73,9 @@ cd swbmcm-2026-race
 ## 五、跑起来
 
 ```bash
-python -m pip install -r requirements.txt    # 依赖见文件内注释
-python 03_code/run_all.py                     # 一键复现全部结果与图
+python -m pip install -r requirements.txt    # 依赖清单（与 requirements-review.txt 对齐）
+python 03_code/run_all.py                    # 严格 Fail-Fast 一键洁净室复现全部 P1–P4、图表、PDF 与 6 项审计
+python -m pytest tests/ -v                   # 运行全部 9 文件单元测试与提交包匿名/合规验收
 ```
 
 规则：

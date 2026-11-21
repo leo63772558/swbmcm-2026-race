@@ -63,14 +63,16 @@ FIGURE_MAP = (
      "P2(2) shared-k schedule Gantt, vehicle trajectories and k=3 vs k=8 ranking-reversal breakdown"),
     ("fig06_p3_risk", "P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv",
      "P3 Monte Carlo scatter, analytical ellipse, 66.837 m coverage threshold inset and (a,b) admissible domain"),
-    ("fig07_p4_resilience", "P4_cases.csv; Executed_timeline.json; priority_3.json",
-     "P4 73-scenario disturbance resilience matrix, dual-policy distributions and event-driven rescheduling flow"),
+    ("fig07_p4_resilience", "P4_dedup_expanded_cases.csv; P4_category_summary_expanded.csv; P4_budget_stability.csv",
+     "P4 115-scenario deduplicated & spatially expanded faceted resilience analysis and k=2/3/5/8 budget stability"),
     ("fig08_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json",
      "V5 single-fault counterexample aligned dual-policy Gantt showing +1.893 s bottleneck shift"),
-    ("fig09_global_sensitivity", "Global_sensitivity_oat.csv; Global_sensitivity_interaction.csv",
-     "Global parameter sensitivity: OAT ranking, tornado swing, 6x6 interaction matrix and Pareto cumulative share"),
-    ("fig10_pareto_and_3d", "Pareto_tradeoff.csv; Executed_timeline.json; browser_captures/webgl_*.png",
-     "Multi-objective Pareto tradeoff frontier and dark 3D digital twin three-stage keyframe triptych"),
+    ("fig09_global_sensitivity", "Global_sensitivity_oat.csv; Global_sensitivity_fixed_vs_reopt.csv; Global_sensitivity_interaction.csv; Global_sensitivity_weight_check.csv",
+     "Parameter perturbation & pairwise interaction analysis: re-optimized vs fixed-plan, tornado, 6x6 interactions, and 5-scheme weight stability"),
+    ("fig10_pareto_3d", "Pareto_tradeoff_3d.csv",
+     "Three-objective Pareto non-dominated frontier (time, travel, observation quality) and 2D projections proving k=5 and k=8 non-dominance"),
+    ("fig11_3d_dashboard", "Executed_timeline.json; browser_captures/webgl_*.png",
+     "Dedicated print-enhanced dark 3D digital twin three-stage keyframe triptych verified offline in Chromium"),
 )
 PLOT_METADATA = {
     "Creator": "Matplotlib",
@@ -183,15 +185,19 @@ def framework(results):
          "Geometry, precision and resilience checks", BLUE)
     connect(ax, (.30,.795), (.358,.795))
     connect(ax, (.640,.795), (.701,.795))
-    connect(ax, (.47,.692), (.21,.581))
+    connect(ax, (.44,.692), (.20,.582))
     connect(ax, (.50,.692), (.50,.582))
     connect(ax, (.641,.480), (.701,.480))
-    connect(ax, (.840,.377), (.61,.267))
-    connect(ax, (.641,.16), (.701,.16))
-    ax.annotate("", (.709,.095), (.292,.092), arrowprops={"arrowstyle":"-|>",
-                "connectionstyle":"arc3,rad=.29", "color":MUTED, "lw":.9, "ls":"--"})
-    ax.plot([.08,.011,.011],[.7,.67,.21],color=MUTED,lw=.9,ls="--")
-    connect(ax, (.011,.21), (.017,.195), style="--")
+    connect(ax, (.840,.377), (.58,.267))
+    connect(ax, (.641,.165), (.701,.165))
+    connect(ax, (.30,.165), (.358,.165), style="--")
+    # Clean orthogonal dashed feed from Official Field -> P3 Uncertainty
+    ax.plot([.155, .155], [.695, .625], color=MUTED, lw=.9, ls="--")
+    ax.plot([.155, .012, .012], [.625, .625, .165], color=MUTED, lw=.9, ls="--")
+    connect(ax, (.012, .165), (.023, .165), style="--")
+    # Dashed feedback from P3 Travel Limit -> Deployment Review
+    ax.annotate("", (.705, .085), (.295, .085), arrowprops={"arrowstyle": "-|>",
+                "connectionstyle": "arc3,rad=.16", "color": MUTED, "lw": .9, "ls": "--"})
     return fig
 
 
@@ -328,8 +334,12 @@ def precision(results):
     close.scatter(0,0,color=ORANGE,marker="*",s=58,zorder=5)
     close.set(xlim=(-amplitude,amplitude),ylim=(-amplitude,amplitude),aspect="equal",
               xlabel="East error relative to T2 (m)",ylabel="North error relative to T2 (m)")
-    close.text(.03,.96,f"95% ellipse\nRMS {rms:.6f} m",va="top",transform=close.transAxes,
-               bbox={"fc":"white","ec":GRID,"boxstyle":"round,pad=.25"},zorder=8)
+    close.text(.03,.96,
+               rf"95% analytic ellipse" + "\n" +
+               rf"$\mathrm{{RMS}} = \sqrt{{2}}\,\sigma_\theta r_{{\min}}$" + "\n" +
+               rf"$= {rms:.6f}$ m ($\gamma = 90^\circ$)",
+               va="top",transform=close.transAxes,fontsize=8.8,
+               bbox={"fc":"white","ec":GRID,"boxstyle":"round,pad=.28"},zorder=8)
     return fig
 
 
@@ -483,9 +493,17 @@ def dispatch(results):
     scene(map_ax,nominal,model.TARGETS)
     vehicle_legend(map_ax,loc="lower center",bbox_to_anchor=(.5,-.02),columnspacing=.9)
     clock = fig.add_subplot(gs[0,2:])
-    panel(clock,"B",rf"Executed phases at shared $k = {summary['shared_k']}$")
+    panel(clock,"B",rf"Executed phases at shared $k = {summary['shared_k']}$ (Critical Path on V3)")
     gantt(clock,nominal,max(i["end_s"] for i in nominal if i["phase"]!="idle")*1.08,
           summary["P2_latest_starts_s"]["beam"])
+    # Highlight Critical Path on V3 (0 -> 11.034 s: T1 -> reset -> T3)
+    cp_end = summary["P2_latest_starts_s"]["beam"]
+    clock.add_patch(Rectangle((0, 3 - 0.39), cp_end, 0.78, fill=False, edgecolor=CORAL,
+                              linewidth=1.8, linestyle="-", zorder=8))
+    clock.annotate("Critical Path: V3 (T1 → reset → T3)", xy=(cp_end * 0.52, 2.58),
+                   xytext=(cp_end * 0.56, 1.92), fontsize=8.3, fontweight="bold", color=CORAL,
+                   ha="center", arrowprops={"arrowstyle": "->", "color": CORAL, "lw": 1.1},
+                   bbox={"fc": "white", "ec": CORAL, "alpha": 0.94, "pad": 1.4}, zorder=9)
     segment_cols = (
         ("depart_s","arrival_s","travel"),("arrival_s","ready_s","slew"),
         ("ready_s","start_s","wait_partner"),("start_s","end_s","observe"),
@@ -603,100 +621,130 @@ def p3_risk(results):
                        marker=mark,s=28,color=c,label=group.capitalize()+" checks",zorder=4)
     bounds.set(xlim=(-.035,max(a)*1.19),ylim=(-.001,max(b)*1.19),
                xlabel=r"Base position std $a$ (m)",ylabel=r"Drift slope $b$ (m/m)")
+    bounds.text(.04, .12,
+                r"$a \geq 0,\; b \geq 0$" + "\n" + r"$a + 80b \leq 1.63674517\ \mathrm{m}$",
+                transform=bounds.transAxes, fontsize=8.8, fontweight="bold", color=INK,
+                bbox={"fc": "white", "ec": TEAL, "alpha": 0.92, "boxstyle": "round,pad=.3"}, zorder=8)
     bounds.legend(loc="upper right",fontsize=8.3)
     return fig
 
 
 def p4_resilience(results):
-    groups = {}
-    for row in read_csv(results/"P4_cases.csv"):
-        groups.setdefault(row["case"], {})[row["policy"]] = row
-    summary = read_json(results/"priority_3.json")
-    trace = read_json(results/"Executed_timeline.json")
-    assert len(groups)==summary["P4_case_count"] and groups.keys()==trace["cases"].keys()
-    expected_plan = summary["nominal_plan_id"]
-    assert all(r["plan_id"]==expected_plan for pair in groups.values() for r in pair.values())
-    index, matrix = [], []
-    for n,(case,pair) in enumerate(groups.items(),1):
-        keep,replan = (pair[k] for k in ("keep","reschedule"))
-        last = [float(r["latest_start_s"]) for r in (keep,replan)]
-        success = [int(r["successes"]) for r in (keep,replan)]
-        ratios = [float(r["completion_ratio"]) for r in (keep,replan)]
-        score_keep,score_plan = (success[0],-last[0]),(success[1],-last[1])
-        result = (score_plan > score_keep)-(score_plan < score_keep)
-        both_completed = success[0]==success[1]==int(keep["alerts"])
-        matrix.append((*ratios,last[1]-last[0] if both_completed else np.nan,result))
-        index.append({
-            "column":n,"case":case,"keep_ratio":keep["completion_ratio"],"reschedule_ratio":replan["completion_ratio"],
-            "reschedule_minus_keep_s":f"{last[1]-last[0]:.12g}" if both_completed else "",
-            "score_outcome":{-1:"keep",0:"tie",1:"reschedule"}[result],
-        })
-    values = np.asarray(matrix)
-    fig, gs = layout(f"P4  |  Resilience across {len(groups)} archived case IDs",
-                     (10,7.8),4,2,height_ratios=(1,1,1,1.85),width_ratios=(28,1))
-    norm_time = max(abs(v) for v in values[:,2] if np.isfinite(v)) or 1
-    time_map = mpl.colormaps["PuOr_r"].copy()
-    time_map.set_bad("#D4DCE3")
-    score_map = ListedColormap(["#E6A754","#E1E9F0","#48A799"])
-    image_rows = [
-        (r"Keep completion $\eta$", mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
-        (r"Reschedule completion $\eta$",mpl.colormaps["cividis"],mpl.colors.Normalize(0,1)),
-        (r"Start diff. $\Delta t_{\mathrm{last}}$ (s)", time_map,TwoSlopeNorm(vmin=-norm_time,vcenter=0,vmax=norm_time)),
-        ("Lexicographic winner", score_map,BoundaryNorm([-1.5,-.5,.5,1.5],score_map.N)),
+    """Fig. 7: Faceted P4 resilience analysis across 115 deduplicated & spatially expanded scenarios
+    plus search-budget stability (k=2/3/5/8) and hysteresis-gated workflow."""
+    cases = read_csv(results / "P4_dedup_expanded_cases.csv")
+    cats = [r for r in read_csv(results / "P4_category_summary_expanded.csv") if r["category"] != "Total Unique Suite"]
+    budgets = read_csv(results / "P4_budget_stability.csv")
+    # Preserve P4_PANEL_INDEX.csv provenance for all unique cases
+    index = [
+        {
+            "column": i, "case": r["case"], "category": r["category"],
+            "keep_ratio": r["keep_eta"], "reschedule_ratio": r["replan_eta"],
+            "reschedule_minus_keep_s": r["delta_replan_minus_keep_s"],
+            "score_outcome": r["winner"],
+        }
+        for i, r in enumerate(cases, 1)
     ]
-    chunks = np.array_split(values,3)
-    for p,rows in enumerate(chunks):
-        ax = fig.add_subplot(gs[p,0])
-        color_ax = fig.add_subplot(gs[p,1])
-        color_ax.axis("off")
-        letter = "ABC"[p]
-        first = sum(len(s) for s in chunks[:p])+1
-        panel(ax,letter,f"Case IDs {first}–{first+len(rows)-1}  |  source order")
-        for y,(_,color,norm) in enumerate(image_rows):
-            rendered = norm(np.ma.masked_invalid(rows[:,y]))
-            for j,value in enumerate(rendered):
-                ax.add_patch(Rectangle((first+j-.5,y-.46),1,.92,lw=0,fc=color(value),
-                                       antialiased=False,zorder=3))
-            scale = mpl.cm.ScalarMappable(norm=norm,cmap=color)
-            if p==0 and y==0:
-                bar = fig.colorbar(scale,cax=color_ax.inset_axes([.04,.08,.35,.84]),ticks=[0,.5,1],
-                             format=PercentFormatter(1,decimals=0))
-                bar.solids.set_rasterized(False)
-            if p==1 and y==2:
-                bar = fig.colorbar(scale,cax=color_ax.inset_axes([.04,.08,.35,.84]),ticks=[-norm_time,0,norm_time],
-                             format="%.1f")
-                bar.solids.set_rasterized(False)
-        ticks = np.arange(first,first+len(rows),2)
-        ax.set(xlim=(first-.5,first+len(rows)-.5),ylim=(3.55,-.55),yticks=np.arange(4),
-               yticklabels=[x[0] for x in image_rows],xticks=ticks)
-        ax.tick_params(axis="y",length=0)
-        ax.tick_params(axis="x",length=2)
-        ax.grid(False)
-        for spine in ax.spines.values():
-            spine.set_visible(False)
-    flow = fig.add_subplot(gs[-1,:])
+
+    short_cat = {
+        "Vehicle Failure Only": "Fail",
+        "New Alert Only": "Alert",
+        "Comms Outage Only (cached)": "Outage",
+        "Failure + New Alert": "Fail+Alert",
+        "Failure + Comms Outage": "Fail+Out",
+        "New Alert + Comms Outage": "Alert+Out",
+        "All Three Combined": "All Three",
+    }
+    labels = [f"{short_cat.get(r['category'], r['category'])}\n(n={r['cases']})" for r in cats]
+    x = np.arange(len(cats))
+
+    fig, gs = layout(
+        f"P4  |  Deduplicated & spatially expanded resilience ({len(cases)} unique scenarios)",
+        (11.2, 8.0), 2, 2, height_ratios=(1.12, 1.0), wspace=0.22, hspace=0.28,
+    )
+
+    # Panel A: Completion fraction eta by disturbance category
+    ax_a = fig.add_subplot(gs[0, 0])
+    panel(ax_a, "a", r"Mean completion ratio $\eta$ by disturbance category")
+    w = 0.34
+    keep_eta = [float(r["mean_keep_eta"]) for r in cats]
+    rep_eta = [float(r["mean_replan_eta"]) for r in cats]
+    ax_a.bar(x - w / 2, keep_eta, width=w, color=ORANGE, alpha=0.9, label="Keep Plan")
+    ax_a.bar(x + w / 2, rep_eta, width=w, color=TEAL, alpha=0.9, label="Reschedule / Hysteresis")
+    for idx, (ke, re_v) in enumerate(zip(keep_eta, rep_eta)):
+        ax_a.text(idx - w / 2, ke + 0.025, f"{ke:.2f}", ha="center", va="bottom", fontsize=7.5, color=INK)
+    ax_a.set_xticks(x)
+    ax_a.set_xticklabels(labels, fontsize=7.8)
+    ax_a.set_ylabel(r"Completion fraction $\eta$")
+    ax_a.set_ylim(0, 1.18)
+    ax_a.legend(loc="lower right", frameon=True, facecolor="white", fontsize=8.2)
+
+    # Panel B: Response latency t_last distribution under Reschedule vs Hysteresis across categories
+    ax_b = fig.add_subplot(gs[0, 1])
+    panel(ax_b, "b", r"Latest paired start $t_{\mathrm{last}}$ distribution (115 unique cases)")
+    grouped_t = [[float(r["hyst_latest_s"]) for r in cases if r["category"] == c["category"]] for c in cats]
+    bp = ax_b.boxplot(
+        grouped_t, positions=x, widths=0.52, patch_artist=True,
+        medianprops={"color": INK, "linewidth": 1.4},
+        whiskerprops={"color": MUTED, "linewidth": 1.0},
+        capprops={"color": MUTED, "linewidth": 1.0},
+        flierprops={"marker": "o", "markersize": 3.5, "markerfacecolor": CORAL, "markeredgecolor": "none"},
+    )
+    for patch_b in bp["boxes"]:
+        patch_b.set_facecolor("#BAE6FD")
+        patch_b.set_edgecolor(BLUE)
+        patch_b.set_linewidth(1.0)
+    means = [float(c["mean_replan_tlast_s"]) for c in cats]
+    ax_b.plot(x, means, marker="D", markersize=4.5, color=CORAL, lw=1.2, ls="--", label="Category mean")
+    ax_b.set_xticks(x)
+    ax_b.set_xticklabels(labels, fontsize=7.8)
+    ax_b.set_ylabel(r"Latest paired start $t_{\mathrm{last}}$ (s)")
+    ax_b.set_ylim(5, 48)
+    ax_b.legend(loc="upper left", frameon=True, facecolor="white", fontsize=8.2)
+
+    # Panel C: Search-budget stability (k=2/3/5/8 on 62 unique baseline cases) + W/T/L outcomes
+    ax_c = fig.add_subplot(gs[1, 0])
+    panel(ax_c, "c", r"Search-budget stability ($k \in \{2,3,5,8\}$, 62 deduplicated cases)")
+    bx = np.arange(len(budgets))
+    b_labels = [rf"$k={r['stations_k']}, w={r['beam_width']}$" for r in budgets]
+    t_rep = [float(r["mean_replan_tlast_s"]) for r in budgets]
+    t_hyst = [float(r["mean_hyst_tlast_s"]) for r in budgets]
+    ax_c.plot(bx, t_rep, marker="o", color=BLUE, lw=2.0, label=r"Unconditional Replan (57W/4T/1L)")
+    ax_c.plot(bx, t_hyst, marker="s", color=TEAL, lw=2.0, ls="--", label=r"Hysteresis-Gated (57W/5T/0L)")
+    for i, (tr, th) in enumerate(zip(t_rep, t_hyst)):
+        ax_c.annotate(f"{tr:.3f} s", (i, tr), xytext=(0, 7), textcoords="offset points",
+                      ha="center", fontsize=8, color=BLUE, fontweight="bold")
+        ax_c.annotate(f"{th:.3f} s", (i, th), xytext=(0, -13), textcoords="offset points",
+                      ha="center", fontsize=8, color=TEAL, fontweight="bold")
+    ax_c.set_xticks(bx)
+    ax_c.set_xticklabels(b_labels, fontsize=8.8)
+    ax_c.set_ylabel(r"Mean $t_{\mathrm{last}}$ across 62 unique cases (s)")
+    ax_c.set_ylim(28.98, 29.24)
+    ax_c.text(0.03, 0.08,
+              "All 4 budgets: 100% completion ($\\eta=1.000$)\nV5 penalty invariant (+1.893 s), 0 losses under Eq. (5)",
+              transform=ax_c.transAxes, fontsize=8.0, color=INK,
+              bbox={"fc": "#F8FAFC", "ec": GRID, "boxstyle": "round,pad=.3"})
+    ax_c.legend(loc="upper right", frameon=True, facecolor="white", fontsize=8.0)
+
+    # Panel D: Event-driven hysteresis-gated rescheduling architecture
+    flow = fig.add_subplot(gs[1, 1])
     flow.axis("off")
-    flow.set(xlim=(0,1),ylim=(0,1))
-    panel(flow,"D","Event-driven policy comparison")
-    node(flow,.015,.34,.213,.37,"Freeze nominal plan","Case clocks and availability",BLUE)
-    node(flow,.265,.34,.213,.37,"Advance event state","Replay to release time",BLUE)
-    node(flow,.523,.56,.216,.31,"Keep","Replay cached assignments",GOLD)
-    node(flow,.523,.16,.216,.31,"Reschedule","Lock pairs, revisit pending",TEAL)
-    node(flow,.78,.34,.204,.37,"Compare","Score starts in window",PURPLE)
-    connect(flow,(.232,.525),(.261,.525))
-    connect(flow,(.482,.525),(.519,.696))
-    connect(flow,(.482,.525),(.519,.325))
-    connect(flow,(.744,.697),(.776,.525))
-    connect(flow,(.744,.324),(.776,.525))
-    wins = np.asarray(values[:,3],dtype=int)
-    handles = [
-        Patch(fc="#D4DCE3",label="Time masked if either policy incomplete"),
-        Patch(fc="#E6A754",label=f"Keep {sum(wins<0)}"),
-        Patch(fc="#E1E9F0",label=f"Ties {sum(wins==0)}"),
-        Patch(fc="#48A799",label=f"Reschedule {sum(wins>0)}"),
-    ]
-    flow.legend(handles=handles,loc="lower center",ncols=4,fontsize=9,columnspacing=1)
-    return fig,index
+    flow.set(xlim=(0, 1), ylim=(0, 1))
+    panel(flow, "d", "Hysteresis-gated event-driven rescheduling flow")
+    def compact_card(ax_f, x0, y0, cw, ch, head, sub, col):
+        ax_f.add_patch(FancyBboxPatch((x0, y0), cw, ch, boxstyle="round,pad=.007,rounding_size=.014",
+                                      lw=.8, fc=PAPER, ec="#B8C8D7"))
+        ax_f.add_patch(Rectangle((x0, y0 + .012), .009, ch - .024, color=col, lw=0))
+        ax_f.text(x0 + .022, y0 + ch * .68, head, weight="bold", fontsize=9.2, va="center")
+        ax_f.text(x0 + .022, y0 + ch * .30, sub, fontsize=8.1, va="center", color=MUTED)
+    compact_card(flow, .01, .60, .45, .28, "1. Frozen nominal plan", r"Advance to $t_{\mathrm{rel}}$; lock pairs", BLUE)
+    compact_card(flow, .53, .60, .46, .28, "2. Parallel rollouts", "Keep vs. Cancel-Reset Replan", PURPLE)
+    compact_card(flow, .01, .18, .45, .28, "3. Hysteresis gate Eq. (5)", r"Accept iff $\Delta\eta>0$ or $\Delta t>\delta_{\mathrm{hyst}}$", ORANGE)
+    compact_card(flow, .53, .18, .46, .28, "4. Verified 115-case score", "110W / 5T / 0L (V5 blocked)", TEAL)
+    connect(flow, (.47, .74), (.52, .74))
+    connect(flow, (.76, .59), (.24, .47))
+    connect(flow, (.47, .32), (.52, .32))
+    return fig, index
 
 
 def v5_timeline(results):
@@ -851,12 +899,15 @@ def p2_paths(results):
 
 
 def global_sensitivity(results):
-    """Fig. 9: Four-panel global sensitivity & interaction analysis from verified OAT/interaction CSVs."""
+    """Fig. 9: Real-solver parameter perturbation, pairwise interaction, and 5-scheme weight stability."""
     oat = read_csv(results / "Global_sensitivity_oat.csv")
     inter = read_csv(results / "Global_sensitivity_interaction.csv")
+    weights = read_csv(results / "Global_sensitivity_weight_check.csv")
 
-    fig, gs = layout("Global parameter sensitivity and interaction analysis", (11.2, 7.8), 2, 2,
-                     wspace=0.38, hspace=0.28)
+    fig, gs = layout(
+        "Parameter perturbation & pairwise interaction analysis (real P1–P4 solvers)",
+        (11.4, 7.6), 2, 2, wspace=0.26, hspace=0.22,
+    )
 
     short_names = {
         "pitch_ceiling": r"Pitch ceiling $\beta_{\max}$",
@@ -866,48 +917,59 @@ def global_sensitivity(results):
         "pos_error_intercept": r"Base std $a$",
         "vehicle_speed": r"Speed $v$",
     }
+    short_tick_map = {
+        "pitch_ceiling": r"$\beta_{\max}$",
+        "pos_error_slope": r"$b$",
+        "outage_duration": r"$\Delta t_{\mathrm{out}}$",
+        "pan_speed": r"$\omega_{\mathrm{pan}}$",
+        "pos_error_intercept": r"$a$",
+        "vehicle_speed": r"$v$",
+    }
     labels = [short_names.get(r["parameter"], r["label"]) for r in oat]
+    p_order = [r["parameter"] for r in oat]
+    short_tick = [short_tick_map[k] for k in p_order]
     y_pos = np.arange(len(oat))
 
-    # (a) Main effect horizontal bar ranking
+    # (a) Re-Optimized vs. Fixed-Plan OAT Main Effect Ranking
     ax = fig.add_subplot(gs[0, 0])
-    panel(ax, "a", "One-at-a-time (OAT) main effect ranking")
-    swings = [float(r["swing_pct"]) for r in oat]
-    bar_cols = [BLUE, TEAL, ORANGE, PURPLE, CORAL, MUTED][:len(oat)]
-    ax.barh(y_pos, swings, color=bar_cols, edgecolor="white", height=0.62)
+    panel(ax, "a", "OAT swing: Re-Optimized vs. Fixed-Plan P2")
+    sw_reopt = [float(r["swing_pct"]) for r in oat]
+    sw_fixed = [float(r["fixed_plan_swing_pct"]) for r in oat]
+    h = 0.36
+    ax.barh(y_pos - h / 2, sw_reopt, color=BLUE, edgecolor="white", height=h, label="Re-Optimized")
+    ax.barh(y_pos + h / 2, sw_fixed, color=ORANGE, edgecolor="white", height=h, alpha=0.88, label="Fixed-Plan Local")
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(labels)
+    ax.set_yticklabels(labels, fontsize=9.2)
     ax.invert_yaxis()
     ax.set_xlabel("Composite index swing (%)")
-    for idx, val in enumerate(swings):
-        ax.text(val + 0.25, idx, f"{val:.2f}%", va="center", fontsize=8.5, fontweight="bold", color=INK)
-    ax.set_xlim(0, max(swings) * 1.22)
+    for idx, val in enumerate(sw_reopt):
+        ax.text(val + 0.22, idx - h / 2, f"{val:.2f}%", va="center", fontsize=7.8, fontweight="bold", color=INK)
+    ax.set_xlim(0, max(max(sw_reopt), max(sw_fixed)) * 1.24)
+    ax.legend(loc="lower right", fontsize=8.0, frameon=True, facecolor="white")
 
     # (b) Tornado chart (delta low vs delta high)
     ax = fig.add_subplot(gs[0, 1])
-    panel(ax, "b", "Tornado sensitivity (±20% parameter sweep)")
+    ax.set_title(r"b   Tornado ($\pm 20\%$, decoupled pan/tilt)", loc="left", fontsize=11.0, fontweight="bold")
     d_lo = [float(r["delta_low_pct"]) for r in oat]
     d_hi = [float(r["delta_high_pct"]) for r in oat]
     ax.axvline(0.0, color=INK, linewidth=1.0, zorder=3)
     ax.barh(y_pos, d_lo, color=CORAL, alpha=0.88, height=0.56, label="Low parameter bound")
-    ax.barh(y_pos, d_hi, color=BLUE, alpha=0.88, height=0.56, label="High parameter bound")
+    ax.barh(y_pos, d_hi, color=TEAL, alpha=0.88, height=0.56, label="High parameter bound")
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(labels)
+    ax.set_yticklabels(labels, fontsize=9.2)
     ax.invert_yaxis()
     ax.set_xlabel(r"Relative change in composite index $\Delta J$ (%)")
-    ax.legend(loc="lower right", fontsize=8.5, frameon=True, facecolor="white")
+    ax.legend(loc="lower right", fontsize=8.0, frameon=True, facecolor="white")
 
     # (c) 6x6 Pairwise Interaction Matrix Heatmap
     ax = fig.add_subplot(gs[1, 0])
-    panel(ax, "c", "Pairwise parameter interaction matrix (%)")
-    p_order = [r["parameter"] for r in oat]
+    panel(ax, "c", "Symmetric 6×6 pairwise interaction matrix (%)")
     idx_map = {k: i for i, k in enumerate(p_order)}
     mat = np.zeros((len(p_order), len(p_order)), dtype=float)
     for r in inter:
         if r["param_i"] in idx_map and r["param_j"] in idx_map:
             mat[idx_map[r["param_i"]], idx_map[r["param_j"]]] = float(r["interaction_pct"])
     im = ax.imshow(mat, cmap="YlGnBu", aspect="auto", vmin=0, vmax=max(0.2, float(mat.max())))
-    short_tick = [r"$\beta_{\max}$", r"$b$", r"$\Delta t_{\mathrm{out}}$", r"$\omega_{\mathrm{pan}}$", r"$a$", r"$v$"]
     ax.set_xticks(range(len(p_order)))
     ax.set_xticklabels(short_tick, fontsize=9)
     ax.set_yticks(range(len(p_order)))
@@ -922,101 +984,176 @@ def global_sensitivity(results):
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("Interaction (%)", fontsize=8.5)
 
-    # (d) Pareto main-effect + cumulative contribution dual-axis
+    # (d) 5-Scheme Weight-Perturbation Rank Stability Matrix
     ax = fig.add_subplot(gs[1, 1])
-    panel(ax, "d", "Pareto share & cumulative sensitivity")
-    shares = [float(r["main_share_pct"]) for r in oat]
-    cum = [float(r["cumulative_share_pct"]) for r in oat]
-    x = np.arange(len(oat))
-    ax.bar(x, shares, color=TEAL, alpha=0.85, width=0.58, label="Main effect share (%)")
-    ax.set_xticks(x)
-    ax.set_xticklabels(short_tick, fontsize=9)
-    ax.set_ylabel("Individual share (%)", color=TEAL)
-    ax.set_ylim(0, max(shares) * 1.25)
-    ax2 = ax.twinx()
-    ax2.spines["top"].set_visible(False)
-    ax2.spines["right"].set_visible(True)
-    ax2.plot(x, cum, color=CORAL, marker="o", linewidth=2.0, markersize=5.5, label="Cumulative (%)")
-    ax2.axhline(80.0, color=MUTED, linestyle="--", linewidth=1.0)
-    ax2.text(len(x) - 0.5, 82.0, "80% rule", ha="right", fontsize=8, color=MUTED)
-    ax2.set_ylabel("Cumulative share (%)", color=CORAL)
-    ax2.set_ylim(0, 108)
-    ax2.grid(False)
-    for i, cval in enumerate(cum):
-        ax2.annotate(f"{cval:.1f}%", (i, cval), xytext=(0, 5), textcoords="offset points",
-                     ha="center", fontsize=7.5, color=CORAL, fontweight="bold")
+    ax.set_title("d   Rank stability (5 weight schemes)", loc="left", fontsize=11.0, fontweight="bold")
+    schemes = [
+        ("baseline_balanced", "Balanced"),
+        ("equal_weight", "Equal"),
+        ("time_priority", "Time"),
+        ("precision_priority", "Precision"),
+        ("resilience_priority", "Resilience"),
+    ]
+    rank_mat = np.zeros((len(p_order), len(schemes)), dtype=float)
+    share_mat = np.zeros((len(p_order), len(schemes)), dtype=float)
+    w_lookup = {(r["scheme"], r["parameter"]): (int(r["rank"]), float(r["share_pct"])) for r in weights}
+    for i, k in enumerate(p_order):
+        for j, (s_key, _) in enumerate(schemes):
+            rk, sh = w_lookup[(s_key, k)]
+            rank_mat[i, j] = rk
+            share_mat[i, j] = sh
+    im2 = ax.imshow(rank_mat, cmap="RdYlGn_r", aspect="auto", vmin=1, vmax=6)
+    ax.set_xticks(range(len(schemes)))
+    ax.set_xticklabels([lbl for _, lbl in schemes], fontsize=7.6)
+    ax.set_yticks(range(len(p_order)))
+    ax.set_yticklabels(short_tick, fontsize=9)
+    ax.grid(False)
+    for i in range(len(p_order)):
+        for j in range(len(schemes)):
+            rk = int(rank_mat[i, j])
+            sh = share_mat[i, j]
+            ax.text(j, i, f"#{rk}\n({sh:.0f}%)", ha="center", va="center", fontsize=7.6,
+                    fontweight="bold" if rk <= 2 else "normal",
+                    color="white" if rk in (1, 6) else INK)
+    cbar2 = fig.colorbar(im2, ax=ax, fraction=0.046, pad=0.04, ticks=[1, 2, 3, 4, 5, 6])
+    cbar2.set_label("Sensitivity rank (1 = highest)", fontsize=8.2)
     return fig
 
 
-def pareto_and_3d(results, directory):
-    """Fig. 10: Multi-objective Pareto frontier + dark 3D digital twin three-stage keyframe triptych."""
-    from PIL import Image
+def pareto_3d(results):
+    """Fig. 10: True 3D Multi-Objective Pareto Frontier (Time, Travel, Observation Quality) + 2D Projections."""
+    pareto = read_csv(results / "Pareto_tradeoff_3d.csv")
+    fig = plt.figure(figsize=(11.4, 5.2), layout="constrained")
+    fig.suptitle(
+        r"Three-objective Pareto frontier: latency $t_{\mathrm{last}}$, travel $D_{\mathrm{tot}}$, and quality $\bar{Q}$ (16 configs, 8 3D non-dominated)",
+        x=0.02, ha="left", fontsize=12.6, fontweight="bold", color=INK,
+    )
+    gs = fig.add_gridspec(1, 3, width_ratios=(1.25, 1.0, 1.0), wspace=0.22)
 
-    pareto = read_csv(results / "Pareto_tradeoff.csv")
-    fig = plt.figure(figsize=(11.2, 7.6), constrained_layout=True)
-    fig.suptitle("Multi-objective Pareto tradeoff & 3D digital twin validation",
-                 fontsize=13, fontweight="bold", color=INK)
-    outer = fig.add_gridspec(2, 1, height_ratios=(1.05, 1.0), hspace=0.18)
+    p3d = [r for r in pareto if r["is_pareto_3d"] == "True"]
+    dom = [r for r in pareto if r["is_pareto_3d"] != "True"]
+    k5 = next(r for r in pareto if r["policy"] == "beam" and r["k"] == "5" and r["beam_width"] == "20")
+    k8 = next(r for r in pareto if r["tag"] == "nominal_recommended")
+    near = next(r for r in pareto if r["tag"] == "nearest_baseline")
+    k3w5 = next(r for r in pareto if r["policy"] == "beam" and r["k"] == "3" and r["beam_width"] == "5")
 
-    # Top row: (a) Pareto tradeoff scatter + frontier
-    ax = fig.add_subplot(outer[0, 0])
-    panel(ax, "a", "Dispatch response time vs. fleet travel exposure (16 verified solver configurations)")
-    beam_pts = [r for r in pareto if r["policy"] == "beam"]
-    near_pts = [r for r in pareto if r["policy"] == "nearest"]
-    front = sorted([r for r in pareto if r["is_pareto"] == "True"], key=lambda r: float(r["latest_start_s"]))
+    # (a) 3D Scatter of all 16 configs highlighting the 3D non-dominated front
+    ax3 = fig.add_subplot(gs[0, 0], projection="3d")
+    ax3.set_title("a   3D objective space", loc="left", fontsize=10.8, fontweight="bold", pad=4)
+    ax3.scatter(
+        [float(r["latest_start_s"]) for r in dom],
+        [float(r["total_travel_m"]) for r in dom],
+        [float(r["mean_quality_m_inv"]) * 1e3 for r in dom],
+        s=36, color="#94A3B8", alpha=0.65, label="Dominated (8)",
+    )
+    ax3.scatter(
+        [float(r["latest_start_s"]) for r in p3d],
+        [float(r["total_travel_m"]) for r in p3d],
+        [float(r["mean_quality_m_inv"]) * 1e3 for r in p3d],
+        s=58, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto front (8)",
+    )
+    ax3.scatter([float(k8["latest_start_s"])], [float(k8["total_travel_m"])], [float(k8["mean_quality_m_inv"]) * 1e3],
+                s=130, marker="*", color=CORAL, edgecolor=INK, lw=0.8, label=r"Nominal $k=8$", zorder=8)
+    ax3.scatter([float(k5["latest_start_s"])], [float(k5["total_travel_m"])], [float(k5["mean_quality_m_inv"]) * 1e3],
+                s=75, marker="D", color=BLUE, edgecolor=INK, lw=0.8, label=r"Low-travel $k=5$", zorder=7)
+    ax3.set_xlabel(r"$t_{\mathrm{last}}$ (s)", fontsize=8.5, labelpad=4)
+    ax3.set_ylabel(r"Travel $D_{\mathrm{tot}}$ (m)", fontsize=8.5, labelpad=4)
+    ax3.set_zlabel(r"$\bar{Q}$ ($10^{-3}\ \mathrm{m}^{-1}$)", fontsize=8.5, labelpad=4)
+    ax3.tick_params(labelsize=7.5)
+    ax3.view_init(elev=22, azim=-52)
+    ax3.legend(loc="upper left", fontsize=7.4, frameon=True, facecolor="white")
 
-    ax.scatter([float(r["latest_start_s"]) for r in beam_pts],
-               [float(r["total_travel_m"]) for r in beam_pts],
-               s=62, color=BLUE, edgecolor=INK, linewidth=0.7, alpha=0.85, label="Beam Search sweep", zorder=4)
-    ax.scatter([float(r["latest_start_s"]) for r in near_pts],
-               [float(r["total_travel_m"]) for r in near_pts],
-               s=68, marker="^", color=ORANGE, edgecolor=INK, linewidth=0.7, alpha=0.9, label="Nearest baseline", zorder=5)
-    if front:
-        ax.plot([float(r["latest_start_s"]) for r in front],
-                [float(r["total_travel_m"]) for r in front],
-                color=TEAL, linewidth=2.2, linestyle="-", label="Non-dominated Pareto front", zorder=3)
-    # Highlight nominal recommended (k=8, bw=20)
-    nom = next((r for r in pareto if r["tag"] == "nominal_recommended"), None)
-    if nom:
-        nx, ny = float(nom["latest_start_s"]), float(nom["total_travel_m"])
-        ax.scatter([nx], [ny], s=140, marker="*", color=CORAL, edgecolor=INK, linewidth=0.9,
-                   label=r"Nominal plan ($k=8$, $w=20$)", zorder=7)
-        ax.annotate(rf"Nominal $k=8$ ({nx:.3f} s, {ny:.1f} m)", (nx, ny),
-                    xytext=(12, 10), textcoords="offset points", fontsize=8.5, fontweight="bold", color=CORAL,
-                    arrowprops=dict(arrowstyle="->", color=CORAL, lw=1.0))
-    base = next((r for r in pareto if r["tag"] == "nearest_baseline"), None)
-    if base:
-        bx, by = float(base["latest_start_s"]), float(base["total_travel_m"])
-        ax.annotate(f"Nearest baseline ({bx:.3f} s, {by:.1f} m)", (bx, by),
-                    xytext=(14, 8), textcoords="offset points", fontsize=8.5, fontweight="bold", color=GOLD,
-                    arrowprops=dict(arrowstyle="->", color=GOLD, lw=1.0))
-    ax.set_xlabel(r"Latest paired observation start $t_{\mathrm{last}}$ (s)")
-    ax.set_ylabel("Total fleet travel distance (m)")
-    ax.set_ylim(19.2, 46.5)
-    ax.legend(loc="upper right", fontsize=8.4, frameon=True, facecolor="white", framealpha=0.95, ncol=2)
+    # (b) 2D Projection: t_last vs Total Travel
+    ax_b = fig.add_subplot(gs[0, 1])
+    panel(ax_b, "b", r"Projection: latency vs. travel")
+    ax_b.scatter([float(r["latest_start_s"]) for r in dom], [float(r["total_travel_m"]) for r in dom],
+                 s=42, color="#94A3B8", alpha=0.7, label="Dominated")
+    ax_b.scatter([float(r["latest_start_s"]) for r in p3d], [float(r["total_travel_m"]) for r in p3d],
+                 s=62, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto")
+    ax_b.scatter([float(k8["latest_start_s"])], [float(k8["total_travel_m"])],
+                 s=135, marker="*", color=CORAL, edgecolor=INK, lw=0.8, zorder=7)
+    ax_b.scatter([float(k5["latest_start_s"])], [float(k5["total_travel_m"])],
+                 s=70, marker="D", color=BLUE, edgecolor=INK, lw=0.8, zorder=6)
+    ax_b.annotate(r"Nominal $k=8$" + "\n(11.034 s, 38.2 m)", (float(k8["latest_start_s"]), float(k8["total_travel_m"])),
+                  xytext=(16, 12), textcoords="offset points", fontsize=7.8, fontweight="bold", color=CORAL,
+                  arrowprops={"arrowstyle": "->", "color": CORAL, "lw": 0.9})
+    ax_b.annotate(r"$k=5$ (36.1 m)", (float(k5["latest_start_s"]), float(k5["total_travel_m"])),
+                  xytext=(18, -14), textcoords="offset points", fontsize=7.8, fontweight="bold", color=BLUE,
+                  arrowprops={"arrowstyle": "->", "color": BLUE, "lw": 0.9})
+    ax_b.annotate(r"Nearest (11.724 s, 21.1 m)", (float(near["latest_start_s"]), float(near["total_travel_m"])),
+                  xytext=(10, 8), textcoords="offset points", fontsize=7.6, fontweight="bold", color=GOLD,
+                  arrowprops={"arrowstyle": "->", "color": GOLD, "lw": 0.9})
+    ax_b.set_xlabel(r"Latest paired start $t_{\mathrm{last}}$ (s)")
+    ax_b.set_ylabel(r"Total fleet travel $D_{\mathrm{tot}}$ (m)")
+    ax_b.set_ylim(19.0, 44.5)
 
-    # Bottom row: (b) Three-panel dark 3D digital twin keyframe triptych with print-ready framing
-    sub = outer[1, 0].subgridspec(1, 3, wspace=0.07)
+    # (c) 2D Projection: Total Travel vs Mean Observation Quality (proving k=8 beats k=5 on quality!)
+    ax_c = fig.add_subplot(gs[0, 2])
+    panel(ax_c, "c", r"Projection: travel vs. quality $\bar{Q}$")
+    ax_c.scatter([float(r["total_travel_m"]) for r in dom], [float(r["mean_quality_m_inv"]) * 1e3 for r in dom],
+                 s=42, color="#94A3B8", alpha=0.7, label="Dominated")
+    ax_c.scatter([float(r["total_travel_m"]) for r in p3d], [float(r["mean_quality_m_inv"]) * 1e3 for r in p3d],
+                 s=62, color=TEAL, edgecolor=INK, lw=0.7, label="3D Pareto")
+    # Connect the tied 11.034 s tradeoff branch (k=5 -> k=6 -> k=8)
+    tied = sorted([r for r in pareto if abs(float(r["latest_start_s"]) - 11.034062) < 1e-4],
+                  key=lambda r: float(r["total_travel_m"]))
+    ax_c.plot([float(r["total_travel_m"]) for r in tied],
+              [float(r["mean_quality_m_inv"]) * 1e3 for r in tied],
+              color=CORAL, lw=2.0, ls="-", zorder=5, label=r"$t_{\mathrm{last}}=11.034$ s ridge")
+    ax_c.scatter([float(k8["total_travel_m"])], [float(k8["mean_quality_m_inv"]) * 1e3],
+                 s=135, marker="*", color=CORAL, edgecolor=INK, lw=0.8, zorder=7)
+    ax_c.scatter([float(k5["total_travel_m"])], [float(k5["mean_quality_m_inv"]) * 1e3],
+                 s=70, marker="D", color=BLUE, edgecolor=INK, lw=0.8, zorder=6)
+    ax_c.annotate(r"$k=8$: $\bar{Q}=20.08$" + "\n(59.9 m range)", (float(k8["total_travel_m"]), float(k8["mean_quality_m_inv"]) * 1e3),
+                  xytext=(-65, 16), textcoords="offset points", fontsize=7.6, fontweight="bold", color=CORAL,
+                  arrowprops={"arrowstyle": "->", "color": CORAL, "lw": 0.9})
+    ax_c.annotate(r"$k=5$: $\bar{Q}=19.37$" + "\n(62.5 m range)", (float(k5["total_travel_m"]), float(k5["mean_quality_m_inv"]) * 1e3),
+                  xytext=(-62, -26), textcoords="offset points", fontsize=7.6, fontweight="bold", color=BLUE,
+                  arrowprops={"arrowstyle": "->", "color": BLUE, "lw": 0.9})
+    ax_c.annotate(r"$k=3,w=5$" + "\n(11.496 s)", (float(k3w5["total_travel_m"]), float(k3w5["mean_quality_m_inv"]) * 1e3),
+                  xytext=(-52, -16), textcoords="offset points", fontsize=7.4, color=TEAL, fontweight="bold",
+                  arrowprops={"arrowstyle": "->", "color": TEAL, "lw": 0.9})
+    ax_c.set_xlabel(r"Total fleet travel $D_{\mathrm{tot}}$ (m)")
+    ax_c.set_ylabel(r"Mean quality $\bar{Q}$ ($10^{-3}\ \mathrm{m}^{-1}$)")
+    ax_c.set_ylim(12.5, 31.5)
+    ax_c.legend(loc="lower left", fontsize=7.6, frameon=True, facecolor="white")
+    return fig
+
+
+def dashboard_3d(directory):
+    """Fig. 11: Dedicated enlarged, print-enhanced dark 3D digital twin keyframe triptych."""
+    from PIL import Image, ImageEnhance
+
+    fig = plt.figure(figsize=(11.6, 4.35), layout="constrained")
+    fig.suptitle(
+        "Offline 3D digital twin command dashboard  |  Verified Chromium keyframes (0/892 segment collisions)",
+        x=0.02, ha="left", fontsize=12.4, fontweight="bold", color=INK,
+    )
+    gs = fig.add_gridspec(1, 3, wspace=0.06)
     captures = directory / "replay_frames" / "browser_captures"
     fallbacks = directory / "replay_frames"
     triplets = [
-        ("b1", r"Normal Coordination ($t = 3.093$ s)", captures / "webgl_1_nominal_beam.png", fallbacks / "normal_coordination.png"),
-        ("b2", r"V5 Fault Trigger ($t = 5.000$ s)", captures / "webgl_2_failure_V5_keep.png", fallbacks / "v5_fault_trigger.png"),
-        ("b3", r"Reschedule Recovery ($t = 12.927$ s)", captures / "webgl_3_failure_V5_reschedule.png", fallbacks / "v5_recovery_compare.png"),
+        ("a", r"Normal Coordination ($t = 3.093$ s)", captures / "webgl_1_nominal_beam.png", fallbacks / "normal_coordination.png"),
+        ("b", r"V5 Fault Trigger ($t = 5.000$ s)", captures / "webgl_2_failure_V5_keep.png", fallbacks / "v5_fault_trigger.png"),
+        ("c", r"Reschedule Recovery ($t = 12.927$ s)", captures / "webgl_3_failure_V5_reschedule.png", fallbacks / "v5_recovery_compare.png"),
     ]
     for col_i, (tag, subtitle, primary_img, fallback_img) in enumerate(triplets):
-        ax3 = fig.add_subplot(sub[0, col_i])
+        ax3 = fig.add_subplot(gs[0, col_i])
         img_path = primary_img if primary_img.is_file() else fallback_img
         if img_path.is_file():
             with Image.open(img_path) as im:
-                # Crop subtle dark margins for tighter 3D showcase framing
-                w_px, h_px = im.size
+                rgb = im.convert("RGB")
+                w_px, h_px = rgb.size
                 box = (int(w_px * 0.14), int(h_px * 0.08), int(w_px * 0.86), int(h_px * 0.92))
-                ax3.imshow(im.crop(box))
+                cropped = rgb.crop(box)
+                # Gentle print-readability lift so dark-theme 3D buildings & paths print crisply
+                lifted = ImageEnhance.Brightness(cropped).enhance(1.24)
+                lifted = ImageEnhance.Contrast(lifted).enhance(1.16)
+                ax3.imshow(lifted)
         ax3.set_title(
             f"({tag}) {subtitle}",
-            fontsize=9.2, fontweight="bold", color=INK, pad=6,
-            bbox=dict(boxstyle="square,pad=0.28", facecolor="#FFFFFF", edgecolor="#CBD5E1", linewidth=0.6),
+            fontsize=9.6, fontweight="bold", color=INK, pad=6,
+            bbox=dict(boxstyle="square,pad=0.30", facecolor="#FFFFFF", edgecolor="#CBD5E1", linewidth=0.6),
         )
         ax3.set_xticks([])
         ax3.set_yticks([])
@@ -1030,7 +1167,9 @@ def pareto_and_3d(results, directory):
 def generate(root):
     directory = root / "figures"
     results = root / "results"
-    # Ensure replay_frames standalone figures exist before fig10_pareto_and_3d
+    # Clean legacy combined fig10_pareto_and_3d if present
+    for legacy in directory.glob("fig10_pareto_and_3d.*"):
+        legacy.unlink()
     replay_frames(results, directory)
     scripts = (
         ("fig01_framework", lambda: framework(results)),
@@ -1042,7 +1181,8 @@ def generate(root):
         ("fig07_p4_resilience", lambda: p4_resilience(results)),
         ("fig08_v5_timeline", lambda: v5_timeline(results)),
         ("fig09_global_sensitivity", lambda: global_sensitivity(results)),
-        ("fig10_pareto_and_3d", lambda: pareto_and_3d(results, directory)),
+        ("fig10_pareto_3d", lambda: pareto_3d(results)),
+        ("fig11_3d_dashboard", lambda: dashboard_3d(directory)),
     )
     for stem, draw in scripts:
         out = draw()
@@ -1054,7 +1194,7 @@ def generate(root):
         {"figure": name, "source": inputs, "purpose": description, "formats": "Vector PDF; PNG 320 dpi"}
         for name, inputs, description in FIGURE_MAP
     ))
-    print("Rendered 10 publication-grade analytical figures and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
+    print("Rendered 11 publication-grade analytical figures and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
 
 
 if __name__ == "__main__":

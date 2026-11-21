@@ -316,7 +316,7 @@ def inspect_pdf(path, qa, *, paper=True):
         all_text = "".join(text_pages)
         assert all(section in all_text for section in ("References", "AIUsageDisclosure"))
         assert "[FILL" not in all_text
-        assert set(re.findall(r"Figure(\d+)\.", all_text)) == set(map(str, range(1, 11)))
+        assert set(re.findall(r"Figure(\d+)\.", all_text)) == set(map(str, range(1, 12)))
         numbers = read_csv(path.parent/"NUMBER_PROVENANCE.csv")
         linked = [r for r in numbers if not r["macro"].startswith(("From","To","At","Branch"))]
         omitted = [r["macro"] for r in linked if r["rendered"] not in all_text]

@@ -138,26 +138,53 @@ ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
 (B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
-Underfull \hbox (badness 7273) in paragraph at lines 180--181
+Underfull \hbox (badness 7273) in paragraph at lines 181--182
 []|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
 (team/framework.tex [4]) (team/p1.tex
 Underfull \hbox (badness 1354) in paragraph at lines 1--2
 \TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
 mobile vehicle can legally station itself
 [5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
-[11]) [12] (team/p3.tex
+[11]) (team/p3.tex
 Underfull \hbox (badness 1264) in paragraph at lines 4--5
 \TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
  Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
 T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
-[13] [14]) (team/p4.tex [15]) [16] (team/v5.tex [17]) [18]
-(team/sensitivity.tex [19] [20]) (team/limits.tex [21]) [22]
-(team/conclusion.tex)
+[12] [13] [14]) (team/p4.tex [15] [16]) (team/v5.tex [17] [18])
+(team/sensitivity.tex [19]
+Underfull \hbox (badness 2012) in paragraph at lines 6--7
+\TU/TimesNewRoman(0)/m/n/12 preference profiles—\TU/TimesNewRoman(0)/m/it/12 Eq
+ual $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \
+OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr
+/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
+ 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/TimesNewRoman(0)/m/n/12 , \TU/Times
+NewRoman(0)/m/it/12 Time Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr
+/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12
+ 45\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML
+/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/Times
+NewRoman(0)/m/n/12 , \TU/TimesNewRoman(0)/m/it/12 Preci-
+
+Underfull \hbox (badness 1881) in paragraph at lines 6--7
+\TU/TimesNewRoman(0)/m/it/12 sion Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 
+:\OT1/cmr/m/n/12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/c
+mr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/
+12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15)$
+\TU/TimesNewRoman(0)/m/n/12 , and \TU/TimesNewRoman(0)/m/it/12 Resilience Prior
+ity $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \
+OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 20\OML/cmm/m/it/12 ; \OT1/cmr
+/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
+ 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 50)$\TU/TimesNewRoman(0)/m/n/12 —logged in
+
+Underfull \hbox (badness 1092) in paragraph at lines 15--16
+\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
+2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
+(0)/m/n/12 resolves this tension cleanly
+[20] [21]) (team/limits.tex [22]) (team/conclusion.tex [23])
 Underfull \hbox (badness 1584) in paragraph at lines 474--475
 \TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
 5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
  pp. 100–107, Jul. 1968, doi:
-[23]
+[24]
 Underfull \hbox (badness 5359) in paragraph at lines 481--482
 []\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
 g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
@@ -176,9 +203,13 @@ Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
 ec. 2018, pp. 162–176, doi:
 
 AED: lastpage setting LastPage
-[24] (B_submission.aux) )
+[25] (B_submission.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ )
 (see the transcript file for additional information)
-Output written on B_submission.pdf (24 pages).
+Output written on B_submission.pdf (25 pages).
 Transcript written on B_submission.log.
 
 This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
@@ -321,26 +352,53 @@ ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
 (E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
 (B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
-Underfull \hbox (badness 7273) in paragraph at lines 180--181
+Underfull \hbox (badness 7273) in paragraph at lines 181--182
 []|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
 (team/framework.tex [4]) (team/p1.tex
 Underfull \hbox (badness 1354) in paragraph at lines 1--2
 \TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
 mobile vehicle can legally station itself
 [5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
-[11]) [12] (team/p3.tex
+[11]) (team/p3.tex
 Underfull \hbox (badness 1264) in paragraph at lines 4--5
 \TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
  Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
 T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
-[13] [14]) (team/p4.tex [15]) [16] (team/v5.tex [17]) [18]
-(team/sensitivity.tex [19] [20]) (team/limits.tex [21]) [22]
-(team/conclusion.tex)
+[12] [13] [14]) (team/p4.tex [15] [16]) (team/v5.tex [17] [18])
+(team/sensitivity.tex [19]
+Underfull \hbox (badness 2012) in paragraph at lines 6--7
+\TU/TimesNewRoman(0)/m/n/12 preference profiles—\TU/TimesNewRoman(0)/m/it/12 Eq
+ual $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \
+OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr
+/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
+ 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/TimesNewRoman(0)/m/n/12 , \TU/Times
+NewRoman(0)/m/it/12 Time Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr
+/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12
+ 45\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML
+/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 25)$\TU/Times
+NewRoman(0)/m/n/12 , \TU/TimesNewRoman(0)/m/it/12 Preci-
+
+Underfull \hbox (badness 1881) in paragraph at lines 6--7
+\TU/TimesNewRoman(0)/m/it/12 sion Priority $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 
+:\OT1/cmr/m/n/12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/c
+mr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/
+12 35\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15)$
+\TU/TimesNewRoman(0)/m/n/12 , and \TU/TimesNewRoman(0)/m/it/12 Resilience Prior
+ity $\OT1/cmr/m/n/12 (0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \
+OT1/cmr/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 20\OML/cmm/m/it/12 ; \OT1/cmr
+/m/n/12 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 15\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12
+ 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 50)$\TU/TimesNewRoman(0)/m/n/12 —logged in
+
+Underfull \hbox (badness 1092) in paragraph at lines 15--16
+\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
+2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
+(0)/m/n/12 resolves this tension cleanly
+[20] [21]) (team/limits.tex [22]) (team/conclusion.tex [23])
 Underfull \hbox (badness 1584) in paragraph at lines 474--475
 \TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
 5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
  pp. 100–107, Jul. 1968, doi:
-[23]
+[24]
 Underfull \hbox (badness 5359) in paragraph at lines 481--482
 []\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
 g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
@@ -359,7 +417,7 @@ Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
 ec. 2018, pp. 162–176, doi:
 
 AED: lastpage setting LastPage
-[24] (B_submission.aux) )
+[25] (B_submission.aux) )
 (see the transcript file for additional information)
-Output written on B_submission.pdf (24 pages).
+Output written on B_submission.pdf (25 pages).
 Transcript written on B_submission.log.

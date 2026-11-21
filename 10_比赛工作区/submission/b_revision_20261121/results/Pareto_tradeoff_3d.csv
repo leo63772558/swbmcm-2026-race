@@ -1,0 +1,17 @@
+policy,k,beam_width,latest_start_s,total_travel_m,max_vehicle_travel_m,mean_range_m,mean_quality_m_inv,tag,is_pareto_2d,is_pareto_3d,is_pareto
+beam,5,20,11.034062,36.1496,10.4403,62.506,0.019368,sweep,True,True,True
+beam,6,20,11.034062,36.8896,11.1803,61.2393,0.019671,sweep,False,True,True
+beam,8,20,11.034062,38.2392,12.53,59.9162,0.020081,nominal_recommended,False,True,True
+beam,3,5,11.496125,33.5507,20.8806,53.6057,0.029069,sweep,True,True,True
+beam,8,5,11.496125,40.3854,20.8806,53.7519,0.029006,sweep,False,False,False
+beam,8,10,11.496125,40.3854,20.8806,53.7519,0.029006,sweep,False,False,False
+beam,10,20,11.496125,40.3854,20.8806,53.7519,0.029006,sweep,False,False,False
+beam,12,20,11.496125,40.3854,20.8806,53.7519,0.029006,sweep,False,False,False
+nearest,3,1,11.724422,21.1142,8.9443,59.2238,0.01931,sweep,True,True,True
+nearest,5,1,11.724422,21.1142,8.9443,59.2238,0.01931,sweep,True,True,True
+nearest,8,1,11.724422,21.1142,8.9443,59.2238,0.01931,nearest_baseline,True,True,True
+nearest,12,1,11.724422,21.1142,8.9443,59.2238,0.01931,sweep,True,True,True
+beam,2,10,12.006612,28.3215,8.9443,74.5112,0.013658,sweep,False,False,False
+beam,4,20,12.006612,28.3215,8.9443,74.5112,0.013658,sweep,False,False,False
+beam,8,40,12.915073,40.5118,20.0,58.1443,0.025289,sweep,False,False,False
+beam,3,20,13.069183,23.3773,7.2111,66.6829,0.01573,sweep,False,False,False

@@ -14,11 +14,11 @@ python 03_code/run_all.py --only P2 # 只跑某一问
 | 目录 | 内容 | 负责人 |
 |---|---|---|
 | `common/` | 公共几何：场地边界、建筑侵入判定、视线遮挡（**相切即遮挡**）、仰角计算、坐标换算 | **改之前先说一声**，四问都依赖它 |
-| `P1/` | 可观测区域网格化 + 最优站位搜索 | 黄俊斌 |
-| `P2/` | `p2_1_accuracy.py`（精度模型 + 最优站点对）、`p2_2_schedule.py`（车辆复用与路径） | 胡允贤 / 李丞渊 |
-| `P3/` | 误差传播 + 双侧尾概率 + 参数反解 | 黄俊斌 |
-| `P4/` | 重调度 + 场景集 + 与保留原方案对比 | 胡允贤 |
-| `tests/` | 单元测试。几何与遮挡判定必须有测试 | 全员 |
+| `P1/` | 可观测区域网格化 + 最优站位搜索 | Member B |
+| `P2/` | `p2_1_accuracy.py`（精度模型 + 最优站点对）、`p2_2_schedule.py`（车辆复用与路径） | Member C / Member A |
+| `P3/` | 误差传播 + 双侧尾概率 + 参数反解 | Member B |
+| `P4/` | 重调度 + 场景集 + 与保留原方案对比 | Member C |
+| `tests/` | 单元测试（仓库根 `tests/` 共 9 个测试文件）。几何、定位、调度、概率、重调度与提交包全覆盖 | 全员 |
 
 ## 每个模块的 README 要写四件事
 
@@ -41,13 +41,12 @@ python 03_code/run_all.py --only P2 # 只跑某一问
 
 见仓库根 `requirements.txt`。新增依赖必须钉版本，并写进文件。
 
-## B 题工程复核交接
+## B 题工程复核与统一一键复现入口
 
-赛时复核的版本化实现位于 `10_比赛工作区/src/`。输入为 `data/B题题面参数.csv`、存档 `results/B_*.csv` 及复核包的 CSV/JSON。入口为 `python -B 10_比赛工作区/src/reproduce_b_revision.py --out <新目录>`，输出为对照结果、8 组 Matplotlib 图、3 组帧、3D 离线回放和复跑清单。PDF 构建与浏览器检查见复核包的 `REPRODUCE.md`、`VERIFY_REPORT.md`。
-
-## 提交前
+赛时复核的版本化实现位于 `10_比赛工作区/src/`，并已通过 `03_code/run_all.py` 严格 fail-fast 桥接（无静默跳过、任意阶段失败即返回非零退出码）：
 
 ```bash
-python 03_code/run_all.py     # 跑通
-python -m pytest 03_code/tests -q   # 测试过
+python 03_code/run_all.py                      # 一键复现全部 P1–P4、敏感性/3D Pareto、P4 扩充、11 组图、3D 大屏与校验
+python 03_code/run_all.py --out <独立洁净目录>  # 输出到指定洁净目录
+python -m pytest tests/ -v                     # 运行仓库根 9 文件 pytest 测试套件
 ```

@@ -1,6 +1,10 @@
 {
+  "method": "Parameter Perturbation and Pairwise Interaction Analysis (real P1-P4 solver evaluations)",
   "top_parameter": "pitch_ceiling",
-  "top_swing_pct": 13.6856,
+  "top_swing_pct": 11.6704,
   "pareto_configs": 16,
-  "pareto_front_count": 6
+  "pareto_front_count": 8,
+  "pareto_front_2d_count": 6,
+  "pareto_front_3d_count": 8,
+  "weight_schemes_tested": 5
 }

@@ -239,3 +239,20 @@
    - **严禁**再改已经验证通过的底层数值、10 组图与暗黑 3D 模拟器（防引入回归 Bug）；
    - **严禁**把 73 行原始长表重新塞回论文附录；
    - **把 100% 精力集中于**：队员亲笔用低 AIGC 学术英文改写 13 个 `paper/team/*.tex` 成稿（含完整 Theorem 1 `proof`）、交叉校对数值与签字承诺书、执行终版 PDF 质检与提前演练系统提交。
+
+
+---
+
+## 四、第二轮外部深度审计（7 项 P0/P1 硬伤）专项整改闭环记录（2026-11-21）
+
+针对外部深度代码与数学审计暴露的 7 项 P0/P1 漏洞，本轮已逐项完成源码级整改、实跑验证、论文同步与自动化 `pytest` 锁定：
+
+| 编号 | 审计暴露问题 | 源码级整改与验证结果 | 状态 |
+|---|---|---|---|
+| **P0-1** | 原 B&B 仅枚举 360 种拓扑（遗漏单车 3 告警、双车各 2 告警及闲置车模式） | `b_hardcore_audit.py` 扩展至全部 $\binom{5}{2}^3=1{,}000$ 种合法配对（6 种复用模式之和 = 1,000）与 4,200 种无环服务顺序；seeded（`11.034162 s`）与独立 unseeded（`+\infty`）均精确证成 `11.034062 s`（gap = `0.000000 s`） | **CLOSED (PASS)** |
+| **P0-2** | 敏感性脚本含 P4 线性代理公式、Pan/Tilt 混算、假等权注释及夸大“Sobol”命名 | `b_revision_sensitivity_pareto.py` 彻底移除代理公式改为真实 `solve_p4` 事件仿真；严格按 $\max(|\Delta\alpha|/\omega_{\mathrm{pan}}, |\Delta\beta|/30^\circ/\text{s})$ 解耦双轴并对比 Fixed-Plan Local vs Re-Optimized；新增 5 组权重扰动对照（`Global_sensitivity_weight_check.csv`）；全篇诚实更名为 *Parameter Perturbation and Pairwise Interaction Analysis*（0 处 Sobol） | **CLOSED (PASS)** |
+| **P0-3** | 二维 Pareto 中 `k=8` 被 `k=5` 支配；Fig. 10 过于拥挤且 3D 截图偏暗 | 正式引入平均观测质量 $\bar{Q}=\frac{1}{6}\sum 1/r$ 升级三维 Pareto（`Pareto_tradeoff_3d.csv`，8/16 非支配），严格证成 `k=5` 与 `k=8` 同为三维非支配解；拆分高清独立大图 **Fig. 10**（三维 Pareto + 投影）与 **Fig. 11**（放大并提亮印刷对比度的 3D 指挥大屏三联图） | **CLOSED (PASS)** |
+| **P0-4** | P2(1) 缺正式解析下界命题；P3 定理未覆盖 $a=0, b=0$ 边界与闭式 80 m 域；P1 勘误未完全融合 | `p2-precision.tex` 新增 `Proposition 1` 与严格证明；`p3.tex` 扩展 `Theorem 1` 覆盖 $a,b\ge 0$ 边界并证成闭式 80 m 可行域 $a\ge 0, b\ge 0, a+80b\le 1.63674517\text{ m}$（标注入 Fig. 6）；`p1.tex` 完整融合 P1 边界闭性勘误 | **CLOSED (PASS)** |
+| **P0-5** | `run_all.py` 静默跳过假通过；缺 `pytest` 套件；AI 日志 6 列错位且缺独立报告；代码 README 含真实姓名 | 重写 `03_code/run_all.py` 严格 fail-fast 桥接 `reproduce_b_revision.py`；新增 9 文件 `tests/test_*.py`（全部 PASS）；修复 3 份 `AI_USAGE_LOG.csv` 为严格 11 列并匿名；新增独立 `AI_Usage_Report.md` 纳入支撑包；匿名化 `03_code/**/README.md` 并更新根 `README.md` 与 `requirements.txt` | **CLOSED (PASS)** |
+| **P1-1** | P4 73 归档含 11 组重复且缺空间扩展与在线搜索预算敏感性 | 新增 `b_revision_p4_extended.py`：去重为 62 唯一基线 + 53 组 8 方位 × 3 距离 + 4 阴影边缘难例 = **115 唯一场景**（Keep $\eta=0.642$，Replan $\eta=1.000$，110W/4T/1L，滞回 0 损失）；实跑 `k=2/3/5/8` 预算稳定性证成 V5 `+1.893 s` 退化严格不变 | **CLOSED (PASS)** |
+| **P1-2** | 图件视觉升级与全篇严格 ≤ 25 页出版验证 | 重绘/更新 Fig. 1、3、5、6、7、9、10、11（全套 11 组 PDF+PNG）；XeLaTeX 实编译 **25 页 A4** 零告警（11/11 图、72/72 宏、15/15 文献、首页满版无页眉、第 2 页 `Content`） | **CLOSED (PASS)** |

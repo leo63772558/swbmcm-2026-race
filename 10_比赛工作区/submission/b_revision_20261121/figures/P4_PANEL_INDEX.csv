@@ -1,74 +1,116 @@
-column,case,keep_ratio,reschedule_ratio,reschedule_minus_keep_s,score_outcome
-1,new_1,0.75,1.0,,reschedule
-2,new_2,0.75,1.0,,reschedule
-3,new_3,0.75,1.0,,reschedule
-4,failure_V1,0.6666666666666666,1.0,,reschedule
-5,failure_V2,0.6666666666666666,1.0,,reschedule
-6,failure_V3,0.6666666666666666,1.0,,reschedule
-7,failure_V4,0.6666666666666666,1.0,,reschedule
-8,failure_V5,1.0,1.0,1.89297960737,keep
-9,outage_interior,1.0,1.0,0,tie
-10,outage_upper_time,1.0,1.0,0,tie
-11,outage_upper_duration,1.0,1.0,0,tie
-12,new_failure_V1,0.5,1.0,,reschedule
-13,failure_outage_V1,0.6666666666666666,1.0,,reschedule
-14,all_V1,0.5,1.0,,reschedule
-15,new_failure_V2,0.5,1.0,,reschedule
-16,failure_outage_V2,0.6666666666666666,1.0,,reschedule
-17,all_V2,0.5,1.0,,reschedule
-18,new_failure_V3,0.5,1.0,,reschedule
-19,failure_outage_V3,0.6666666666666666,1.0,,reschedule
-20,all_V3,0.5,1.0,,reschedule
-21,new_failure_V4,0.5,1.0,,reschedule
-22,failure_outage_V4,0.6666666666666666,1.0,,reschedule
-23,all_V4,0.5,1.0,,reschedule
-24,new_failure_V5,0.75,1.0,,reschedule
-25,failure_outage_V5,1.0,1.0,0,tie
-26,all_V5,0.75,1.0,,reschedule
-27,new_outage,0.75,1.0,,reschedule
-28,all_duration_sensitivity,0.5,1.0,,reschedule
-29,new_1_V1_recovery_5,0.5,1.0,,reschedule
-30,new_1_V2_recovery_5,0.5,1.0,,reschedule
-31,new_1_V3_recovery_5,0.5,1.0,,reschedule
-32,new_1_V4_recovery_5,0.5,1.0,,reschedule
-33,new_1_V5_recovery_5,0.75,1.0,,reschedule
-34,new_2_V1_recovery_5,0.5,1.0,,reschedule
-35,new_2_V2_recovery_5,0.5,1.0,,reschedule
-36,new_2_V3_recovery_5,0.5,1.0,,reschedule
-37,new_2_V4_recovery_5,0.5,1.0,,reschedule
-38,new_2_V5_recovery_5,0.75,1.0,,reschedule
-39,new_3_V1_recovery_5,0.5,1.0,,reschedule
-40,new_3_V2_recovery_5,0.5,1.0,,reschedule
-41,new_3_V3_recovery_5,0.5,1.0,,reschedule
-42,new_3_V4_recovery_5,0.5,1.0,,reschedule
-43,new_3_V5_recovery_5,0.75,1.0,,reschedule
-44,new_1_V1_recovery_30,0.5,1.0,,reschedule
-45,new_1_V2_recovery_30,0.5,1.0,,reschedule
-46,new_1_V3_recovery_30,0.5,1.0,,reschedule
-47,new_1_V4_recovery_30,0.5,1.0,,reschedule
-48,new_1_V5_recovery_30,0.75,1.0,,reschedule
-49,new_2_V1_recovery_30,0.5,1.0,,reschedule
-50,new_2_V2_recovery_30,0.5,1.0,,reschedule
-51,new_2_V3_recovery_30,0.5,1.0,,reschedule
-52,new_2_V4_recovery_30,0.5,1.0,,reschedule
-53,new_2_V5_recovery_30,0.75,1.0,,reschedule
-54,new_3_V1_recovery_30,0.5,1.0,,reschedule
-55,new_3_V2_recovery_30,0.5,1.0,,reschedule
-56,new_3_V3_recovery_30,0.5,1.0,,reschedule
-57,new_3_V4_recovery_30,0.5,1.0,,reschedule
-58,new_3_V5_recovery_30,0.75,1.0,,reschedule
-59,new_1_V1_recovery_35,0.5,1.0,,reschedule
-60,new_1_V2_recovery_35,0.5,1.0,,reschedule
-61,new_1_V3_recovery_35,0.5,1.0,,reschedule
-62,new_1_V4_recovery_35,0.5,1.0,,reschedule
-63,new_1_V5_recovery_35,0.75,1.0,,reschedule
-64,new_2_V1_recovery_35,0.5,1.0,,reschedule
-65,new_2_V2_recovery_35,0.5,1.0,,reschedule
-66,new_2_V3_recovery_35,0.5,1.0,,reschedule
-67,new_2_V4_recovery_35,0.5,1.0,,reschedule
-68,new_2_V5_recovery_35,0.75,1.0,,reschedule
-69,new_3_V1_recovery_35,0.5,1.0,,reschedule
-70,new_3_V2_recovery_35,0.5,1.0,,reschedule
-71,new_3_V3_recovery_35,0.5,1.0,,reschedule
-72,new_3_V4_recovery_35,0.5,1.0,,reschedule
-73,new_3_V5_recovery_35,0.75,1.0,,reschedule
+column,case,category,keep_ratio,reschedule_ratio,reschedule_minus_keep_s,score_outcome
+1,new_1,New Alert Only,0.75,1.0,-41.676179,reschedule
+2,new_2,New Alert Only,0.75,1.0,-40.564176,reschedule
+3,new_3,New Alert Only,0.75,1.0,-39.736831,reschedule
+4,failure_V1,Vehicle Failure Only,0.666667,1.0,-46.601192,reschedule
+5,failure_V2,Vehicle Failure Only,0.666667,1.0,-46.601192,reschedule
+6,failure_V3,Vehicle Failure Only,0.666667,1.0,-46.601192,reschedule
+7,failure_V4,Vehicle Failure Only,0.666667,1.0,-46.601192,reschedule
+8,failure_V5,Vehicle Failure Only,1.0,1.0,1.89298,keep
+9,outage_interior,Comms Outage Only (cached),1.0,1.0,0.0,tie
+10,outage_upper_time,Comms Outage Only (cached),1.0,1.0,0.0,tie
+11,outage_upper_duration,Comms Outage Only (cached),1.0,1.0,0.0,tie
+12,new_failure_V1,Failure + New Alert,0.5,1.0,-35.489881,reschedule
+13,failure_outage_V1,Failure + Comms Outage,0.666667,1.0,-24.091535,reschedule
+14,all_V1,All Three Combined,0.5,1.0,-23.845971,reschedule
+15,new_failure_V2,Failure + New Alert,0.5,1.0,-39.426131,reschedule
+16,failure_outage_V2,Failure + Comms Outage,0.666667,1.0,-26.27282,reschedule
+17,all_V2,All Three Combined,0.5,1.0,-25.17392,reschedule
+18,new_failure_V3,Failure + New Alert,0.5,1.0,-34.77128,reschedule
+19,failure_outage_V3,Failure + Comms Outage,0.666667,1.0,-25.88333,reschedule
+20,all_V3,All Three Combined,0.5,1.0,-23.538918,reschedule
+21,new_failure_V4,Failure + New Alert,0.5,1.0,-38.913909,reschedule
+22,failure_outage_V4,Failure + Comms Outage,0.666667,1.0,-26.904963,reschedule
+23,all_V4,All Three Combined,0.5,1.0,-23.845971,reschedule
+24,new_failure_V5,Failure + New Alert,0.75,1.0,-39.426131,reschedule
+25,failure_outage_V5,Failure + Comms Outage,1.0,1.0,0.0,tie
+26,all_V5,All Three Combined,0.75,1.0,-27.99663,reschedule
+27,new_outage,New Alert + Comms Outage,0.75,1.0,-27.99663,reschedule
+28,all_duration_sensitivity,All Three Combined,0.5,1.0,-20.17392,reschedule
+29,new_1_V2_recovery_5,Failure + New Alert,0.5,1.0,-37.372084,reschedule
+30,new_1_V3_recovery_5,Failure + New Alert,0.5,1.0,-35.135191,reschedule
+31,new_1_V5_recovery_5,Failure + New Alert,0.75,1.0,-37.875887,reschedule
+32,new_2_V1_recovery_5,Failure + New Alert,0.5,1.0,-35.204384,reschedule
+33,new_2_V3_recovery_5,Failure + New Alert,0.5,1.0,-35.204384,reschedule
+34,new_2_V4_recovery_5,Failure + New Alert,0.5,1.0,-39.426131,reschedule
+35,new_3_V1_recovery_5,Failure + New Alert,0.5,1.0,-34.77128,reschedule
+36,new_3_V2_recovery_5,Failure + New Alert,0.5,1.0,-38.913909,reschedule
+37,new_3_V4_recovery_5,Failure + New Alert,0.5,1.0,-38.913909,reschedule
+38,new_3_V5_recovery_5,Failure + New Alert,0.75,1.0,-38.913909,reschedule
+39,new_1_V2_recovery_30,All Three Combined,0.5,1.0,-25.88333,reschedule
+40,new_1_V3_recovery_30,All Three Combined,0.5,1.0,-23.845971,reschedule
+41,new_1_V5_recovery_30,All Three Combined,0.75,1.0,-26.708461,reschedule
+42,new_2_V1_recovery_30,All Three Combined,0.5,1.0,-23.828198,reschedule
+43,new_2_V3_recovery_30,All Three Combined,0.5,1.0,-24.701294,reschedule
+44,new_2_V4_recovery_30,All Three Combined,0.5,1.0,-23.828198,reschedule
+45,new_3_V1_recovery_30,All Three Combined,0.5,1.0,-24.091535,reschedule
+46,new_3_V2_recovery_30,All Three Combined,0.5,1.0,-23.538918,reschedule
+47,new_3_V4_recovery_30,All Three Combined,0.5,1.0,-24.691527,reschedule
+48,new_3_V5_recovery_30,All Three Combined,0.75,1.0,-27.10337,reschedule
+49,new_1_V1_recovery_35,All Three Combined,0.5,1.0,-18.845971,reschedule
+50,new_1_V2_recovery_35,All Three Combined,0.5,1.0,-20.88333,reschedule
+51,new_1_V3_recovery_35,All Three Combined,0.5,1.0,-18.845971,reschedule
+52,new_1_V4_recovery_35,All Three Combined,0.5,1.0,-18.845971,reschedule
+53,new_1_V5_recovery_35,All Three Combined,0.75,1.0,-21.708461,reschedule
+54,new_2_V1_recovery_35,All Three Combined,0.5,1.0,-18.828198,reschedule
+55,new_2_V3_recovery_35,All Three Combined,0.5,1.0,-19.701294,reschedule
+56,new_2_V4_recovery_35,All Three Combined,0.5,1.0,-18.828198,reschedule
+57,new_2_V5_recovery_35,All Three Combined,0.75,1.0,-22.99663,reschedule
+58,new_3_V1_recovery_35,All Three Combined,0.5,1.0,-19.091535,reschedule
+59,new_3_V2_recovery_35,All Three Combined,0.5,1.0,-18.538918,reschedule
+60,new_3_V3_recovery_35,All Three Combined,0.5,1.0,-18.538918,reschedule
+61,new_3_V4_recovery_35,All Three Combined,0.5,1.0,-19.691527,reschedule
+62,new_3_V5_recovery_35,All Three Combined,0.75,1.0,-22.10337,reschedule
+63,spatial_az000_r40,New Alert Only,0.75,1.0,-42.069265,reschedule
+64,spatial_az000_r50,New Alert Only,0.75,1.0,-42.212366,reschedule
+65,spatial_az045_r30,New Alert Only,0.75,1.0,-40.883813,reschedule
+66,spatial_az045_r40,New Alert Only,0.75,1.0,-40.907578,reschedule
+67,spatial_az045_r50,New Alert Only,0.75,1.0,-41.382602,reschedule
+68,spatial_az090_r30,New Alert Only,0.75,1.0,-40.612574,reschedule
+69,spatial_az090_r40,New Alert Only,0.75,1.0,-40.526342,reschedule
+70,spatial_az135_r30,New Alert Only,0.75,1.0,-39.906073,reschedule
+71,spatial_az135_r40,New Alert Only,0.75,1.0,-39.252525,reschedule
+72,spatial_az135_r50,New Alert Only,0.75,1.0,-37.930212,reschedule
+73,spatial_az180_r30,New Alert Only,0.75,1.0,-39.736831,reschedule
+74,spatial_az180_r40,New Alert Only,0.75,1.0,-39.736831,reschedule
+75,spatial_az180_r50,New Alert Only,0.75,1.0,-39.736831,reschedule
+76,spatial_az225_r30,New Alert Only,0.75,1.0,-39.736831,reschedule
+77,spatial_az225_r40,New Alert Only,0.75,1.0,-39.736831,reschedule
+78,spatial_az225_r50,New Alert Only,0.75,1.0,-39.736831,reschedule
+79,spatial_az270_r30,New Alert Only,0.75,1.0,-39.736831,reschedule
+80,spatial_az270_r40,New Alert Only,0.75,1.0,-39.736831,reschedule
+81,spatial_az270_r50,New Alert Only,0.75,1.0,-39.736831,reschedule
+82,spatial_az315_r30,New Alert Only,0.75,1.0,-40.841182,reschedule
+83,spatial_az315_r40,New Alert Only,0.75,1.0,-42.242796,reschedule
+84,spatial_az315_r50,New Alert Only,0.75,1.0,-41.226917,reschedule
+85,hard_shadow_B2_NE,New Alert Only,0.75,1.0,-41.621572,reschedule
+86,hard_shadow_B2_NE_out30,New Alert + Comms Outage,0.75,1.0,-27.22097,reschedule
+87,hard_shadow_B2_NE_V2_act,Failure + New Alert,0.5,1.0,-40.483528,reschedule
+88,hard_shadow_B2_NE_V2_out30,All Three Combined,0.5,1.0,-25.170337,reschedule
+89,hard_shadow_B2_NE_V3_act,Failure + New Alert,0.5,1.0,-36.928348,reschedule
+90,hard_shadow_B2_NE_V3_out30,All Three Combined,0.5,1.0,-24.701294,reschedule
+91,hard_shadow_B2_NE_V5_act,Failure + New Alert,0.75,1.0,-40.483528,reschedule
+92,hard_shadow_B2_NE_V5_out30,All Three Combined,0.75,1.0,-26.315605,reschedule
+93,hard_shadow_B5_SW_out30,New Alert + Comms Outage,0.75,1.0,-27.495737,reschedule
+94,hard_shadow_B5_SW_V2_act,Failure + New Alert,0.5,1.0,-38.957413,reschedule
+95,hard_shadow_B5_SW_V2_out30,All Three Combined,0.5,1.0,-23.538918,reschedule
+96,hard_shadow_B5_SW_V3_act,Failure + New Alert,0.5,1.0,-35.118551,reschedule
+97,hard_shadow_B5_SW_V3_out30,All Three Combined,0.5,1.0,-23.538918,reschedule
+98,hard_shadow_B5_SW_V5_act,Failure + New Alert,0.75,1.0,-38.913909,reschedule
+99,hard_shadow_B5_SW_V5_out30,All Three Combined,0.75,1.0,-27.495737,reschedule
+100,hard_shadow_B4_SE,New Alert Only,0.75,1.0,-40.914118,reschedule
+101,hard_shadow_B4_SE_out30,New Alert + Comms Outage,0.75,1.0,-26.743985,reschedule
+102,hard_shadow_B4_SE_V2_act,Failure + New Alert,0.5,1.0,-38.175753,reschedule
+103,hard_shadow_B4_SE_V2_out30,All Three Combined,0.5,1.0,-26.222849,reschedule
+104,hard_shadow_B4_SE_V3_act,Failure + New Alert,0.5,1.0,-35.560929,reschedule
+105,hard_shadow_B4_SE_V3_out30,All Three Combined,0.5,1.0,-25.88333,reschedule
+106,hard_shadow_B4_SE_V5_act,Failure + New Alert,0.75,1.0,-38.913909,reschedule
+107,hard_shadow_B4_SE_V5_out30,All Three Combined,0.75,1.0,-26.743985,reschedule
+108,hard_shadow_B3_NW,New Alert Only,0.75,1.0,-38.722734,reschedule
+109,hard_shadow_B3_NW_out30,New Alert + Comms Outage,0.75,1.0,-27.378398,reschedule
+110,hard_shadow_B3_NW_V2_act,Failure + New Alert,0.5,1.0,-37.584689,reschedule
+111,hard_shadow_B3_NW_V2_out30,All Three Combined,0.5,1.0,-24.053308,reschedule
+112,hard_shadow_B3_NW_V3_act,Failure + New Alert,0.5,1.0,-33.663884,reschedule
+113,hard_shadow_B3_NW_V3_out30,All Three Combined,0.5,1.0,-24.053308,reschedule
+114,hard_shadow_B3_NW_V5_act,Failure + New Alert,0.75,1.0,-37.584689,reschedule
+115,hard_shadow_B3_NW_V5_out30,All Three Combined,0.75,1.0,-27.378398,reschedule

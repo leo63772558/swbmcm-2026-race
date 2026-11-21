@@ -68,6 +68,6 @@ RouteCount,2925,results/Route_summary.json,root,compared_routes,2925
 ShortenedCount,100,results/Route_summary.json,root,shorter_paths,100
 RestoredCount,5,results/Route_summary.json,root,restored_endpoints,5
 SavingsMax,0.03193,results/Route_summary.json,root,maximum_saving_m,0.03192622815850399
-GlobalTopSwing,13.69,results/Global_sensitivity_summary.json,root,top_swing_pct,13.6856
+GlobalTopSwing,11.67,results/Global_sensitivity_summary.json,root,top_swing_pct,11.6704
 ParetoConfigs,16,results/Global_sensitivity_summary.json,root,pareto_configs,16
-ParetoFrontCount,6,results/Global_sensitivity_summary.json,root,pareto_front_count,6
+ParetoFrontCount,8,results/Global_sensitivity_summary.json,root,pareto_front_count,8

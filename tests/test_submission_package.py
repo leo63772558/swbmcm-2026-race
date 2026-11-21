@@ -1,0 +1,138 @@
+from __future__ import annotations
+
+import csv
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+from pypdf import PdfReader
+
+REPO = Path(__file__).resolve().parent.parent
+REVIEW_DIR = REPO / "10_比赛工作区" / "submission" / "b_revision_20261121"
+PDF_PATH = REVIEW_DIR / "paper" / "B_submission.pdf"
+ZIP_PATH = REVIEW_DIR / "BSWBMCM2613050fj.zip"
+
+FORBIDDEN_IDENTITY_TOKENS = [
+    "黄俊斌",
+    "胡允贤",
+    "李丞渊",
+    "LEI SENG UN",
+    "南京大学",
+    "华南理工",
+    "华中科技",
+]
+
+FORBIDDEN_PAPER_TOKENS = [
+    "Drafting Blueprint",
+    "Author input pending",
+    "[FILL",
+    "TODO",
+    "Sobol",
+]
+
+
+def test_submission_pdf_format_figures_and_anonymity():
+    """B_submission.pdf obeys <=25 pages A4, Page 1 no header, Page 2 Content, 11 figures, zero leaks."""
+    assert PDF_PATH.is_file()
+    reader = PdfReader(PDF_PATH)
+    assert 1 <= len(reader.pages) <= 25
+    assert not (reader.metadata and reader.metadata.get("/Author")), "PDF Author metadata must be empty"
+
+    pages_text = [p.extract_text() or "" for p in reader.pages]
+    for idx, txt in enumerate(pages_text, start=1):
+        assert len(txt.strip()) > 80, f"Page {idx} appears empty or nearly blank"
+
+    assert "Team#SWBMCM2613050" not in pages_text[0], "Page 1 Summary Sheet must not have Team# header"
+    assert "Summary" in pages_text[0]
+    assert "Content" in pages_text[1]
+    assert "Team#SWBMCM2613050" in pages_text[1]
+
+    full_text = "\n".join(pages_text)
+    for fig_idx in range(1, 12):
+        assert f"Figure {fig_idx}." in full_text, f"Missing Figure {fig_idx}. in B_submission.pdf"
+
+    for bad in FORBIDDEN_PAPER_TOKENS:
+        assert bad not in full_text, f"Forbidden draft/inaccurate token found in PDF: {bad}"
+    for leak in FORBIDDEN_IDENTITY_TOKENS:
+        assert leak not in full_text, f"Anonymity violation in B_submission.pdf: {leak}"
+
+
+def test_ai_usage_logs_strict_11_columns_and_report_exists():
+    """All AI_USAGE_LOG CSVs strictly obey 11-column schema with zero personal name leaks; standalone report exists."""
+    report = REVIEW_DIR / "AI_Usage_Report.md"
+    assert report.is_file()
+    report_text = report.read_text(encoding="utf-8")
+    assert "SWBMCM2613050" in report_text and len(report_text) > 1000
+    for leak in FORBIDDEN_IDENTITY_TOKENS:
+        assert leak not in report_text, f"Anonymity violation in AI_Usage_Report.md: {leak}"
+
+    csv_paths = [
+        REVIEW_DIR / "AI_USAGE_LOG.csv",
+        REPO / "08_ai-log" / "AI_USAGE_LOG.csv",
+        REPO / "12_AI使用记录" / "AI_USAGE_LOG_比赛版.csv",
+    ]
+    for path in csv_paths:
+        assert path.is_file(), f"Missing AI log: {path}"
+        with path.open("r", encoding="utf-8-sig", newline="") as fh:
+            rows = list(csv.reader(fh))
+        assert len(rows) >= 2
+        assert len(rows[0]) == 11, f"Header in {path} does not have 11 columns"
+        for line_no, row in enumerate(rows[1:], start=2):
+            assert len(row) == 11, f"{path} line {line_no} has {len(row)} columns (expected 11): {row}"
+            joined = ",".join(row)
+            for leak in FORBIDDEN_IDENTITY_TOKENS:
+                assert leak not in joined, f"Anonymity violation in {path} line {line_no}: {leak}"
+
+
+def test_code_readmes_anonymized_and_run_all_fail_fast():
+    """03_code READMEs contain zero real names; 03_code/run_all.py --list reports all stages READY."""
+    for readme in (REPO / "03_code").rglob("README.md"):
+        txt = readme.read_text(encoding="utf-8")
+        for leak in FORBIDDEN_IDENTITY_TOKENS:
+            assert leak not in txt, f"Anonymity violation in {readme}: {leak}"
+
+    proc = subprocess.run(
+        [sys.executable, str(REPO / "03_code" / "run_all.py"), "--list"],
+        cwd=str(REPO),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, f"run_all.py --list failed: {proc.stderr}"
+    assert "MISSING" not in proc.stdout
+    assert proc.stdout.count("[READY]") == 7
+
+
+def test_supporting_zip_size_contents_and_full_anonymity_scan():
+    """BSWBMCM2613050fj.zip is <20 MB, contains AI_Usage_Report.md, and has zero identity leaks across all members."""
+    assert ZIP_PATH.is_file(), f"Missing supporting package: {ZIP_PATH}"
+    size_mb = ZIP_PATH.stat().st_size / (1024 * 1024)
+    assert size_mb < 20.0, f"ZIP exceeds 20 MB limit: {size_mb:.2f} MB"
+
+    text_exts = {".md", ".txt", ".csv", ".json", ".py", ".tex", ".html", ".cjs", ".js"}
+    with zipfile.ZipFile(ZIP_PATH, "r") as zf:
+        names = set(zf.namelist())
+        assert "AI_Usage_Report.md" in names
+        assert "AI_USAGE_LOG.csv" in names
+        assert "artifacts/paper/B_submission.pdf" in names
+
+        # Verify AI_USAGE_LOG.csv inside ZIP strictly obeys 11-column schema
+        import io
+        zip_ai_rows = list(csv.reader(io.StringIO(zf.read("AI_USAGE_LOG.csv").decode("utf-8-sig"))))
+        assert len(zip_ai_rows) >= 2
+        for line_no, row in enumerate(zip_ai_rows, start=1):
+            assert len(row) == 11, f"ZIP AI_USAGE_LOG.csv line {line_no} has {len(row)} columns"
+
+        for member in zf.namelist():
+            ext = Path(member).suffix.lower()
+            if ext in text_exts:
+                content = zf.read(member).decode("utf-8", errors="ignore")
+                for leak in FORBIDDEN_IDENTITY_TOKENS:
+                    assert leak not in content, f"Anonymity leak ({leak}) in ZIP member {member}"
+            elif ext == ".pdf":
+                import io
+                reader = PdfReader(io.BytesIO(zf.read(member)))
+                pdf_text = "\n".join((p.extract_text() or "") for p in reader.pages)
+                for leak in FORBIDDEN_IDENTITY_TOKENS:
+                    assert leak not in pdf_text, f"Anonymity leak ({leak}) in ZIP PDF {member}"

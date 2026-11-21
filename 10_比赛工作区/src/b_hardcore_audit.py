@@ -11,7 +11,8 @@ Checks:
 AI assistance: Antigravity (Gemini), 2026-11-21. Audit & verification only.
 """
 from argparse import ArgumentParser
-from itertools import combinations, permutations
+from collections import Counter
+from itertools import combinations, permutations, product
 from math import dist, isfinite
 from pathlib import Path
 import re
@@ -132,192 +133,376 @@ def audit_3_tie_break_uniqueness(review_dir):
     }
 
 
-def _exact_p2_bnb(shortlist_k=None):
-    """Independent zero-truncation exact Branch-and-Bound over all 360 vehicle-to-alert topologies.
+def _topological_orders_for_pairing(pairing, alerts):
+    """Return all acyclic per-vehicle service-order combinations and a valid global topological order.
 
-    If shortlist_k is an int (e.g. 8), uses the exact arrival-sorted top-k stations per (vehicle, alert)
-    just like b_revision_experiments.py. If shortlist_k is None, searches the ENTIRE discrete station pool.
+    pairing: tuple of 3 vehicle pairs (pair_T1, pair_T2, pair_T3), each a sorted 2-tuple in 0..4.
+    """
+    veh_alerts = {v: [] for v in range(5)}
+    for a_idx, (u, w) in enumerate(pairing):
+        veh_alerts[u].append(a_idx)
+        veh_alerts[w].append(a_idx)
+    reused = [(v, tuple(al)) for v, al in veh_alerts.items() if len(al) >= 2]
+    if not reused:
+        return [({}, (0, 1, 2))]
+    perm_lists = [list(permutations(al)) for _, al in reused]
+    valid = []
+    for choice in product(*perm_lists):
+        # Build precedence graph on alerts {0, 1, 2}
+        adj = {0: set(), 1: set(), 2: set()}
+        indeg = {0: 0, 1: 0, 2: 0}
+        veh_order = {}
+        for (v, _), seq in zip(reused, choice, strict=True):
+            veh_order[v] = seq
+            for x, y in zip(seq, seq[1:]):
+                if y not in adj[x]:
+                    adj[x].add(y)
+                    indeg[y] += 1
+        # Kahn's algorithm to detect cycles and produce canonical topological order
+        queue = sorted(a for a in (0, 1, 2) if indeg[a] == 0)
+        topo = []
+        while queue:
+            u = queue.pop(0)
+            topo.append(u)
+            for nxt in sorted(adj[u]):
+                indeg[nxt] -= 1
+                if indeg[nxt] == 0:
+                    queue.append(nxt)
+                    queue.sort()
+        if len(topo) == 3:
+            valid.append((veh_order, tuple(topo)))
+    return valid
+
+
+def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
+    """Independent zero-truncation exact Branch-and-Bound over ALL C(5,2)^3 = 1,000 legal vehicle pairings
+    and ALL acyclic service-order permutations (covering 1-vehicle 3-alert, 2-vehicle 2-alert, 3-vehicle
+    2-alert, idle-vehicle patterns, and the 360 1-reused-vehicle topologies).
+
+    If shortlist_k is an int (e.g. 8), uses the exact arrival-sorted top-k stations per (vehicle, alert).
+    If shortlist_k is None, searches the ENTIRE 585-station discrete candidate pool.
     """
     orig_opts = solver.station_options
     alerts = tuple(model.TARGETS.keys())  # ("T1", "T2", "T3")
+    goals = tuple(model.TARGETS[a] for a in alerts)
     n_veh = len(model.VEHICLES)
+    all_pairs = list(combinations(range(n_veh), 2))  # 10 pairs
 
     with (
         patch.object(solver, "road_clear", rounded.road_clear),
         patch.object(solver, "route", rounded.route),
         patch.object(solver, "candidate_stations", rounded.stations),
     ):
-        # Precompute station pools from initial positions (t=0) for each (v, alert)
-        # Arrival-sorted exactly as in b_revision_experiments.all_options
+        all_stations = {a_i: rounded.stations(goals[a_i]) for a_i in range(3)}
+        total_pool_size = sum(len(v) for v in all_stations.values())
+
+        # Arrival-sorted station pools from t=0, plus ready-sorted views for tight B&B pruning
         init_opts = {}
-        all_stations = {a: rounded.stations(model.TARGETS[a]) for a in alerts}
+        init_ready_sorted = {}
+        r0_min = {}
         for v in range(n_veh):
-            for a in alerts:
-                full = sorted(orig_opts(solver.INITIAL[v], model.TARGETS[a], len(all_stations[a])))
-                init_opts[(v, a)] = full[:shortlist_k] if shortlist_k else full
+            for a_i in range(3):
+                full = sorted(orig_opts(solver.INITIAL[v], goals[a_i], len(all_stations[a_i])))
+                pool = full[:shortlist_k] if shortlist_k else full
+                init_opts[(v, a_i)] = pool
+                rs = sorted(pool, key=lambda x: (x[1], x[0], x[2]))
+                init_ready_sorted[(v, a_i)] = rs
+                r0_min[(v, a_i)] = rs[0][1] if rs else float("inf")
 
-        # Cache second-leg options from any station s1 at time t_free to alert a2
-        second_leg_cache = {}
+        min_slew = {
+            a_i: min(solver._station_slew_time(st, goals[a_i]) for st in all_stations[a_i])
+            for a_i in range(3)
+        }
 
-        def get_second_opts(pos1, a2):
-            key = (pos1, a2)
-            if key not in second_leg_cache:
-                full = sorted(orig_opts((pos1, 0.0), model.TARGETS[a2], len(all_stations[a2])))
-                second_leg_cache[key] = full[:shortlist_k] if shortlist_k else full
-            return second_leg_cache[key]
+        # Precompute exact second/third-leg options from any station pos at t=0 (relative times)
+        leg_cache = {}
 
-        # Precompute best single-use (non-reused) pair start time for any two vehicles (v1, v2) on alert a
-        best_pair_single = {}
-        for a in alerts:
-            goal = model.TARGETS[a]
-            for v1, v2 in combinations(range(n_veh), 2):
+        def get_leg_opts(pos, a_i):
+            key = (pos, a_i)
+            if key not in leg_cache:
+                full = sorted(orig_opts((pos, 0.0), goals[a_i], len(all_stations[a_i])))
+                pool = full[:shortlist_k] if shortlist_k else full
+                leg_cache[key] = sorted(pool, key=lambda x: (x[1], x[0], x[2]))
+            return leg_cache[key]
+
+        # Precompute exact minimum single-use pair start time when both vehicles start fresh from t=0
+        best_pair_fresh = {}
+        for a_i in range(3):
+            goal = goals[a_i]
+            for v1, v2 in all_pairs:
                 best_t = float("inf")
                 best_st = None
-                for _arr1, r1, p1, _path1 in init_opts[(v1, a)]:
+                opts1 = init_ready_sorted[(v1, a_i)]
+                opts2 = init_ready_sorted[(v2, a_i)]
+                for _a1, r1, p1, _ in opts1:
                     if r1 >= best_t:
-                        continue
+                        break
                     b1 = solver._station_bearing(p1, goal)
-                    for _arr2, r2, p2, _path2 in init_opts[(v2, a)]:
+                    for _a2, r2, p2, _ in opts2:
                         t_st = r1 if r1 >= r2 else r2
-                        if t_st >= best_t or p1 == p2:
+                        if t_st >= best_t:
+                            break
+                        if p1 == p2:
                             continue
                         g = solver._crossing_angle(solver._station_bearing(p2, goal) - b1)
                         if 1e-6 < g < 180.0 - 1e-6:
                             best_t = t_st
                             best_st = (p1, p2)
-                best_pair_single[(v1, v2, a)] = (best_t, best_st)
-                best_pair_single[(v2, v1, a)] = (best_t, (best_st[1], best_st[0]) if best_st else None)
+                            break
+                best_pair_fresh[(v1, v2, a_i)] = (best_t, best_st)
+                best_pair_fresh[(v2, v1, a_i)] = (best_t, (best_st[1], best_st[0]) if best_st else None)
 
-        # Exhaustively search all 360 topologies with exact Branch-and-Bound pruning
-        best_makespan = float("inf")
+        best_makespan = initial_ub
         best_witness = None
-        topologies_checked = 0
-        pruned_branches = 0
+        pairings_total = 0
+        ordered_topologies_total = 0
+        pruned_layer0 = 0
+        pruned_inner = 0
+        pattern_counts = Counter()
 
-        for v_reuse in range(n_veh):
-            others = [v for v in range(n_veh) if v != v_reuse]
-            for a1, a2 in permutations(alerts, 2):
-                a_solo = next(a for a in alerts if a not in (a1, a2))
-                goal1, goal2 = model.TARGETS[a1], model.TARGETS[a2]
-                # Choose 2 of the 4 remaining vehicles for a_solo, 1 for a1 partner, 1 for a2 partner
-                for solo_pair in combinations(others, 2):
-                    rem = [v for v in others if v not in solo_pair]
-                    t_solo, _ = best_pair_single[(solo_pair[0], solo_pair[1], a_solo)]
-                    for p_a1, p_a2 in ((rem[0], rem[1]), (rem[1], rem[0])):
-                        topologies_checked += 1
-                        if t_solo >= best_makespan:
-                            pruned_branches += 1
+        for pairing in product(all_pairs, repeat=3):
+            pairings_total += 1
+            mult = Counter(v for pr in pairing for v in pr)
+            pattern = tuple(sorted([mult[v] for v in range(n_veh)], reverse=True))
+            pattern_counts[str(pattern)] += 1
+
+            # Determine all acyclic service orders for this pairing
+            orders = _topological_orders_for_pairing(pairing, alerts)
+            for veh_order, topo in orders:
+                ordered_topologies_total += 1
+
+                # --- Layer-0 theoretical lower bound ---
+                # (a) Every alert a must wait at least max(r0_min[u, a], r0_min[w, a])
+                # (b) If neither u nor w has an earlier alert, exact fresh pair minimum applies
+                # (c) For each reused vehicle with sequence (a0, a1[, a2]), chain lower bound:
+                #     t_start(a1) >= r0_min[v, a0] + OBSERVE + min_slew[a0] + min_slew[a1]
+                #     t_start(a2) >= r0_min[v, a0] + 2*OBSERVE + min_slew[a0] + 2*min_slew[a1] + min_slew[a2]
+                lb0 = 0.0
+                first_alert_of = {}
+                for pos_idx, a_i in enumerate(topo):
+                    u, w = pairing[a_i]
+                    u_fresh = u not in first_alert_of
+                    w_fresh = w not in first_alert_of
+                    if u_fresh:
+                        first_alert_of[u] = a_i
+                    if w_fresh:
+                        first_alert_of[w] = a_i
+                    if u_fresh and w_fresh:
+                        t_lb = best_pair_fresh[(u, w, a_i)][0]
+                    else:
+                        t_lb = max(
+                            r0_min[(u, a_i)] if u_fresh else min_slew[a_i],
+                            r0_min[(w, a_i)] if w_fresh else min_slew[a_i],
+                        )
+                    if t_lb > lb0:
+                        lb0 = t_lb
+                for v, seq in veh_order.items():
+                    if len(seq) == 2:
+                        a0, a1 = seq
+                        t_chain = r0_min[(v, a0)] + model.OBSERVE + min_slew[a0] + min_slew[a1]
+                        if t_chain > lb0:
+                            lb0 = t_chain
+                    elif len(seq) == 3:
+                        a0, a1, a2 = seq
+                        t_chain = (
+                            r0_min[(v, a0)]
+                            + 2.0 * model.OBSERVE
+                            + min_slew[a0]
+                            + 2.0 * min_slew[a1]
+                            + min_slew[a2]
+                        )
+                        if t_chain > lb0:
+                            lb0 = t_chain
+
+                if lb0 >= best_makespan - 1e-12:
+                    pruned_layer0 += 1
+                    continue
+
+                # Determine for each step in topo whether each vehicle has a subsequent alert
+                # (only vehicles with a subsequent alert need full station branching; terminal vehicles
+                # only need their earliest non-collinear station!)
+                last_step_of = {}
+                for step_idx, a_i in enumerate(topo):
+                    for v in pairing[a_i]:
+                        last_step_of[v] = step_idx
+
+                # Recursive exact B&B over the 3 alerts in topological order
+                # veh_state[v] = (pos, available_s)
+                init_state = {v: (model.VEHICLES[v], 0.0) for v in range(n_veh)}
+
+                def dfs(step_idx, veh_state, cur_max, chosen):
+                    nonlocal best_makespan, best_witness, pruned_inner
+                    if cur_max >= best_makespan - 1e-12:
+                        pruned_inner += 1
+                        return
+                    if step_idx == 3:
+                        if cur_max < best_makespan - 1e-12:
+                            best_makespan = cur_max
+                            best_witness = {
+                                "pairing": {alerts[i]: [pairing[i][0] + 1, pairing[i][1] + 1] for i in range(3)},
+                                "pattern": list(pattern),
+                                "topo_order": [alerts[i] for i in topo],
+                                "reused_orders": {f"V{v+1}": [alerts[i] for i in seq] for v, seq in veh_order.items()},
+                                "starts_s": {alerts[a_i]: round(t_st, 6) for a_i, t_st, _, _ in chosen},
+                            }
+                        return
+
+                    a_i = topo[step_idx]
+                    goal = goals[a_i]
+                    u, w = pairing[a_i]
+                    pos_u, avail_u = veh_state[u]
+                    pos_w, avail_w = veh_state[w]
+                    u_reused_later = last_step_of[u] > step_idx
+                    w_reused_later = last_step_of[w] > step_idx
+
+                    # If neither u nor w is reused later AND both are fresh at t=0, use exact precomputed pair!
+                    if not u_reused_later and not w_reused_later and avail_u == 0.0 and avail_w == 0.0:
+                        t_st, st_pair = best_pair_fresh[(u, w, a_i)]
+                        if t_st >= best_makespan - 1e-12:
+                            pruned_inner += 1
+                            return
+                        dfs(step_idx + 1, veh_state, max(cur_max, t_st), chosen + ((a_i, t_st, st_pair[0], st_pair[1]),))
+                        return
+
+                    opts_u = init_ready_sorted[(u, a_i)] if avail_u == 0.0 else get_leg_opts(pos_u, a_i)
+                    opts_w = init_ready_sorted[(w, a_i)] if avail_w == 0.0 else get_leg_opts(pos_w, a_i)
+
+                    # Swap so that if only one is reused later, the reused one is outer loop (u_out)
+                    if not u_reused_later and w_reused_later:
+                        u, w = w, u
+                        pos_u, avail_u, pos_w, avail_w = pos_w, avail_w, pos_u, avail_u
+                        u_reused_later, w_reused_later = True, False
+                        opts_u, opts_w = opts_w, opts_u
+
+                    for _au, ru_rel, su, _ in opts_u:
+                        ru = avail_u + ru_rel
+                        if ru >= best_makespan - 1e-12:
+                            pruned_inner += 1
+                            break
+                        bu = solver._station_bearing(su, goal)
+                        slew_u = solver._station_slew_time(su, goal)
+                        if u_reused_later and (ru + model.OBSERVE + slew_u >= best_makespan - 1e-12):
+                            pruned_inner += 1
                             continue
-                        # Pre-sort partner options by ready time for tight pruning
-                        opts_p1 = sorted(init_opts[(p_a1, a1)], key=lambda x: x[1])
-                        opts_p2 = sorted(init_opts[(p_a2, a2)], key=lambda x: x[1])
-                        if not opts_p1 or not opts_p2:
-                            continue
-                        if opts_p1[0][1] >= best_makespan or opts_p2[0][1] >= best_makespan:
-                            pruned_branches += 1
-                            continue
-                        # Loop over v_reuse station on a1
-                        for _arr_r1, r_r1, st_r1, _path_r1 in init_opts[(v_reuse, a1)]:
-                            if r_r1 >= best_makespan:
+
+                        for _aw, rw_rel, sw, _ in opts_w:
+                            rw = avail_w + rw_rel
+                            t_st = ru if ru >= rw else rw
+                            if t_st >= best_makespan - 1e-12:
+                                pruned_inner += 1
+                                break
+                            if su == sw:
                                 continue
-                            b_r1 = solver._station_bearing(st_r1, goal1)
-                            # Find best compatible partner p_a1 station for st_r1
-                            best_t1 = float("inf")
-                            for _ap1, r_p1, st_p1, _ in opts_p1:
-                                t1 = r_r1 if r_r1 >= r_p1 else r_p1
-                                if t1 >= best_t1:
-                                    break
-                                if st_p1 == st_r1:
-                                    continue
-                                g1 = solver._crossing_angle(solver._station_bearing(st_p1, goal1) - b_r1)
-                                if 1e-6 < g1 < 180.0 - 1e-6:
-                                    best_t1 = t1
-                                    break
-                            if best_t1 >= best_makespan:
+                            g = solver._crossing_angle(solver._station_bearing(sw, goal) - bu)
+                            if not (1e-6 < g < 180.0 - 1e-6):
                                 continue
-                            # Exact time v_reuse finishes a1 and resets gimbal
-                            t_free = best_t1 + model.OBSERVE + solver._station_slew_time(st_r1, goal1)
-                            if t_free >= best_makespan:
-                                continue
-                            # Loop over v_reuse station on a2 from st_r1
-                            for _arr_r2, r_r2_rel, st_r2, _ in get_second_opts(st_r1, a2):
-                                r_r2 = t_free + r_r2_rel
-                                if r_r2 >= best_makespan:
-                                    continue
-                                b_r2 = solver._station_bearing(st_r2, goal2)
-                                for _ap2, r_p2, st_p2, _ in opts_p2:
-                                    t2 = r_r2 if r_r2 >= r_p2 else r_p2
-                                    if t2 >= best_makespan:
+
+                            # Check post-observation release lower bounds for vehicles reused later
+                            next_state = dict(veh_state)
+                            if u_reused_later:
+                                t_free_u = t_st + model.OBSERVE + slew_u
+                                if t_free_u >= best_makespan - 1e-12:
+                                    pruned_inner += 1
+                                    if not w_reused_later:
                                         break
-                                    if st_p2 == st_r2:
-                                        continue
-                                    g2 = solver._crossing_angle(solver._station_bearing(st_p2, goal2) - b_r2)
-                                    if 1e-6 < g2 < 180.0 - 1e-6:
-                                        mk = max(t_solo, best_t1, t2)
-                                        if mk < best_makespan:
-                                            best_makespan = mk
-                                            best_witness = {
-                                                "reused_vehicle": v_reuse + 1,
-                                                "reuse_order": f"{a1}->{a2}",
-                                                "solo_alert": a_solo,
-                                                "solo_vehicles": [solo_pair[0] + 1, solo_pair[1] + 1],
-                                                "partner_a1": p_a1 + 1,
-                                                "partner_a2": p_a2 + 1,
-                                                "t_solo_s": round(t_solo, 6),
-                                                "t_a1_s": round(best_t1, 6),
-                                                "t_a2_s": round(t2, 6),
-                                            }
-                                        break
+                                    continue
+                                next_state[u] = (su, t_free_u)
+                            if w_reused_later:
+                                slew_w = solver._station_slew_time(sw, goal)
+                                t_free_w = t_st + model.OBSERVE + slew_w
+                                if t_free_w >= best_makespan - 1e-12:
+                                    pruned_inner += 1
+                                    continue
+                                next_state[w] = (sw, t_free_w)
+
+                            dfs(step_idx + 1, next_state, max(cur_max, t_st), chosen + ((a_i, t_st, su, sw),))
+
+                            # If w is NOT reused later, the first compatible w (sorted by ready time)
+                            # strictly dominates all later w for this fixed su!
+                            if not w_reused_later:
+                                break
+                        # If neither u nor w is reused later, the first feasible pair can still be
+                        # improved only by a later u? No: opts_u is sorted by ready time, so wait:
+                        # if su == sw blocked the best w, a slightly later su might match a much earlier sw,
+                        # so we only break outer when ru >= best_makespan (already checked above).
+
+                dfs(0, init_state, 0.0, ())
 
         return {
             "shortlist_k": shortlist_k if shortlist_k else "FULL_DISCRETE_POOL",
-            "topologies_checked": topologies_checked,
-            "pruned_branches": pruned_branches,
+            "discrete_station_pool_size": total_pool_size,
+            "legal_pairings_total": pairings_total,
+            "acyclic_ordered_topologies_total": ordered_topologies_total,
+            "multiplicity_pattern_counts": dict(sorted(pattern_counts.items())),
+            "initial_upper_bound_s": round(initial_ub, 6) if isfinite(initial_ub) else None,
+            "lower_bound_formula": (
+                "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); "
+                "Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle)."
+            ),
+            "pruned_layer0_topologies": pruned_layer0,
+            "pruned_inner_branches": pruned_inner,
             "exact_discrete_optimum_s": round(best_makespan, 6),
             "witness": best_witness,
         }
 
 
 def audit_4_p2_exact_bnb(review_dir):
-    """Run independent exact Branch-and-Bound on k=8 shortlist AND on the full discrete station pool."""
+    """Run independent exact Branch-and-Bound over ALL 1,000 legal pairings on k=8 AND full 585-station pool."""
     trials = read_csv(review_dir / "results" / "P2_trials.csv")
     beam_k8 = float(next(
         r["latest_start_s"] for r in trials
         if r["routing"] == "rounded" and r["k"] == "8" and r["beam_width"] == "20" and r["policy"] == "beam"
     ))
-    exact_k8 = _exact_p2_bnb(shortlist_k=8)
-    exact_full = _exact_p2_bnb(shortlist_k=None)
+    exact_k8 = _exact_p2_bnb(shortlist_k=8, initial_ub=beam_k8 + 1e-4)
+    exact_full = _exact_p2_bnb(shortlist_k=None, initial_ub=beam_k8 + 1e-4)
     gap_k8 = beam_k8 - exact_k8["exact_discrete_optimum_s"]
     gap_full = beam_k8 - exact_full["exact_discrete_optimum_s"]
+    gap_k8 = 0.0 if abs(gap_k8) < 1e-12 else round(gap_k8, 6)
+    gap_full = 0.0 if abs(gap_full) < 1e-12 else round(gap_full, 6)
     return {
-        "passed": exact_k8["exact_discrete_optimum_s"] <= beam_k8 + 1e-6,
+        "passed": exact_k8["legal_pairings_total"] == 1000 and exact_full["legal_pairings_total"] == 1000
+                  and exact_k8["exact_discrete_optimum_s"] <= beam_k8 + 1e-6
+                  and exact_full["exact_discrete_optimum_s"] <= beam_k8 + 1e-6,
         "beam_k8_incumbent_s": round(beam_k8, 6),
         "exact_k8_bnb": exact_k8,
-        "gap_vs_exact_k8_s": round(gap_k8, 6),
+        "gap_vs_exact_k8_s": gap_k8,
         "exact_full_discrete_pool_bnb": exact_full,
-        "gap_vs_full_discrete_pool_s": round(gap_full, 6),
+        "gap_vs_full_discrete_pool_s": gap_full,
     }
 
 
 def audit_5_sensitivity_pareto(review_dir):
-    """Verify sensitivity & Pareto CSVs are deterministic, non-empty, and dimensionally consistent."""
+    """Verify real-solver perturbation, 5-scheme weight stability, 3D Pareto, and P4 dedup/extended CSVs."""
     oat = read_csv(review_dir / "results" / "Global_sensitivity_oat.csv")
     inter = read_csv(review_dir / "results" / "Global_sensitivity_interaction.csv")
-    pareto = read_csv(review_dir / "results" / "Pareto_tradeoff.csv")
+    w_chk = read_csv(review_dir / "results" / "Global_sensitivity_weight_check.csv")
+    f_reopt = read_csv(review_dir / "results" / "Global_sensitivity_fixed_vs_reopt.csv")
+    pareto = read_csv(review_dir / "results" / "Pareto_tradeoff_3d.csv")
+    p4_ext = read_csv(review_dir / "results" / "P4_dedup_expanded_cases.csv")
     share_sum = sum(float(r["main_share_pct"]) for r in oat)
     sym_err = 0.0
     imap = {(r["param_i"], r["param_j"]): float(r["interaction_pct"]) for r in inter}
     for (i, j), v in imap.items():
         sym_err = max(sym_err, abs(v - imap[(j, i)]))
-    n_front = sum(1 for r in pareto if r["is_pareto"] == "True")
+    n_front_3d = sum(1 for r in pareto if r["is_pareto_3d"] == "True")
+    k5_3d = any(r["policy"] == "beam" and r["k"] == "5" and r["is_pareto_3d"] == "True" for r in pareto)
+    k8_3d = any(r["policy"] == "beam" and r["k"] == "8" and r["beam_width"] == "20" and r["is_pareto_3d"] == "True" for r in pareto)
     return {
-        "passed": len(oat) == 6 and len(inter) == 36 and len(pareto) == 16 and abs(share_sum - 100.0) < 0.05 and sym_err < 1e-9,
+        "passed": (
+            len(oat) == 6 and len(inter) == 36 and len(w_chk) == 30 and len(f_reopt) == 6
+            and len(pareto) == 16 and abs(share_sum - 100.0) < 0.05 and sym_err < 1e-9
+            and k5_3d and k8_3d and len(p4_ext) == 115
+        ),
         "oat_count": len(oat),
         "interaction_entries": len(inter),
         "interaction_max_asymmetry": sym_err,
+        "weight_check_rows": len(w_chk),
+        "fixed_vs_reopt_rows": len(f_reopt),
         "main_share_sum_pct": round(share_sum, 2),
         "pareto_configs": len(pareto),
-        "pareto_front_count": n_front,
+        "pareto_3d_front_count": n_front_3d,
+        "k5_and_k8_both_3d_nondominated": bool(k5_3d and k8_3d),
+        "p4_unique_expanded_cases": len(p4_ext),
     }
 
 

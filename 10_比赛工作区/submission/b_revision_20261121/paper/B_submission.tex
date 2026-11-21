@@ -50,7 +50,7 @@
 \hypersetup{pdftitle={\PaperTitle},pdfauthor={},pdfsubject={2026 ShuWei Cup Problem B Final Paper}}
 
 \newcommand{\ReviewHead}{%
-  \fancyhf{}\fancyhead[L]{\color{paperink}Team\#\TeamID}%
+  \fancyhf{}\fancyhead[L]{\color{paperink}Team\# B\TeamID}%
   \fancyhead[R]{\color{paperink}Page \thepage\ of \pageref*{LastPage}}%
   \renewcommand{\headrulewidth}{0.4pt}}
 \fancypagestyle{fancy}{\ReviewHead}
@@ -141,11 +141,11 @@ Verified Quantitative Metric & Recorded Value\\
 \midrule
 P1: Min.\ horizontal range / pitch / quality & \BMinRange{} m / \BMaxPitch{}° / \BQuality{} m\textsuperscript{$-1$}\\
 P1: Readiness-optimal station time (V4) & \BReadyTime{} s (drive \BArrivalTime{} s)\\
-P1: Rounded vs.\ AABB clearance audit & \BShortenedCount{} shorter, \BRestoredCount{} restored / \BRouteCount{}\\
-P2(1): T2 local horizontal RMS (V3--V5) & \BFirstRMS{} m (\BCrossing{}° crossing)\\
-P2(2): Shared-shortlist $k=8$ (beam / 1,000-pair B\&B) & \BBeamEight{} s (0.000 s gap) vs.\ \BNearestEight{} s\\
+P1: Feasible optimal arc length & \BArcLength{} m\\
+P2(1): T2 local first-order RMS (V3--V5) & \BFirstRMS{} m (\BCrossing{}° crossing)\\
+P2(2): T1 shallow crossing / guarded delay & $13.15^\circ$ / $+8.8\%$\\
 P3: Independent 95\% coverage threshold & \BIntegratedCrossing{} m ($\sigma^*=\BSigmaCrossing{}$ m)\\
-P4: Unique suite (115 cases; \BCaseCount{} raw) & 110W/4T/1L (0 losses hyst.); V5 $+\BVFiveDelay{}$ s\\
+P4: Completion (Keep / Append / Replan); W/T/L & $0.642/1.000/1.000$;\; $34/55/26$\\
 Perturbation: Top driver ($\beta_{\max}$, real P1--P4) & \BGlobalTopSwing{}\% (5 distinct / \BParetoFrontCount{} Pareto cfg)\\
 \bottomrule
 \end{tabular}
@@ -206,9 +206,9 @@ $\eta, t_{\mathrm{last}}, N, k$ & Completion fraction, latest paired start, tota
 Stage & Core Mathematical Model & Verified Quantitative Metric & Validation \& Core Insight\\
 \midrule
 \textbf{P1} & Minkowski rounded free space $B_k\oplus D(0,1.5)$, closed-prism LOS, Eq.~\eqref{eq:p1-quality} & $r_{\min}=\BMinRange{}$ m, $Q=\BQuality{}$ m\textsuperscript{$-1$}, V4 ready \BReadyTime{} s, \BRestoredCount{} restored / \BShortenedCount{} shorter & 0.1 m grid + 250,000-sample MC; $\sec^2\beta_{\max}$ drives \BPitchLoss{}\% loss per $1^\circ$ pitch drop\\
-\textbf{P2(1--2)} & Bearing Jacobian Eq.~\eqref{eq:p2-rms} \& Prop.~\ref{prop:p21-lb}; 5-vehicle 6-slot dispatch Eq.~\eqref{eq:p2-dispatch} \& Alg.~\ref{alg:p2-dispatch} & T2 RMS \BFirstRMS{} m ($\gamma=\BCrossing{}^\circ$); $k=8$ beam \BBeamEight{} s vs.\ nearest \BNearestEight{} s & Analytical lower bound attained; exact 1,000-pair (4,200-order) B\&B certifies 0.000 s gap on 585-station pool\\
+\textbf{P2(1--2)} & Bearing Jacobian Eq.~\eqref{eq:p2-rms} \& Prop.~\ref{prop:p21-lb}; 5-vehicle 6-slot dispatch Eq.~\eqref{eq:p2-dispatch} \& Alg.~\ref{alg:p2-dispatch} & T2 local first-order RMS \BFirstRMS{} m ($\gamma=\BCrossing{}^\circ$); $k=8$ beam \BBeamEight{} s vs.\ nearest \BNearestEight{} s & Analytical lower bound attained; exact 1,000-pair (4,200-order) B\&B certifies 0.000 s gap on 585-station pool\\
 \textbf{P3} & Wrapped offset-normal azimuth error Eq.~\eqref{eq:p3-prob} \& Theorem~\ref{thm:p3-monotone} ($a,b\ge 0$) & Unique $s_{\max}=\BIntegratedCrossing{}$ m ($\sigma^*=\BSigmaCrossing{}$ m), far-tail $\le\BFarBound{}$ & Strict proof + $3\times 2{,}000{,}000$ Bonferroni--Wilson CIs; exact 80 m bound $a+80b\le\BSigmaCrossing{}$ m\\
-\textbf{P4} & Discrete-event replay, Eq.~\eqref{eq:p4-score} three-way gate \& Alg.~\ref{alg:p4-reschedule} & 115 unique cases (\BCaseCount{} raw$\to$62+53): 110W/4T/1L vs.\ Keep, 34W/55T/26L vs.\ Append; V5 $+\BVFiveDelay{}$ s & Budget-invariant ($k=2/3/5/8$); cached plans save 22.69 s; three-way gate serves 115/115\\
+\textbf{P4} & Discrete-event replay, three-way gated selector, Eq.~\eqref{eq:p4-three-way} & 115 unique cases (\BCaseCount{} raw$\to$62+53): 110W/4T/1L vs.\ Keep, 34W/55T/26L vs.\ Append; V5 $+\BVFiveDelay{}$ s & Budget-invariant ($k=2/3/5/8$); cached plans save 22.69 s; selector serves 115/115 (mean 26.767 s)\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -348,18 +348,20 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \TeamText{p4}{Problem 4 formulation and 115-case summary}
 
 \begin{keybox}
-\textbf{Lexicographic Scoring and Hysteresis-Gated Conditional Rescheduling Law.}
-\begin{equation}
-\begin{aligned}
-\eta = \frac{k}{N}, \qquad \mathrm{Score} &= \left(\eta,\,-t_{\mathrm{last}}\right), \\
-\text{Trigger Replan} \iff \eta_{\mathrm{replan}} > \eta_{\mathrm{keep}} &\;\lor\; \left(\eta_{\mathrm{replan}} = \eta_{\mathrm{keep}} \;\land\; t_{\mathrm{last}}^{\mathrm{keep}} - t_{\mathrm{last}}^{\mathrm{replan}} > \delta_{\mathrm{hyst}}\right).
-\end{aligned}
+\textbf{Three-Way Gated Selector and Two-Way Baseline.}
+\begin{align}
+\eta_p&=\frac{k_p}{N}, \quad
+p^*=\operatorname*{arg\,max}_{p\in\{\mathrm{Keep},\,\mathrm{Keep\text{-}Append},\,\mathrm{Replan}\}}
+  \bigl(\eta_p,-t_{\mathrm{last},p}\bigr)
+  \qquad\text{(lexicographic)},\label{eq:p4-three-way}\\
+\text{Two-way Replan} &\iff \eta_{\mathrm{replan}} > \eta_{\mathrm{keep}} \;\lor\;
+ \left(\eta_{\mathrm{replan}} = \eta_{\mathrm{keep}} \;\land\; t_{\mathrm{last}}^{\mathrm{keep}} - t_{\mathrm{last}}^{\mathrm{replan}} > \delta_{\mathrm{hyst}}\right).
 \label{eq:p4-score}
-\end{equation}
+\end{align}
 \end{keybox}
 
-\begin{ieeealgo}{Hysteresis-Gated Event-Driven Dynamic Rescheduling}{alg:p4-reschedule}
-\item \textbf{Input:} Frozen nominal plan $\Pi_0$, disturbance event $\mathcal{E}$ at $t_d=5$ s (fault $v_f$, new alert $T_4$, recovery $t_{\mathrm{rec}}$), horizon $H_w=60$ s, hysteresis threshold $\delta_{\mathrm{hyst}}\ge 0$.
+\begin{ieeealgo}{Two-Way Keep/Replan Event-Driven Baseline}{alg:p4-reschedule}
+\item \textbf{Input:} Frozen nominal plan $\Pi_0$, disturbance event $\mathcal{E}$ at $t_d=5$ s (fault $v_f$, new alert $T_4$, recovery $t_{\mathrm{rec}}$), horizon $H_w=60$ s, improvement threshold $\delta_{\mathrm{hyst}}\ge 0$.
 \item \textbf{Output:} Executed event timeline $\mathcal{L}^*$, completion ratio $\eta$, and latest paired start $t_{\mathrm{last}}$.
 \item Advance all vehicles along cached plan $\Pi_0$ from $t=0$ to $t_d$; apply vehicle failure $v_f$ and register new alert $T_4$ if present.
 \item Determine dispatch release clock $t_{\mathrm{rel}}\leftarrow t_{\mathrm{rec}}$ if the communication link is interrupted, else $t_{\mathrm{rel}}\leftarrow t_d$.
@@ -378,7 +380,7 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
-\caption{Categorized three-policy summary across all 115 strictly unique Problem 4 scenarios (62 deduplicated from \BCaseCount{} archived IDs + 53 multi-azimuth/range/shadow-edge stress cases). Append freezes the nominal timeline and queues unserved alerts after the last cached slot; the last column counts Reschedule wins / ties / losses against Append (ledgers in \texttt{results/P4\_dedup\_expanded\_cases.csv} and \texttt{results/P4\_keep\_append\_cases.csv}).}
+\caption{Completion across 115 unique scenarios (62 archived + 53 stress cases) and Replan win/tie/loss counts against Keep-Append (ledger: \texttt{results/P4\_keep\_append\_cases.csv}). Selector ties favor Keep, then Keep-Append, then Replan.}
 \label{tab:p4cat}
 \begin{tabular}{@{}lrrrrc@{}}
 \toprule
@@ -437,7 +439,7 @@ Base position std $a$ (m) & 0.30 & 0.24--0.36 & 2.24 & 2.24 & 5.49\\
 \end{table}
 
 \subsection{Operational Deployment Recommendations}
-Table~\ref{tab:deploy} synthesizes our three-objective Pareto frontier, Problem~3 odometry drift ceiling, and Problem~4 hysteresis-gating analysis into four actionable configurations tailored to distinct urban operational priorities.
+Table~\ref{tab:deploy} synthesizes our three-objective Pareto frontier, Problem~3 odometry drift ceiling, and Problem~4 three-way selector analysis into four actionable configurations tailored to distinct urban operational priorities.
 \begin{table}[htbp]
 \centering\small
 \caption{Actionable deployment configurations derived from 3D Pareto frontier, P3 drift bounds, and P4 resilience analysis.}
@@ -449,7 +451,7 @@ Operational Priority & Recommended Setting & Verified Engineering Basis\\
 Rapid + High Quality & Beam $k=8$, $w=20$ (3D Pareto) & Exact discrete optimum \BBeamEight{} s; highest $\bar{Q}=0.02008$ m\textsuperscript{$-1$} (59.92 m range) at min time\\
 Low-Drift / Energy & $k=5$ ($w=20$) or Nearest & 3D Pareto: cuts travel to 36.15 m ($k=5$, tied \BBeamEight{} s) or 21.11 m (Nearest, \BNearestEight{} s)\\
 Sensor Spec (80 m) & $a,b\ge 0,\; a+80b\le\BSigmaCrossing{}$ m & Exact closed-form $\ge 95\%$ coverage boundary (Theorem~\ref{thm:p3-monotone})\\
-Dynamic Recourse & Three-way gate over Keep, Append, Replan & Serves 115/115 cases at mean $t_{\mathrm{last}}=26.77$ s; eliminates V5 $+\BVFiveDelay{}$ s penalty\\
+Dynamic Recourse & Three-way gated selector & Serves 115/115 cases at mean $t_{\mathrm{last}}=26.767$ s; eliminates V5 $+\BVFiveDelay{}$ s penalty\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -485,23 +487,23 @@ Dynamic Recourse & Three-way gate over Keep, Append, Replan & Serves 115/115 cas
 \bibitem{wilson1927} E. B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist. Assoc.}, vol. 22, no. 158, pp. 209--212, Jun. 1927, doi: 10.1080/01621459.1927.10502953.
 \bibitem{brown2001} L. D. Brown, T. T. Cai, and A. DasGupta, ``Interval estimation for a binomial proportion,'' \emph{Statist. Sci.}, vol. 16, no. 2, pp. 101--133, May 2001, doi: 10.1214/ss/1009213286.
 \bibitem{stentz1994} A. Stentz, ``Optimal and efficient path planning for partially-known environments,'' in \emph{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)}, San Diego, CA, USA, May 1994, pp. 3310--3317, doi: 10.1109/ROBOT.1994.351061.
-\bibitem{archivedai} ChatGPT (Codex), GPT-5.4 / GPT-6.2 Sol, OpenAI, used 20--21 Nov. 2026.
+\bibitem{archivedai} ChatGPT (Codex), GPT-5.4 / GPT-6.2 Sol / GPT-6, OpenAI, used 20--21 Nov. 2026.
 \bibitem{antigravityai} Antigravity (Gemini), Gemini 3.1 Pro, Google DeepMind, used 21 Nov. 2026.
-\bibitem{workbuddyai} WorkBuddy Agent, DeepSeek-V4.1-Flash, Tencent, used 17 and 21 Nov. 2026.
+\bibitem{workbuddyai} WorkBuddy Agent, DeepSeek-V4.1-Flash, DeepSeek / Tencent, used 17 and 21 Nov. 2026.
 \end{thebibliography}
 \endgroup
 
 % ===================== AI USAGE DISCLOSURE =====================
 \section*{AI Usage Disclosure}
 \addcontentsline{toc}{section}{AI Usage Disclosure}
-Codex \cite{archivedai} assisted with code, checks (Sections~4--8), and typesetting; Antigravity \cite{antigravityai} with dispatch and P4 audits, sensitivity, Pareto, replay (Sections~6, 8--9), and Figures~1--11; WorkBuddy \cite{workbuddyai} with rule checking and the crossing-angle and keep-append studies (Sections~6, 8). Model design and interpretation remain the team's; Appendix~B and the ZIP give details.
+Codex \cite{archivedai} assisted with code, checks (Sections~4--8), and typesetting; Antigravity \cite{antigravityai} with dispatch and P4 audits, sensitivity, Pareto, replay (Sections~6, 8--9), and Figures~1--11; WorkBuddy \cite{workbuddyai} with rule checking and the crossing-angle and keep-append studies (Sections~6, 8). The team led model design, interpretation, and derivation of conclusions. Appendix~B and the supporting archive detail the AI assistance.
 
 % ===================== APPENDICES (EXEMPT FROM 25-PAGE CAP) =====================
 \clearpage
 \appendix
 \section*{Appendix A: Complete P2(2) Vehicle Timelines and P4 Representative Scenarios}
 \addcontentsline{toc}{section}{Appendix A: Complete P2(2) Timelines and P4 Scenarios}
-Table~\ref{tab:app-p22} lists the certified nominal schedule ($t_{\mathrm{last}}=\BBeamEight{}$~s). Table~\ref{tab:app-p4} lists representative P4 alert locations and the deterministic hysteresis results.
+Table~\ref{tab:app-p22} lists the certified nominal schedule ($t_{\mathrm{last}}=\BBeamEight{}$~s). Table~\ref{tab:app-p4} lists representative P4 alert locations and the two-way threshold sweep.
 
 \begin{table}[htbp]
 \centering\footnotesize
@@ -525,21 +527,21 @@ V3 (reused) & T3 & $(12.00,\; 92.00)$ & 9.077 & 9.077 & 11.034 & 11.034 & 16.034
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{4.2pt}
-\caption{Representative Problem 4 pop-up alert T4 coordinates ($z=50$ m) and positive-threshold hysteresis sweep summary.}
+\caption{Representative Problem 4 pop-up alert T4 coordinates ($z=50$ m) and two-way improvement-threshold sweep summary.}
 \label{tab:app-p4}
 \begin{tabular}{@{}lccc>{\raggedright\arraybackslash}p{0.34\linewidth}@{}}
 \toprule
 Probe / Setting & Polar $(\theta, R)$ from $O$ & Cartesian $(x,y,z)$ (m) & Role & Key Verified Outcome\\
 \midrule
-\texttt{new\_1} & $(0^\circ,\; 30\text{ m})$ & $(80.00,\; 50.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
-\texttt{new\_2} & $(90^\circ,\; 50\text{ m})$ & $(50.00,\; 100.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
-\texttt{new\_3} & $(210^\circ,\; 40\text{ m})$ & $(15.36,\; 30.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
-\texttt{shadow\_B2\_NE} & $(38^\circ,\; 34\text{ m})$ & $(76.79,\; 70.93,\; 50)$ & Shadow edge & Adjacent to B2 (28 m); 100\% covered\\
-\texttt{shadow\_B5\_SW} & $(225^\circ,\; 30\text{ m})$ & $(28.79,\; 28.79,\; 50)$ & Shadow edge & Across tall B5 (32 m); 100\% covered\\
-\texttt{shadow\_B4\_SE} & $(315^\circ,\; 38\text{ m})$ & $(76.87,\; 23.13,\; 50)$ & Shadow edge & Adjacent to B4 (24 m); 100\% covered\\
-\texttt{shadow\_B3\_NW} & $(145^\circ,\; 42\text{ m})$ & $(15.60,\; 74.09,\; 50)$ & Shadow edge & Adjacent to B3 \& corner; 100\% covered\\
+New Alert \#1 & $(0^\circ,\; 30\text{ m})$ & $(80.00,\; 50.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
+New Alert \#2 & $(90^\circ,\; 50\text{ m})$ & $(50.00,\; 100.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
+New Alert \#3 & $(210^\circ,\; 40\text{ m})$ & $(15.36,\; 30.00,\; 50)$ & Baseline T4 & Replan $\eta=1.000$ vs.\ Keep $0.750$\\
+B2 NE Edge & $(38^\circ,\; 34\text{ m})$ & $(76.79,\; 70.93,\; 50)$ & Shadow edge & Adjacent to B2 (28 m); 100\% covered\\
+B5 SW Edge & $(225^\circ,\; 30\text{ m})$ & $(28.79,\; 28.79,\; 50)$ & Shadow edge & Across tall B5 (32 m); 100\% covered\\
+B4 SE Edge & $(315^\circ,\; 38\text{ m})$ & $(76.87,\; 23.13,\; 50)$ & Shadow edge & Adjacent to B4 (24 m); 100\% covered\\
+B3 NW Edge & $(145^\circ,\; 42\text{ m})$ & $(15.60,\; 74.09,\; 50)$ & Shadow edge & Adjacent to B3 \& corner; 100\% covered\\
 \midrule
-\multicolumn{5}{@{}p{0.96\linewidth}@{}}{\footnotesize Hysteresis threshold sweep (\texttt{results/P4\_hysteresis\_sweep.csv}, 115 unique cases): for all $\delta_{\mathrm{hyst}}\in\{0.0, 0.25, 0.5, 1.0, 2.0\}$ s, completion stays $\eta=1.000$ with 0 losses and 110W/5T/0L because every non-tied rescheduling victory strictly improves $\eta$ ($\Delta\eta>0$).}\\
+\multicolumn{5}{@{}p{0.96\linewidth}@{}}{\footnotesize Two-way improvement-threshold sweep (\texttt{results/P4\_hysteresis\_sweep.csv}, 115 unique cases): for all $\delta_{\mathrm{hyst}}\in\{0.0, 0.25, 0.5, 1.0, 2.0\}$ s, completion stays $\eta=1.000$ with 110W/5T/0L against Keep. Zero losses follow from the acceptance rule. Every rescheduling win improves $\eta$ ($\Delta\eta>0$).}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -556,7 +558,7 @@ Threshold (s) & Trigger rate & Mean saving (s) \\
 \BHoldThresholdMax{} & \BHoldTriggerMax\% & \BHoldSavingMax{} \\
 \bottomrule
 \end{tabular}\par\smallskip
-\caption{Archived P4 stress test with \BStressTrials{} trials, seed \BStressSeed{}, and release clocks from commit \texttt{643c22a}. Wins, ties, and losses are scored against Keep.}
+\caption{Archived P4 stress test with \BStressTrials{} trials, seed \BStressSeed{}, and release clocks from commit \texttt{643c22a}. Wins, ties, and losses are scored against Keep. The selector cannot score below Keep by construction. The Wilson interval covers win probability under the archived sampling distribution.}
 \begin{tabular}{@{}lrrc@{}}
 \toprule
 Policy & Mean completion & Mean latest-start score (s) & Wins / Ties / Losses \\
@@ -571,7 +573,7 @@ Zero-threshold Selector & \BStressSelectorEta{} & \BStressSelectorTime{} & \BStr
 \clearpage
 \section*{Appendix B: AI Tool Usage Report}
 \addcontentsline{toc}{section}{Appendix B: AI Tool Usage Report}
-Pursuant to Article~6 of the 2026 ShuWei Cup AI Tool Usage Policy (exempt from the 25-page main-body page limit), Table~\ref{tab:app-ai} summarizes every AI tool utilized during development, verification, visualization, and document formatting. The complete entry-by-entry chronological log is archived in \texttt{AI\_USAGE\_LOG.csv} inside \texttt{BSWBMCM2613050fj.zip}.
+Pursuant to Article~6 of the 2026 ShuWei Cup AI Tool Usage Policy (exempt from the 25-page main-body page limit), Table~\ref{tab:app-ai} summarizes every AI tool utilized during development, verification, visualization, and document formatting. The team led model design, interpretation, and derivation of conclusions. The complete entry-by-entry chronological log is archived in \texttt{AI\_USAGE\_LOG.csv} inside \texttt{BSWBMCM2613050fj.zip}.
 
 \begin{table}[htbp]
 \centering\scriptsize
@@ -582,9 +584,9 @@ Pursuant to Article~6 of the 2026 ShuWei Cup AI Tool Usage Policy (exempt from t
 \toprule
 Tool \& Version & Provider & Usage Date & Task Stage & Prompt / Operation Summary & Adoption & Verification & Role / Location\\
 \midrule
-ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, and packaging; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
+ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol / GPT-6) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, packaging, and WP1 terminology; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
 Antigravity (Gemini 3.1 Pro) & Google DeepMind & 2026-11-21 & Audit, 3D Twin, Sensitivity, Pareto, Figures, Editing & Built offline 3D digital twin (\texttt{B\_Simulator.html}), 1,000-pair exact B\&B audit, 115-case P4 expansion, real-solver sensitivity/3D Pareto, 11-figure suite, and LaTeX QA fixes. & Adapted \& integrated into \texttt{src/*.py} and \texttt{paper/} & Verified via 6/6 hardcore audits, offline Chromium QA, and \texttt{pytest} & Simulator, Audit, Figs.~1--11, Paper formatting\\
-WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek & 2026-11-17; 2026-11-21 & Pre-contest rule verification; precision-aware dispatch and keep-append studies & Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep and the keep-append baseline, re-ran the exact B\&B and the 115-case suite, and typeset the resulting tables. & Adapted into two scripts under \texttt{src/} and Tables~\ref{tab:p22},~\ref{tab:p4cat} & Results re-verified by the team against the P2 precision and P4 keep-append result files; model design and interpretation remained team work & Sections~6 and~8; AI Usage Disclosure; usage log\\
+WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek / Tencent & 2026-11-17; 2026-11-21 & Pre-contest rule verification; precision-aware dispatch and keep-append studies & Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep and the keep-append baseline, re-ran the exact B\&B and the 115-case suite, and typeset the resulting tables. & Adapted into two scripts under \texttt{src/} and Tables~\ref{tab:p22},~\ref{tab:p4cat} & Results re-verified by the team against the P2 precision and P4 keep-append result files; model design and interpretation remained team work & Sections~6 and~8; AI Usage Disclosure; usage log\\
 \bottomrule
 \end{tabular}
 \end{table}

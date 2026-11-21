@@ -14,9 +14,9 @@ The in-contest tools are listed in References as [15]–[17]. The paper’s AI U
 
 | Ref # | Tool Name | Version / Model | Developer / Organization | Dates Used | Usage Stage | Prompt / Operation Summary | Adoption Status | Verification & Location |
 |---|---|---|---|---|---|---|---|---|
-| `[15]` | ChatGPT (Codex) | GPT-5.4 / GPT-6.2 Sol | OpenAI | 2026-11-20 to 2026-11-21 | Code, Verification, Replay, Figures, Typesetting | Parameter transcription checks, initial P1–P4 solver scaffolding, quadrature/MC validation, replay engine, Matplotlib visualization, LaTeX macro binding, final typography and disclosure alignment, and package checks | Adapted & integrated into active pipeline | Cross-checked via exact B&B, Wilson CIs, and `pytest`; `src/*.py`, `paper/` |
+| `[15]` | ChatGPT (Codex) | GPT-5.4 / GPT-6.2 Sol / GPT-6 | OpenAI | 2026-11-20 to 2026-11-21 | Code, Verification, Replay, Figures, Typesetting | Parameter transcription checks, initial P1–P4 solver scaffolding, quadrature/MC validation, replay engine, Matplotlib visualization, LaTeX macro binding, final typography and disclosure alignment, package checks, and WP1 terminology and reference-order verification | Adapted & integrated into active pipeline | Cross-checked via exact B&B, Wilson CIs, and `pytest`; `src/*.py`, `paper/` |
 | `[16]` | Antigravity (Gemini) | Gemini 3.1 Pro | Google DeepMind | 2026-11-21 | Audit, 3D Twin, Sensitivity, Pareto, Figures, Editing | Offline 3D digital twin UI & Chromium QA, 1,000-pair exact B&B audit, real-solver perturbation & 3D Pareto, 115-case P4 expansion + hysteresis sweep, 11-figure publication suite, LaTeX/proof/English remediation | Adapted & integrated into active pipeline | Verified via 6/6 hardcore audits, offline Chromium QA, and 9-file `pytest`; `src/*.py`, `figures/`, `simulator/B_Simulator.html`, `paper/` |
-| `[17]` | WorkBuddy Agent | DeepSeek-V4.1-Flash | DeepSeek / Tencent | 2026-11-17; 2026-11-21 | Rule verification; precision-aware dispatch and keep-append studies | Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep (`b_revision_precision_dispatch.py`) and the keep-append baseline (`b_revision_p4_append.py`), re-ran the exact B&B and the 115-case suite, and typeset the resulting tables | Adapted & integrated into `src/` and Tables 6 & 8 | Re-verified by the team against `results/P2_precision_tradeoff.csv` and `results/P4_keep_append_summary.csv`; model design and interpretation remained team work |
+| `[17]` | WorkBuddy Agent | DeepSeek-V4.1-Flash | DeepSeek / Tencent | 2026-11-17; 2026-11-21 | Rule verification; precision-aware dispatch and keep-append studies | Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep (`b_revision_precision_dispatch.py`) and the keep-append baseline (`b_revision_p4_append.py`), re-ran the exact B&B and the 115-case suite, and typeset the resulting tables | Adapted & integrated into `src/` and Tables 6 & 8 | Re-verified by the team against `results/P2_precision_tradeoff.csv` and `results/P4_keep_append_summary.csv`; the team led model design, interpretation, and derivation of conclusions |
 
 ---
 
@@ -33,6 +33,8 @@ The in-contest tools are listed in References as [15]–[17]. The paper’s AI U
 ---
 
 ## 3. Compliance Confirmation & Anonymity Statement
+
+The team led model design, interpretation, and derivation of conclusions. AI provided implementation, numerical verification, visualization, and editorial and formatting assistance. The chronological entries record the adopted assistance and the items awaiting team review.
 
 1. **No Fabricated Data or References:** Every numerical value, table, figure, and statistical interval is deterministically traced to executable code and verified outputs in `results/`.
 2. **Code Attribution:** Every active AI-assisted script carries an Article 7 file-header disclosure documenting tool, version/provider, date, and scope.

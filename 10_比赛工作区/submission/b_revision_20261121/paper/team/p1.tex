@@ -1,7 +1,7 @@
 To characterize every ground position from which a mobile vehicle can legally station itself and observe hovering alert T1—located at $T_1=(50+40\cos 30^\circ,\; 50+40\sin 30^\circ,\; 45)\approx(84.641016,\; 70.000000,\; 45)$ m—we construct the vehicle-center feasible set $\mathcal{F}(T_1)$ as the exact intersection of three distinct geometric constraints: planar body safety, gimbal elevation bounds, and three-dimensional building line-of-sight clearance.
 
 \subsection{Exact Euclidean Rounded Minkowski Safety Space and Closure Separation}
-Because each vehicle occupies a rigid horizontal disk $D(0,r_v)$ of radius $r_v=1.5$ m, a candidate station $p=(x,y)$ keeps the vehicle body strictly inside the $[0,100]^2$ field if and only if $p\in\mathcal{W}_{\mathrm{in}}=[1.5,\,98.5]^2$. To prevent chassis contact with any rectangular building footprint $B_k=[x_{k,\min},x_{k,\max}]\times[y_{k,\min},y_{k,\max}]$ ($k=1,\dots,5$), we compute the closed Euclidean Minkowski sum \cite{lozano1983}
+Because each vehicle occupies a rigid horizontal disk $D(0,r_v)$ of radius $r_v=1.5$ m, a candidate station $p=(x,y)$ keeps the vehicle body within the $[0,100]^2$ field if and only if $p\in\mathcal{W}_{\mathrm{in}}=[1.5,\,98.5]^2$. To exclude chassis overlap with any rectangular building footprint $B_k=[x_{k,\min},x_{k,\max}]\times[y_{k,\min},y_{k,\max}]$ ($k=1,\dots,5$), we compute the closed Euclidean Minkowski sum \cite{lozano1983}
 \[
 B_k^{\oplus} = B_k \oplus D(0,r_v) = \bigl\{p\in\mathbb{R}^2 : \operatorname{dist}_2(p,B_k) \le r_v\bigr\},
 \]

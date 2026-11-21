@@ -30,7 +30,7 @@ F_\Theta(\alpha;\kappa)=\int_{\mathbb R}\Phi(\kappa-|y|\cot\alpha)\varphi(y)\,\m
 The derivative of the integrand in $\kappa$ is positive and bounded by $\varphi(y)/\sqrt{2\pi}$ for every $\kappa$. Dominated convergence therefore gives $0<\partial_\kappa F_\Theta\le 1/\sqrt{2\pi}$. Completing the square gives $\partial_\kappa F_\Theta=\sqrt{2/\pi}\sin\alpha\,e^{-\kappa^2\sin^2\alpha/2}\Phi(\kappa\cos\alpha)$.
 
 \emph{Step 2 (Wrapped acceptance).}
-Integrating the periodized Gaussian against $e^{-in\theta}$ unfolds the integral onto $\mathbb R$ and gives Fourier coefficient $q^{n^2}/(2\pi)$, $q=e^{-\sigma_g^2/2}\in(0,1)$ \cite{dlmf}. The Jacobi product gives
+Integrating the periodized Gaussian against $e^{-in\theta}$ unfolds the integral onto $\mathbb R$ and gives Fourier coefficient $q^{n^2}/(2\pi)$, $q=e^{-\sigma_g^2/2}\in(0,1)$ \cite{dlmf}. The Jacobi product uses radians ($1^\circ=\pi/180$ rad) and gives
 \[
 g_W(\theta)=\frac1{2\pi}\prod_{n\ge1}(1-q^{2n})
    (1+2q^{2n-1}\cos\theta+q^{4n-2}).

@@ -10,7 +10,7 @@ Keep continues healthy vehicles' cached nominal plans. At release time $t_{\math
 
 Deduplication by faulted vehicle, T4 position, and recovery clock removes 11 overlaps from the \BCaseCount{} archived IDs, leaving 62 unique cases. We add 53 cases covering eight azimuths, three ranges, and four building-shadow-edge points tested with selected faults and recovery at 30 s. Across the resulting 115 cases, Keep averages $\eta=0.642$. Unconditional Reschedule starts every alert and records 110 wins, 4 ties, and 1 loss against Keep (Table~\ref{tab:p4cat}). The loss is the V5 single fault.
 
-We rerun the 62 distinct archived cases with $(k,w)$ equal to $(2,3)$, $(3,5)$, $(5,10)$, and $(8,20)$. Reschedule starts every alert under each budget and records 57 wins, 4 ties, and 1 loss. Its mean latest start ranges from $29.09$ to $29.15$ s. The V5 delay remains \BVFiveDelay{} s (Figure~\ref{fig:p4}d).
+We rerun the 62 distinct archived cases with $(k,w)$ equal to $(2,3)$, $(3,5)$, $(5,10)$, and $(8,20)$. Reschedule starts every alert under each budget and records 57 wins, 4 ties, and 1 loss. Its mean latest start ranges from $29.09$ to $29.15$ s. The V5 delay remains \BVFiveDelay{} s (Figure~\ref{fig:p4}c).
 
 \paragraph{Hysteresis threshold sweep.}
 At $\tau_{\mathrm{hyst}}=0$ s the selector accepts any strict improvement over Keep. A positive threshold requires a greater time gain for replans that preserve completion, while completion improvements always trigger replanning. We evaluate Keep and Replan once per scenario at $(k,w)=(2,3)$ and apply the rule to the same unrounded scores for thresholds from 0 to 5 s at 0.25 s spacing. All \BHystWins{} selected replans improve completion, so the choices are constant on $[0,5]$ s in this suite. The completion mean applies to the 115 deterministic scenarios.
@@ -32,5 +32,5 @@ Positive threshold & 5.00 & \BHystMeanCompletion{} & \BHystMeanTlast{} & \BHystW
 \end{table}
 
 \ReviewFigure{fig07_p4_resilience.pdf}{86mm}
-{Deduplicated and spatially expanded 115-scenario Problem 4 audit: (a) Keep vs.\ Reschedule completion across 7 categories, (b) timing contrast, (c) lexicographic win/tie/loss ledger, and (d) online search-budget stability across $k\in\{2,3,5,8\}$.}
+{Problem 4 stress cases. (a) Completion across seven categories, (b) latest paired starts, (c) win, tie, and loss counts across the archived search budgets, and (d) the hysteresis decision rule.}
 {fig:p4}

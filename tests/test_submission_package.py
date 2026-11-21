@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import os
 import re
 import subprocess
 import sys
@@ -108,7 +109,8 @@ def test_code_readmes_anonymized_and_run_all_fail_fast():
         [sys.executable, str(REPO / "03_code" / "run_all.py"), "--list"],
         cwd=str(REPO),
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         check=False,
     )
     assert proc.returncode == 0, f"run_all.py --list failed: {proc.stderr}"

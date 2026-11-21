@@ -50,21 +50,11 @@ Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
 (E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
 (E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
 (E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
-(B_review_metrics.tex)
-No file P1_ERRATA.aux.
+(B_review_metrics.tex) (P1_ERRATA.aux)
 (E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
-
-[1] (P1_ERRATA.aux)
-
-Package rerunfilecheck Warning: File `P1_ERRATA.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
- )
+(P1_ERRATA.out) (P1_ERRATA.out) [1] (P1_ERRATA.aux) )
 Output written on P1_ERRATA.pdf (1 page).
 Transcript written on P1_ERRATA.log.
 

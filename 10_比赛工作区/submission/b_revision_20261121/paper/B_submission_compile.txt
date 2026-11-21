@@ -166,29 +166,215 @@ Underfull \hbox (badness 1009) in paragraph at lines 21--22
 0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
 g Plotly
 ) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
-Underfull \hbox (badness 1147) in paragraph at lines 473--474
-[]\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
-vent system specification modeling and simula-
+Underfull \hbox (badness 2846) in paragraph at lines 477--478
+[]\TU/TimesNewRoman(0)/m/n/12 J. R. Shewchuk, “Adaptive precision floating-poin
+t arithmetic and fast robust geomet-
 
-Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
-ec. 2018, pp. 162–176, doi:
+Underfull \hbox (badness 1424) in paragraph at lines 477--478
+\TU/TimesNewRoman(0)/m/n/12 ric predicates,” \TU/TimesNewRoman(0)/m/it/12 Discr
+ete Comput. Geom.\TU/TimesNewRoman(0)/m/n/12 , vol. 18, no. 3, pp. 305–363, Oct
+. 1997, doi:
 
-Underfull \hbox (badness 1584) in paragraph at lines 476--477
-\TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
-5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
- pp. 100–107, Jul. 1968, doi:
-
-Underfull \hbox (badness 5359) in paragraph at lines 483--484
-[]\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
-g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-
-Underfull \hbox (badness 1590) in paragraph at lines 483--484
-\TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
-wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
+Underfull \hbox (badness 2096) in paragraph at lines 482--483
+[]\TU/TimesNewRoman(0)/m/n/12 Joint Committee for Guides in Metrology (JCGM), \
+TU/TimesNewRoman(0)/m/it/12 Evaluation of Measurement Data—
 [25]
-Underfull \hbox (badness 4266) in paragraph at lines 537--537
+Underfull \hbox (badness 4266) in paragraph at lines 540--540
+[]|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
+lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
+ all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
+[26]
+AED: lastpage setting LastPage
+[27] (B_submission.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ )
+(see the transcript file for additional information)
+Output written on B_submission.pdf (27 pages).
+Transcript written on B_submission.log.
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(B_submission.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-04>
+(E:\python\MLP\LaTex\tex/latex/base\article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
+(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
+(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
+(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
+(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
+(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
+(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
+(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
+(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsmath.sty
+For additional information on amsmath, use the `?' option.
+(E:\python\MLP\LaTex\tex/latex/amsmath\amstext.sty
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsgen.sty))
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsbsy.sty)
+(E:\python\MLP\LaTex\tex/latex/amsmath\amsopn.sty))
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amssymb.sty
+(E:\python\MLP\LaTex\tex/latex/amsfonts\amsfonts.sty))
+(E:\python\MLP\LaTex\tex/latex/amscls\amsthm.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics\graphicx.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\graphics.sty
+(E:\python\MLP\LaTex\tex/latex/graphics\trig.sty)
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\graphics.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)))
+(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
+(E:\python\MLP\LaTex\tex/latex/tools\array.sty)
+(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
+(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
+(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
+(E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty)
+)) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
+(E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
+(E:\python\MLP\LaTex\tex/latex/float\float.sty)
+(E:\python\MLP\LaTex\tex/latex/enumitem\enumitem.sty)
+(E:\python\MLP\LaTex\tex/latex/tcolorbox\tcolorbox.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgf.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/utilities\pgfrcs.sty
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-common.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-latex.def)
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfrcs.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf\pgf.revision.tex)))
+(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgfcore.sty
+(E:\python\MLP\LaTex\tex/latex/pgf/systemlayer\pgfsys.sty
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeys.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex)
+) (E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgf.cfg)
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-xetex.def
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-dvipdfmx.def
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def))))
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex))
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcore.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmath.code.tex
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathutil.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathparser.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.t
+ex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.random.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.base.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.round.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.c
+ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfloat.code.tex))
+(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfint.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
+) (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorequick.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex)
+ (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex)))
+(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleshapes.code.tex)
+(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleplot.code.tex)
+(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty)
+(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty))
+(E:\python\MLP\LaTex\tex/latex/tools\verbatim.sty)
+(E:\python\MLP\LaTex\tex/latex/environ\environ.sty
+(E:\python\MLP\LaTex\tex/latex/trimspaces\trimspaces.sty))
+(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
+(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
+(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
+(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
+(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
+(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
+(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
+(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
+(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
+(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
+(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
+(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
+(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
+(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
+(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
+(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
+(E:\python\MLP\LaTex\tex/latex/url\url.sty)
+(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
+(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
+(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
+(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
+(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
+(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
+(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
+(B_review_metrics.tex) (B_submission.aux)
+(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
+*geometry* driver: auto-detecting
+*geometry* detected driver: xetex
+(B_submission.out) (B_submission.out)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
+(E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
+(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
+Underfull \hbox (badness 7273) in paragraph at lines 181--182
+[]|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
+(team/framework.tex [4]) (team/p1.tex
+Underfull \hbox (badness 1354) in paragraph at lines 1--2
+\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a
+mobile vehicle can legally station itself
+[5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
+[11]) (team/p3.tex
+Underfull \hbox (badness 1264) in paragraph at lines 4--5
+\TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
+ Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
+T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
+[12] [13] [14])
+Underfull \hbox (badness 2285) in paragraph at lines 56--323
+\TU/TimesNewRoman(0)/m/n/12 defining the complete admissible odometry procureme
+nt envelope without numerical contour
+(team/p4.tex [15] [16]) (team/v5.tex [17] [18]) [19] (team/sensitivity.tex
+[20]
+Underfull \hbox (badness 1092) in paragraph at lines 15--16
+\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
+2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
+(0)/m/n/12 resolves this tension cleanly
+
+Underfull \hbox (badness 1009) in paragraph at lines 21--22
+\TU/TimesNewRoman(0)/m/n/12 (\TU/lmtt/m/n/12 B_Simulator.html\TU/TimesNewRoman(
+0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
+g Plotly
+) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
+Underfull \hbox (badness 2846) in paragraph at lines 477--478
+[]\TU/TimesNewRoman(0)/m/n/12 J. R. Shewchuk, “Adaptive precision floating-poin
+t arithmetic and fast robust geomet-
+
+Underfull \hbox (badness 1424) in paragraph at lines 477--478
+\TU/TimesNewRoman(0)/m/n/12 ric predicates,” \TU/TimesNewRoman(0)/m/it/12 Discr
+ete Comput. Geom.\TU/TimesNewRoman(0)/m/n/12 , vol. 18, no. 3, pp. 305–363, Oct
+. 1997, doi:
+
+Underfull \hbox (badness 2096) in paragraph at lines 482--483
+[]\TU/TimesNewRoman(0)/m/n/12 Joint Committee for Guides in Metrology (JCGM), \
+TU/TimesNewRoman(0)/m/it/12 Evaluation of Measurement Data—
+[25]
+Underfull \hbox (badness 4266) in paragraph at lines 540--540
 []|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
 lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
  all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
@@ -366,229 +552,20 @@ Underfull \hbox (badness 1009) in paragraph at lines 21--22
 0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
 g Plotly
 ) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
-Underfull \hbox (badness 1147) in paragraph at lines 473--474
-[]\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
-vent system specification modeling and simula-
+Underfull \hbox (badness 2846) in paragraph at lines 477--478
+[]\TU/TimesNewRoman(0)/m/n/12 J. R. Shewchuk, “Adaptive precision floating-poin
+t arithmetic and fast robust geomet-
 
-Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
-ec. 2018, pp. 162–176, doi:
+Underfull \hbox (badness 1424) in paragraph at lines 477--478
+\TU/TimesNewRoman(0)/m/n/12 ric predicates,” \TU/TimesNewRoman(0)/m/it/12 Discr
+ete Comput. Geom.\TU/TimesNewRoman(0)/m/n/12 , vol. 18, no. 3, pp. 305–363, Oct
+. 1997, doi:
 
-Underfull \hbox (badness 1584) in paragraph at lines 476--477
-\TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
-5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
- pp. 100–107, Jul. 1968, doi:
-
-Underfull \hbox (badness 5359) in paragraph at lines 483--484
-[]\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
-g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-
-Underfull \hbox (badness 1590) in paragraph at lines 483--484
-\TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
-wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
+Underfull \hbox (badness 2096) in paragraph at lines 482--483
+[]\TU/TimesNewRoman(0)/m/n/12 Joint Committee for Guides in Metrology (JCGM), \
+TU/TimesNewRoman(0)/m/it/12 Evaluation of Measurement Data—
 [25]
-Underfull \hbox (badness 4266) in paragraph at lines 537--537
-[]|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
-lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
- all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
-[26]
-AED: lastpage setting LastPage
-[27] (B_submission.aux) )
-(see the transcript file for additional information)
-Output written on B_submission.pdf (27 pages).
-Transcript written on B_submission.log.
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
- restricted \write18 enabled.
-entering extended mode
-(B_submission.tex
-LaTeX2e <2023-11-01> patch level 1
-L3 programming layer <2024-01-04>
-(E:\python\MLP\LaTex\tex/latex/base\article.cls
-Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
-(E:\python\MLP\LaTex\tex/latex/base\size12.clo))
-(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.sty
-(E:\python\MLP\LaTex\tex/latex/l3packages/xparse\xparse.sty
-(E:\python\MLP\LaTex\tex/latex/l3kernel\expl3.sty
-(E:\python\MLP\LaTex\tex/latex/l3backend\l3backend-xetex.def)))
-(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec-xetex.sty
-(E:\python\MLP\LaTex\tex/latex/base\fontenc.sty)
-(E:\python\MLP\LaTex\tex/latex/fontspec\fontspec.cfg)))
-(E:\python\MLP\LaTex\tex/latex/geometry\geometry.sty
-(E:\python\MLP\LaTex\tex/latex/graphics\keyval.sty)
-(E:\python\MLP\LaTex\tex/generic/iftex\ifvtex.sty
-(E:\python\MLP\LaTex\tex/generic/iftex\iftex.sty))
-(E:\python\MLP\LaTex\tex/latex/geometry\geometry.cfg))
-(E:\python\MLP\LaTex\tex/latex/amsmath\amsmath.sty
-For additional information on amsmath, use the `?' option.
-(E:\python\MLP\LaTex\tex/latex/amsmath\amstext.sty
-(E:\python\MLP\LaTex\tex/latex/amsmath\amsgen.sty))
-(E:\python\MLP\LaTex\tex/latex/amsmath\amsbsy.sty)
-(E:\python\MLP\LaTex\tex/latex/amsmath\amsopn.sty))
-(E:\python\MLP\LaTex\tex/latex/amsfonts\amssymb.sty
-(E:\python\MLP\LaTex\tex/latex/amsfonts\amsfonts.sty))
-(E:\python\MLP\LaTex\tex/latex/amscls\amsthm.sty)
-(E:\python\MLP\LaTex\tex/latex/graphics\graphicx.sty
-(E:\python\MLP\LaTex\tex/latex/graphics\graphics.sty
-(E:\python\MLP\LaTex\tex/latex/graphics\trig.sty)
-(E:\python\MLP\LaTex\tex/latex/graphics-cfg\graphics.cfg)
-(E:\python\MLP\LaTex\tex/latex/graphics-def\xetex.def)))
-(E:\python\MLP\LaTex\tex/latex/booktabs\booktabs.sty)
-(E:\python\MLP\LaTex\tex/latex/tools\array.sty)
-(E:\python\MLP\LaTex\tex/latex/xcolor\xcolor.sty
-(E:\python\MLP\LaTex\tex/latex/graphics-cfg\color.cfg)
-(E:\python\MLP\LaTex\tex/latex/graphics\mathcolor.ltx))
-(E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty)
-)) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
-(E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
-(E:\python\MLP\LaTex\tex/latex/float\float.sty)
-(E:\python\MLP\LaTex\tex/latex/enumitem\enumitem.sty)
-(E:\python\MLP\LaTex\tex/latex/tcolorbox\tcolorbox.sty
-(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgf.sty
-(E:\python\MLP\LaTex\tex/latex/pgf/utilities\pgfrcs.sty
-(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-common.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfutil-latex.def)
-(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfrcs.code.tex
-(E:\python\MLP\LaTex\tex/generic/pgf\pgf.revision.tex)))
-(E:\python\MLP\LaTex\tex/latex/pgf/basiclayer\pgfcore.sty
-(E:\python\MLP\LaTex\tex/latex/pgf/systemlayer\pgfsys.sty
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys.code.tex
-(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeys.code.tex
-(E:\python\MLP\LaTex\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex)
-) (E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgf.cfg)
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-xetex.def
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-dvipdfmx.def
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def))))
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex))
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcore.code.tex
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmath.code.tex
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathutil.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathparser.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.t
-ex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.random.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.base.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.round.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.c
-ode.tex) (E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathcalc.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfmathfloat.code.tex))
-(E:\python\MLP\LaTex\tex/generic/pgf/math\pgfint.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
-) (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorequick.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex)
- (E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex)))
-(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleshapes.code.tex)
-(E:\python\MLP\LaTex\tex/generic/pgf/modules\pgfmoduleplot.code.tex)
-(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty)
-(E:\python\MLP\LaTex\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty))
-(E:\python\MLP\LaTex\tex/latex/tools\verbatim.sty)
-(E:\python\MLP\LaTex\tex/latex/environ\environ.sty
-(E:\python\MLP\LaTex\tex/latex/trimspaces\trimspaces.sty))
-(E:\python\MLP\LaTex\tex/latex/etoolbox\etoolbox.sty))
-(E:\python\MLP\LaTex\tex/latex/hyperref\hyperref.sty
-(E:\python\MLP\LaTex\tex/generic/infwarerr\infwarerr.sty)
-(E:\python\MLP\LaTex\tex/latex/kvsetkeys\kvsetkeys.sty)
-(E:\python\MLP\LaTex\tex/generic/kvdefinekeys\kvdefinekeys.sty)
-(E:\python\MLP\LaTex\tex/generic/pdfescape\pdfescape.sty
-(E:\python\MLP\LaTex\tex/generic/ltxcmds\ltxcmds.sty)
-(E:\python\MLP\LaTex\tex/generic/pdftexcmds\pdftexcmds.sty))
-(E:\python\MLP\LaTex\tex/latex/hycolor\hycolor.sty)
-(E:\python\MLP\LaTex\tex/latex/letltxmacro\letltxmacro.sty)
-(E:\python\MLP\LaTex\tex/latex/auxhook\auxhook.sty)
-(E:\python\MLP\LaTex\tex/latex/hyperref\nameref.sty
-(E:\python\MLP\LaTex\tex/latex/refcount\refcount.sty)
-(E:\python\MLP\LaTex\tex/generic/gettitlestring\gettitlestring.sty
-(E:\python\MLP\LaTex\tex/latex/kvoptions\kvoptions.sty)))
-(E:\python\MLP\LaTex\tex/latex/hyperref\pd1enc.def)
-(E:\python\MLP\LaTex\tex/generic/intcalc\intcalc.sty)
-(E:\python\MLP\LaTex\tex/latex/hyperref\puenc.def)
-(E:\python\MLP\LaTex\tex/latex/url\url.sty)
-(E:\python\MLP\LaTex\tex/generic/bitset\bitset.sty
-(E:\python\MLP\LaTex\tex/generic/bigintcalc\bigintcalc.sty))
-(E:\python\MLP\LaTex\tex/latex/base\atbegshi-ltx.sty))
-(E:\python\MLP\LaTex\tex/latex/hyperref\hxetex.def
-(E:\python\MLP\LaTex\tex/generic/stringenc\stringenc.sty)
-(E:\python\MLP\LaTex\tex/latex/rerunfilecheck\rerunfilecheck.sty
-(E:\python\MLP\LaTex\tex/generic/uniquecounter\uniquecounter.sty)))
-(B_review_metrics.tex) (B_submission.aux)
-(E:\python\MLP\LaTex\tex/latex/base\ts1cmr.fd)
-*geometry* driver: auto-detecting
-*geometry* detected driver: xetex
-(B_submission.out) (B_submission.out)
-(E:\python\MLP\LaTex\tex/latex/amsfonts\umsa.fd)
-(E:\python\MLP\LaTex\tex/latex/amsfonts\umsb.fd) (team/summary.tex) [1]
-(B_submission.toc) [2] (team/scope.tex) (team/assumptions.tex [3])
-Underfull \hbox (badness 7273) in paragraph at lines 181--182
-[]|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
-(team/framework.tex [4]) (team/p1.tex
-Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a
-mobile vehicle can legally station itself
-[5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
-[11]) (team/p3.tex
-Underfull \hbox (badness 1264) in paragraph at lines 4--5
-\TU/TimesNewRoman(0)/m/n/12 By rotational invariance of the isotropic bivariate
- Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
-T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
-[12] [13] [14])
-Underfull \hbox (badness 2285) in paragraph at lines 56--323
-\TU/TimesNewRoman(0)/m/n/12 defining the complete admissible odometry procureme
-nt envelope without numerical contour
-(team/p4.tex [15] [16]) (team/v5.tex [17] [18]) [19] (team/sensitivity.tex
-[20]
-Underfull \hbox (badness 1092) in paragraph at lines 15--16
-\TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
-2 ([] \OML/cmm/m/it/12 t[];  [] D[];  [] []\OT1/cmr/m/n/12 )$ \TU/TimesNewRoman
-(0)/m/n/12 resolves this tension cleanly
-
-Underfull \hbox (badness 1009) in paragraph at lines 21--22
-\TU/TimesNewRoman(0)/m/n/12 (\TU/lmtt/m/n/12 B_Simulator.html\TU/TimesNewRoman(
-0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
-g Plotly
-) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
-Underfull \hbox (badness 1147) in paragraph at lines 473--474
-[]\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
-vent system specification modeling and simula-
-
-Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
-ec. 2018, pp. 162–176, doi:
-
-Underfull \hbox (badness 1584) in paragraph at lines 476--477
-\TU/TimesNewRoman(0)/m/n/10.95 imum cost paths,” \TU/TimesNewRoman(0)/m/it/10.9
-5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
- pp. 100–107, Jul. 1968, doi:
-
-Underfull \hbox (badness 5359) in paragraph at lines 483--484
-[]\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
-g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
-
-Underfull \hbox (badness 1590) in paragraph at lines 483--484
-\TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
-wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
-[25]
-Underfull \hbox (badness 4266) in paragraph at lines 537--537
+Underfull \hbox (badness 4266) in paragraph at lines 540--540
 []|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
 lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
  all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2

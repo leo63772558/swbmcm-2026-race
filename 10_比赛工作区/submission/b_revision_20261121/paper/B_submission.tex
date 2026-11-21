@@ -462,11 +462,14 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 \TeamText{conclusion}{Conclusion}
 
 % ===================== REFERENCES =====================
-\addcontentsline{toc}{section}{References}
-{\small
-\begin{thebibliography}{16}
-\setlength{\itemsep}{1pt}
+\begingroup
+\let\OriginalSection\section
+\def\section*#1{\OriginalSection*{#1}\addcontentsline{toc}{section}{References}}
 \setlength{\parskip}{0pt}
+\linespread{0.84}\selectfont
+\begin{thebibliography}{16}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
 \bibitem{lozano1983} T. Lozano-P\'{e}rez, ``Spatial planning: A configuration space approach,'' \emph{IEEE Trans. Comput.}, vol. C-32, no. 2, pp. 108--120, Feb. 1983, doi: 10.1109/TC.1983.1676196.
 \bibitem{bishop2010} A. N. Bishop, B. Fidan, B. D. O. Anderson, K. Do\u{g}an\c{c}ay, and P. N. Pathirana, ``Optimality analysis of sensor-target localization geometries,'' \emph{Automatica}, vol. 46, no. 3, pp. 479--492, Mar. 2010, doi: 10.1016/j.automatica.2009.12.003.
 \bibitem{problem} ShuWei Cup Organizing Committee, \emph{2026 ShuWei Cup Problem B: Rapid UAV Localization via Coordinated Mobile Vehicles}, Nov. 2026.
@@ -481,15 +484,15 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 \bibitem{wilson1927} E. B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist. Assoc.}, vol. 22, no. 158, pp. 209--212, Jun. 1927, doi: 10.1080/01621459.1927.10502953.
 \bibitem{brown2001} L. D. Brown, T. T. Cai, and A. DasGupta, ``Interval estimation for a binomial proportion,'' \emph{Statist. Sci.}, vol. 16, no. 2, pp. 101--133, May 2001, doi: 10.1214/ss/1009213286.
 \bibitem{stentz1994} A. Stentz, ``Optimal and efficient path planning for partially-known environments,'' in \emph{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)}, San Diego, CA, USA, May 1994, pp. 3310--3317, doi: 10.1109/ROBOT.1994.351061.
-\bibitem{archivedai} ChatGPT (Codex), GPT-5.4 / GPT-6.2 Sol, OpenAI, used 20--21 Nov. 2026 (solver scaffolding, numerical verification scripts, replay engine, Matplotlib visualization, LaTeX typesetting).
-\bibitem{antigravityai} Antigravity (Gemini), Gemini 3.1 Pro, Google DeepMind, used 21 Nov. 2026 (offline 3D digital twin UI, 1,000-pair B\&B audit, real-solver perturbation/3D Pareto/P4 expansion, 11-figure publication suite, LaTeX formatting and editorial verification).
+\bibitem{archivedai} ChatGPT (Codex), GPT-5.4 / GPT-6.2 Sol, OpenAI, used 20--21 Nov. 2026.
+\bibitem{antigravityai} Antigravity (Gemini), Gemini 3.1 Pro, Google DeepMind, used 21 Nov. 2026.
 \end{thebibliography}
-}
+\endgroup
 
 % ===================== AI USAGE DISCLOSURE =====================
 \section*{AI Usage Disclosure}
 \addcontentsline{toc}{section}{AI Usage Disclosure}
-AI tools \cite{archivedai,antigravityai} assisted with solver scaffolding, verification, exact branch-and-bound audits, offline replay, figures, sensitivity and Pareto analysis, tests, typesetting, editing, and DOI checks. Mathematical models, assumptions, proofs, and conclusions were checked against the deterministic CSV and JSON outputs. Appendix~B gives the AI usage report. The support ZIP includes \texttt{AI\_USAGE\_LOG.csv} and \texttt{AI\_Usage\_Report.md}.
+Codex \cite{archivedai} assisted with code, checks (Sections~4--8), and typesetting. Antigravity \cite{antigravityai} assisted with dispatch and P4 audits, sensitivity, Pareto, replay (Sections~6, 8--9), and Figures~1--11. WorkBuddy Agent (DeepSeek-V4.1-Flash, DeepSeek, 17 Nov. 2026) checked submission and AI rules for the pre-contest checklist. Appendix~B and the ZIP give details.
 
 % ===================== APPENDICES (EXEMPT FROM 25-PAGE CAP) =====================
 \clearpage
@@ -577,8 +580,9 @@ Pursuant to Article~6 of the 2026 ShuWei Cup AI Tool Usage Policy (exempt from t
 \toprule
 Tool \& Version & Provider & Usage Date & Task Stage & Prompt / Operation Summary & Adoption & Verification & Role / Location\\
 \midrule
-ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
+ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, and packaging; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
 Antigravity (Gemini 3.1 Pro) & Google DeepMind & 2026-11-21 & Audit, 3D Twin, Sensitivity, Pareto, Figures, Editing & Built offline 3D digital twin (\texttt{B\_Simulator.html}), 1,000-pair exact B\&B audit, 115-case P4 expansion, real-solver sensitivity/3D Pareto, 11-figure suite, and LaTeX QA fixes. & Adapted \& integrated into \texttt{src/*.py} and \texttt{paper/} & Verified via 6/6 hardcore audits, offline Chromium QA, and \texttt{pytest} & Simulator, Audit, Figs.~1--11, Paper formatting\\
+WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek & 2026-11-17 & Pre-contest rule verification & Checked official submission workflow and AI disclosure requirements. & Findings used in the team rules checklist & Checked against official rule PDFs & AI Usage Disclosure; team checklist and usage log\\
 \bottomrule
 \end{tabular}
 \end{table}

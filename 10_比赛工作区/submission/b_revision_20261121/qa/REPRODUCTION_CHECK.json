@@ -101,14 +101,14 @@
     "P1_ERRATA.pdf"
   ],
   "wall_seconds": {
-    "1_correctness": 0.546,
-    "2_validation": 11.414,
-    "3_experiments": 9.416,
-    "3b_sensitivity_pareto": 248.32,
-    "3c_p4_extended": 50.913,
-    "3d_p4_supplement": 19.054,
-    "4_visuals": 13.223,
-    "5_pdf": 26.581
+    "1_correctness": 0.491,
+    "2_validation": 10.807,
+    "3_experiments": 12.806,
+    "3b_sensitivity_pareto": 271.825,
+    "3c_p4_extended": 17.325,
+    "3d_p4_supplement": 19.912,
+    "4_visuals": 13.909,
+    "5_pdf": 28.183
   },
   "plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab"
 }

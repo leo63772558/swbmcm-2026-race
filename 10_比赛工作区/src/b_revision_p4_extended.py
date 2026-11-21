@@ -122,7 +122,7 @@ def build_dedup_and_expanded_specs():
     return dedup_base, expanded, duplicate_count
 
 
-def _evaluate_cases(nominal_visits, specs, stations, beam_width):
+def _evaluate_cases(nominal_visits, specs, stations, beam_width, *, disturbance=DISTURBANCE):
     """Solve the same Keep and Replan timelines once for each scenario."""
     cases = []
     with ExitStack() as stack:
@@ -133,13 +133,13 @@ def _evaluate_cases(nominal_visits, specs, stations, beam_width):
             goals = dict(model.TARGETS)
             if new_alert is not None:
                 goals["T4"] = new_alert
-            preserved = solver.observation_starts(nominal_visits, failed, DISTURBANCE)
+            preserved = solver.observation_starts(nominal_visits, failed, disturbance)
             locked = {a: t for a, t in preserved.items() if t < rec}
             pending = {a: g for a, g in goals.items() if a not in locked}
-            state = solver.scenario_state(nominal_visits, rec, failed, DISTURBANCE)
+            state = solver.scenario_state(nominal_visits, rec, failed, disturbance)
             revised = solver.solve_schedule(state, pending, HORIZON, beam_width=beam_width, stations=stations)
             solver.validate_visits(revised, goals)
-            revised_starts = locked | solver.observation_starts(revised, None, DISTURBANCE)
+            revised_starts = locked | solver.observation_starts(revised, None, disturbance)
 
             keep = window_score(preserved, set(goals), 0.0, HORIZON, HORIZON)
             replan = window_score(revised_starts, set(goals), 0.0, HORIZON, HORIZON)
@@ -149,7 +149,7 @@ def _evaluate_cases(nominal_visits, specs, stations, beam_width):
                 "category": _category_of(new_alert, failed, rec),
                 "failed_vehicle": "" if failed is None else failed + 1,
                 "recovery_s": rec,
-                "outage_duration_s": round(rec - DISTURBANCE, 6),
+                "outage_duration_s": round(rec - disturbance, 6),
                 "alerts": len(goals),
             }
             cases.append((fields, keep, replan))

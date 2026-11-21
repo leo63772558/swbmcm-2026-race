@@ -110,3 +110,26 @@ def test_real_solver_sensitivity_weight_check_and_3d_pareto():
     assert k8["is_pareto_3d"] == "True"
     assert float(k5["total_travel_m"]) < float(k8["total_travel_m"])
     assert float(k8["mean_quality_m_inv"]) > float(k5["mean_quality_m_inv"])
+
+
+def test_supplemental_p4_ledgers_and_clearance_geometry():
+    from b_revision_data import read_csv, read_json
+    from b_revision_p4_supplement import overlap_min
+
+    results = REVIEW_DIR / "results"
+    trials = read_csv(results / "P4_monte_carlo.csv")
+    summary = read_json(results / "P4_monte_carlo_summary.json")
+    assert summary["seed"] == 20261121 and summary["trials"] == 200
+    assert len(trials) == 600
+    for i in range(0, len(trials), 3):
+        keep, replan, selector = trials[i:i+3]
+        assert keep["trial"] == replan["trial"] == selector["trial"]
+        assert selector["outcome"] != "loss"
+    sweep = read_csv(results / "P4_equal_completion_sweep.csv")
+    assert len(sweep) == 21
+    assert float(sweep[0]["trigger_rate"]) > float(sweep[-1]["trigger_rate"]) == 0
+    assert overlap_min((0, 2, (0, 0), (1, 0)), (0, 2, (2, 0), (-1, 0))) == (0, 1)
+    clearance = read_json(results / "P4_vehicle_clearance.json")
+    rows = read_csv(results / "P4_vehicle_clearance.csv")
+    assert clearance["checked_replays"] == len(rows) == 148
+    assert clearance["minimum"]["distance_m"] == min(float(row["distance_m"]) for row in rows)

@@ -18,6 +18,7 @@ import b_revision_correctness
 import b_revision_experiments
 import b_revision_figures
 import b_revision_p4_extended
+import b_revision_p4_supplement
 import b_revision_p2_tradeoffs
 import b_revision_paper
 import b_revision_replay
@@ -188,6 +189,9 @@ def main(out, reference, bundle):
         tick=perf_counter()
         stage(results)
         times[name]=round(perf_counter()-tick,3)
+    tick=perf_counter()
+    b_revision_p4_supplement.main(results)
+    times["3c_p4_extended"] += round(perf_counter()-tick,3)
     tick=perf_counter()
     assets=reference/"simulator"/"assets"
     b_revision_replay.generate(out,assets/b_revision_replay.ASSET,assets/"PLOTLY_LICENSE.txt")

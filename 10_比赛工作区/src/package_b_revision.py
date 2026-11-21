@@ -132,6 +132,10 @@ def build(review, bundle=None, work=None):
     paper = review / "paper" / "B_submission.pdf"
     paper_info = inspect_paper(paper)
     inspect_replay(review)
+    qa_path = review / "qa" / "SIMULATOR_CHECKS.json"
+    simulator = read_json(qa_path)
+    simulator["vehicle_clearance"] = read_json(review / "results" / "P4_vehicle_clearance.json")
+    write_json(qa_path, simulator)
     reproducibility = build_manifest(review)
     if work is None:
         workspace = TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent)

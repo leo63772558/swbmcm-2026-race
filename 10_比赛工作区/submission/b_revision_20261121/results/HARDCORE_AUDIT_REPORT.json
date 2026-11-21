@@ -22,7 +22,13 @@
     "audited_routes_count": 2925,
     "audited_min_route_margin_m": 0.00044710363518452034,
     "detour_caveat": "Direct legs are exact Euclidean shortest paths; multi-segment detours are continuous-clearance-verified feasible upper bounds on the corner waypoint graph.",
-    "violations": []
+    "violations": [],
+    "nominal_corner_comparison": {
+      "detour_count": 1,
+      "max_gap_m": 0.15468413786471302,
+      "max_gap_pct": 0.8047467655972307,
+      "scope": "all detours found in archived nominal P1 and P2 routes"
+    }
   },
   "audit_3_tie_break_uniqueness": {
     "passed": true,
@@ -419,7 +425,7 @@
     "bound_macros": 93,
     "missing_macros": [],
     "missing_in_pdf": [],
-    "bibitems_total": 15,
+    "bibitems_total": 17,
     "uncited_bibitems": []
   }
 }

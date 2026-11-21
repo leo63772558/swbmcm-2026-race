@@ -632,6 +632,13 @@ def main(review_dir):
         "audit_5_sensitivity_pareto": audit_5_sensitivity_pareto(review_dir),
         "audit_6_three_way_consistency": audit_6_three_way_consistency(review_dir),
     }
+    routes = read_csv(review_dir / "results" / "P2_corner_arc_comparison.csv")
+    report["audit_2_minkowski_clearance"]["nominal_corner_comparison"] = {
+        "detour_count": len(routes),
+        "max_gap_m": max(float(r["absolute_gap_m"]) for r in routes),
+        "max_gap_pct": max(float(r["relative_gap_pct"]) for r in routes),
+        "scope": "all detours found in archived nominal P1 and P2 routes",
+    }
     write_json(review_dir / "results" / "HARDCORE_AUDIT_REPORT.json", report)
     for k, v in report.items():
         print(f"{k}: passed={v['passed']}")

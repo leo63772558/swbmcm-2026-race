@@ -154,6 +154,29 @@ def metrics(root):
         add("GlobalTopSwing", sens["top_swing_pct"], "Global_sensitivity_summary.json", "root", "top_swing_pct", 2)
         add("ParetoConfigs", sens["pareto_configs"], "Global_sensitivity_summary.json", "root", "pareto_configs", None)
         add("ParetoFrontCount", sens["pareto_front_count"], "Global_sensitivity_summary.json", "root", "pareto_front_count", None)
+    extra = "P4_monte_carlo_summary.json"
+    mc = read_json(results / extra)
+    add("StressTrials", mc["trials"], extra, "root", "trials")
+    for row in mc["statistics"]:
+        if row["metric"] not in ("eta", "latest_s"):
+            continue
+        key = row["policy"] + "/" + row["metric"]
+        macro = row["policy"].title() + ("Eta" if row["metric"] == "eta" else "Time")
+        for field in ("mean", "median", "iqr", "p95"):
+            add("Stress" + macro + field.title(), row[field], extra, key, field,
+                3 if row["metric"] == "eta" else 2)
+    bounds = next(r for r in mc["statistics"] if r["policy"] == "selector" and r["metric"] == "win")
+    for i, suffix in enumerate(("Low", "High")):
+        add("StressWin" + suffix, bounds["wilson95"][i], extra, "selector/win", f"wilson95[{i}]", 3)
+    delay = "P4_equal_completion_sweep.csv"
+    midpoint = next(row for row in read_csv(results / delay) if float(row["threshold_s"]) == 2.5)
+    add("HoldTrigger", midpoint["trigger_rate"], delay, "threshold_s=2.5", "trigger_rate", 3)
+    add("HoldSaving", midpoint["mean_saving_s"], delay, "threshold_s=2.5", "mean_saving_s", 3)
+    clearance = "P4_vehicle_clearance.json"
+    separation = read_json(results / clearance)
+    add("ReplayCount", separation["checked_replays"], clearance, "root", "checked_replays")
+    add("ReplayMin", separation["minimum"]["distance_m"], clearance, "minimum", "distance_m", 2)
+    add("ReplayMargin", separation["minimum"]["margin_m"], clearance, "minimum", "margin_m", 2)
     write_csv(paper/"NUMBER_PROVENANCE.csv",source)
     macro_lines = [f"\\newcommand{{\\B{r['macro']}}}{{{r['rendered']}}}" for r in source]
     (paper/"B_review_metrics.tex").write_text(

@@ -41,7 +41,7 @@ For additional information on amsmath, use the `?' option.
 (E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty)
 )) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
 (E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
 (E:\python\MLP\LaTex\tex/latex/float\float.sty)
@@ -142,7 +142,7 @@ Underfull \hbox (badness 7273) in paragraph at lines 181--182
 []|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
 (team/framework.tex [4]) (team/p1.tex
 Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
+\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a
 mobile vehicle can legally station itself
 [5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
 [11]) (team/p3.tex
@@ -151,10 +151,10 @@ Underfull \hbox (badness 1264) in paragraph at lines 4--5
  Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
 T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
 [12] [13] [14])
-Underfull \hbox (badness 2285) in paragraph at lines 64--323
+Underfull \hbox (badness 2285) in paragraph at lines 56--323
 \TU/TimesNewRoman(0)/m/n/12 defining the complete admissible odometry procureme
 nt envelope without numerical contour
-(team/p4.tex [15] [16]) [17] (team/v5.tex [18]) [19] (team/sensitivity.tex
+(team/p4.tex [15] [16]) (team/v5.tex [17] [18]) [19] (team/sensitivity.tex
 [20]
 Underfull \hbox (badness 1092) in paragraph at lines 15--16
 \TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
@@ -165,13 +165,13 @@ Underfull \hbox (badness 1009) in paragraph at lines 21--22
 \TU/TimesNewRoman(0)/m/n/12 (\TU/lmtt/m/n/12 B_Simulator.html\TU/TimesNewRoman(
 0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
 g Plotly
-[21]) (team/limits.tex [22] [23]) (team/conclusion.tex) [24]
+) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
 Underfull \hbox (badness 1147) in paragraph at lines 473--474
 []\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
 vent system specification modeling and simula-
 
 Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc. 
+\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
 ec. 2018, pp. 162–176, doi:
 
@@ -180,25 +180,24 @@ Underfull \hbox (badness 1584) in paragraph at lines 476--477
 5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
  pp. 100–107, Jul. 1968, doi:
 
-Underfull \hbox (badness 5359) in paragraph at lines 482--483
+Underfull \hbox (badness 5359) in paragraph at lines 483--484
 []\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
 g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 
-Underfull \hbox (badness 1590) in paragraph at lines 482--483
+Underfull \hbox (badness 1590) in paragraph at lines 483--484
 \TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
 wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
 [25]
-Underfull \hbox (badness 4266) in paragraph at lines 536--536
+Underfull \hbox (badness 4266) in paragraph at lines 537--537
 []|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
 lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
  all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
-[26] 
+[26]
 AED: lastpage setting LastPage
 [27] (B_submission.aux) )
 (see the transcript file for additional information)
 Output written on B_submission.pdf (27 pages).
 Transcript written on B_submission.log.
-
 This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
  restricted \write18 enabled.
 entering extended mode
@@ -242,7 +241,7 @@ For additional information on amsmath, use the `?' option.
 (E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty)
 )) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
 (E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
 (E:\python\MLP\LaTex\tex/latex/float\float.sty)
@@ -343,7 +342,7 @@ Underfull \hbox (badness 7273) in paragraph at lines 181--182
 []|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
 (team/framework.tex [4]) (team/p1.tex
 Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
+\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a
 mobile vehicle can legally station itself
 [5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
 [11]) (team/p3.tex
@@ -352,10 +351,10 @@ Underfull \hbox (badness 1264) in paragraph at lines 4--5
  Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
 T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
 [12] [13] [14])
-Underfull \hbox (badness 2285) in paragraph at lines 64--323
+Underfull \hbox (badness 2285) in paragraph at lines 56--323
 \TU/TimesNewRoman(0)/m/n/12 defining the complete admissible odometry procureme
 nt envelope without numerical contour
-(team/p4.tex [15] [16]) [17] (team/v5.tex [18]) [19] (team/sensitivity.tex
+(team/p4.tex [15] [16]) (team/v5.tex [17] [18]) [19] (team/sensitivity.tex
 [20]
 Underfull \hbox (badness 1092) in paragraph at lines 15--16
 \TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
@@ -366,13 +365,13 @@ Underfull \hbox (badness 1009) in paragraph at lines 21--22
 \TU/TimesNewRoman(0)/m/n/12 (\TU/lmtt/m/n/12 B_Simulator.html\TU/TimesNewRoman(
 0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
 g Plotly
-[21]) (team/limits.tex [22] [23]) (team/conclusion.tex) [24]
+) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
 Underfull \hbox (badness 1147) in paragraph at lines 473--474
 []\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
 vent system specification modeling and simula-
 
 Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc. 
+\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
 ec. 2018, pp. 162–176, doi:
 
@@ -381,25 +380,24 @@ Underfull \hbox (badness 1584) in paragraph at lines 476--477
 5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
  pp. 100–107, Jul. 1968, doi:
 
-Underfull \hbox (badness 5359) in paragraph at lines 482--483
+Underfull \hbox (badness 5359) in paragraph at lines 483--484
 []\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
 g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 
-Underfull \hbox (badness 1590) in paragraph at lines 482--483
+Underfull \hbox (badness 1590) in paragraph at lines 483--484
 \TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
 wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
 [25]
-Underfull \hbox (badness 4266) in paragraph at lines 536--536
+Underfull \hbox (badness 4266) in paragraph at lines 537--537
 []|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
 lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
  all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
-[26] 
+[26]
 AED: lastpage setting LastPage
 [27] (B_submission.aux) )
 (see the transcript file for additional information)
 Output written on B_submission.pdf (27 pages).
 Transcript written on B_submission.log.
-
 This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex.fmt)
  restricted \write18 enabled.
 entering extended mode
@@ -443,7 +441,7 @@ For additional information on amsmath, use the `?' option.
 (E:\python\MLP\LaTex\tex/latex/fancyhdr\fancyhdr.sty)
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage.sty
 (E:\python\MLP\LaTex\tex/latex/lastpage\lastpage2e.sty
-(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty) 
+(E:\python\MLP\LaTex\tex/latex/lastpage\lastpageclassic.sty)
 )) (E:\python\MLP\LaTex\tex/latex/caption\caption.sty
 (E:\python\MLP\LaTex\tex/latex/caption\caption3.sty))
 (E:\python\MLP\LaTex\tex/latex/float\float.sty)
@@ -544,7 +542,7 @@ Underfull \hbox (badness 7273) in paragraph at lines 181--182
 []|\TU/TimesNewRoman(0)/m/n/10.95 deg, deg, m,
 (team/framework.tex [4]) (team/p1.tex
 Underfull \hbox (badness 1354) in paragraph at lines 1--2
-\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a 
+\TU/TimesNewRoman(0)/m/n/12 To characterize every ground position from which a
 mobile vehicle can legally station itself
 [5] [6]) [7] (team/p2-precision.tex [8]) (team/p2-dispatch.tex [9] [10]
 [11]) (team/p3.tex
@@ -553,10 +551,10 @@ Underfull \hbox (badness 1264) in paragraph at lines 4--5
  Gaussian ground-position error $\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 ^^Nx; ^^Ny\O
 T1/cmr/m/n/12 ) \OMS/cmsy/m/n/12 ^^X
 [12] [13] [14])
-Underfull \hbox (badness 2285) in paragraph at lines 64--323
+Underfull \hbox (badness 2285) in paragraph at lines 56--323
 \TU/TimesNewRoman(0)/m/n/12 defining the complete admissible odometry procureme
 nt envelope without numerical contour
-(team/p4.tex [15] [16]) [17] (team/v5.tex [18]) [19] (team/sensitivity.tex
+(team/p4.tex [15] [16]) (team/v5.tex [17] [18]) [19] (team/sensitivity.tex
 [20]
 Underfull \hbox (badness 1092) in paragraph at lines 15--16
 \TU/TimesNewRoman(0)/m/n/12 into a formal three-objective space $\OT1/cmr/m/n/1
@@ -567,13 +565,13 @@ Underfull \hbox (badness 1009) in paragraph at lines 21--22
 \TU/TimesNewRoman(0)/m/n/12 (\TU/lmtt/m/n/12 B_Simulator.html\TU/TimesNewRoman(
 0)/m/n/12 ; visualization and verification scripts assisted by [[], []]) pairin
 g Plotly
-[21]) (team/limits.tex [22] [23]) (team/conclusion.tex) [24]
+) [21] [22] (team/limits.tex [23]) (team/conclusion.tex) [24]
 Underfull \hbox (badness 1147) in paragraph at lines 473--474
 []\TU/TimesNewRoman(0)/m/n/10.95 Y. Van Tendeloo and H. Vangheluwe, “Discrete e
 vent system specification modeling and simula-
 
 Underfull \hbox (badness 1490) in paragraph at lines 473--474
-\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc. 
+\TU/TimesNewRoman(0)/m/n/10.95 tion,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 Winter Simul. Conf. (WSC)\TU/TimesNewRoman(0)/m/n/10.95 , Gothenburg, Sweden, D
 ec. 2018, pp. 162–176, doi:
 
@@ -582,19 +580,19 @@ Underfull \hbox (badness 1584) in paragraph at lines 476--477
 5 IEEE Trans. Syst. Sci. Cybern.\TU/TimesNewRoman(0)/m/n/10.95 , vol. 4, no. 2,
  pp. 100–107, Jul. 1968, doi:
 
-Underfull \hbox (badness 5359) in paragraph at lines 482--483
+Underfull \hbox (badness 5359) in paragraph at lines 483--484
 []\TU/TimesNewRoman(0)/m/n/10.95 A. Stentz, “Optimal and efficient path plannin
 g for partially-known environments,” in \TU/TimesNewRoman(0)/m/it/10.95 Proc.
 
-Underfull \hbox (badness 1590) in paragraph at lines 482--483
+Underfull \hbox (badness 1590) in paragraph at lines 483--484
 \TU/TimesNewRoman(0)/m/it/10.95 IEEE Int. Conf. Robot. Autom. (ICRA)\TU/TimesNe
 wRoman(0)/m/n/10.95 , San Diego, CA, USA, May 1994, pp. 3310–3317, doi:
 [25]
-Underfull \hbox (badness 4266) in paragraph at lines 536--536
+Underfull \hbox (badness 4266) in paragraph at lines 537--537
 []|\TU/TimesNewRoman(0)/m/n/10 Hysteresis threshold sweep (\TU/lmtt/m/n/10 resu
 lts/P4_hysteresis_sweep.csv\TU/TimesNewRoman(0)/m/n/10 , 115 unique cases): for
  all $\OML/cmm/m/it/10 ^^N[] \OMS/cmsy/m/n/10 2
-[26] 
+[26]
 AED: lastpage setting LastPage
 [27] (B_submission.aux) )
 (see the transcript file for additional information)

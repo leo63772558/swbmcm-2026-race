@@ -22,6 +22,8 @@ from check_b_p4_cross import crossed_cases
 
 DISTURBANCE = model.number("p4", "disturbance", "occurrence_time")   # 5.0 s
 HORIZON = model.number("p4", "evaluation", "window_end")            # 60.0 s
+TIME_TOLERANCE_S = 1e-9
+HYSTERESIS_THRESHOLDS_S = tuple(step / 4 for step in range(21))
 T4_ALT = model.number("p4", "new_alert", "altitude")                # 50.0 m
 
 
@@ -123,9 +125,12 @@ def build_dedup_and_expanded_specs():
     return dedup_base, expanded, duplicate_count
 
 
-def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
-    """Evaluate a list of (suite, name, alert, failed, rec) specs under Keep, Reschedule, and Hysteresis."""
-    rows = []
+def _evaluate_cases(
+    nominal_visits, specs, stations, beam_width, *, disturbance=DISTURBANCE, state_at_release=None
+):
+    """Solve the same Keep and Replan timelines once for each scenario."""
+    state_at_release = state_at_release or solver.scenario_state
+    cases = []
     with ExitStack() as stack:
         stack.enter_context(patch.object(solver, "road_clear", rounded.road_clear))
         stack.enter_context(patch.object(solver, "route", rounded.route))
@@ -134,47 +139,74 @@ def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
             goals = dict(model.TARGETS)
             if new_alert is not None:
                 goals["T4"] = new_alert
-            preserved = solver.observation_starts(nominal_visits, failed, DISTURBANCE)
+            preserved = solver.observation_starts(nominal_visits, failed, disturbance)
             locked = {a: t for a, t in preserved.items() if t < rec}
             pending = {a: g for a, g in goals.items() if a not in locked}
-            state = solver.scenario_state(nominal_visits, rec, failed, DISTURBANCE)
+            state = state_at_release(nominal_visits, rec, failed, disturbance)
             revised = solver.solve_schedule(state, pending, HORIZON, beam_width=beam_width, stations=stations)
             solver.validate_visits(revised, goals)
-            revised_starts = locked | solver.observation_starts(revised, None, DISTURBANCE)
+            revised_starts = locked | solver.observation_starts(revised, None, disturbance)
 
-            k_cnt, k_eta, k_last = window_score(preserved, set(goals), 0.0, HORIZON, HORIZON)
-            r_cnt, r_eta, r_last = window_score(revised_starts, set(goals), 0.0, HORIZON, HORIZON)
-
-            # Hysteresis-gated Eq. (5) decision
-            trigger = (r_eta > k_eta + 1e-12) or (
-                abs(r_eta - k_eta) <= 1e-12 and (k_last - r_last) > hyst_delta + 1e-9
-            )
-            h_eta, h_last = (r_eta, r_last) if trigger else (k_eta, k_last)
-
-            score_k = (k_cnt, -k_last)
-            score_r = (r_cnt, -r_last)
-            winner = "reschedule" if score_r > score_k else ("keep" if score_k > score_r else "tie")
-            score_h = (round(h_eta * len(goals)), -h_last)
-            hyst_winner = "hyst_replan" if score_h > score_k else ("keep" if score_k > score_h else "tie")
-
-            rows.append({
+            keep = window_score(preserved, set(goals), 0.0, HORIZON, HORIZON)
+            replan = window_score(revised_starts, set(goals), 0.0, HORIZON, HORIZON)
+            fields = {
                 "suite": suite,
                 "case": name,
                 "category": _category_of(new_alert, failed, rec),
                 "failed_vehicle": "" if failed is None else failed + 1,
                 "recovery_s": rec,
-                "outage_duration_s": round(rec - DISTURBANCE, 6),
+                "outage_duration_s": round(rec - disturbance, 6),
                 "alerts": len(goals),
-                "keep_eta": round(k_eta, 6),
-                "keep_latest_s": round(k_last, 6),
-                "replan_eta": round(r_eta, 6),
-                "replan_latest_s": round(r_last, 6),
-                "hyst_eta": round(h_eta, 6),
-                "hyst_latest_s": round(h_last, 6),
-                "delta_replan_minus_keep_s": round(r_last - k_last, 6),
-                "winner": winner,
-                "hyst_winner": hyst_winner,
-            })
+            }
+            cases.append((fields, keep, replan))
+    return cases
+
+
+def _select_score(keep, replan, threshold_s):
+    keep_count, _, keep_last = keep
+    replan_count, _, replan_last = replan
+    use_replan = replan_count > keep_count or (
+        replan_count == keep_count and keep_last - replan_last > threshold_s + TIME_TOLERANCE_S
+    )
+    return replan if use_replan else keep
+
+
+def _compare_score(keep, candidate, win_label):
+    rank_keep = (keep[0], -keep[2])
+    rank_candidate = (candidate[0], -candidate[2])
+    return win_label if rank_candidate > rank_keep else ("keep" if rank_keep > rank_candidate else "tie")
+
+
+def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
+    """Evaluate a list of (suite, name, alert, failed, rec) specs under Keep, Reschedule, and Hysteresis."""
+    rows = []
+    for fields, keep, replan in _evaluate_cases(nominal_visits, specs, stations, beam_width):
+        k_cnt, k_eta, k_last = keep
+        r_cnt, r_eta, r_last = replan
+        # Hysteresis-gated Eq. (5) decision
+        trigger = (r_eta > k_eta + 1e-12) or (
+            abs(r_eta - k_eta) <= 1e-12 and (k_last - r_last) > hyst_delta + 1e-9
+        )
+        h_eta, h_last = (r_eta, r_last) if trigger else (k_eta, k_last)
+
+        score_k = (k_cnt, -k_last)
+        score_r = (r_cnt, -r_last)
+        winner = "reschedule" if score_r > score_k else ("keep" if score_k > score_r else "tie")
+        score_h = (round(h_eta * fields["alerts"]), -h_last)
+        hyst_winner = "hyst_replan" if score_h > score_k else ("keep" if score_k > score_h else "tie")
+
+        rows.append({
+            **fields,
+            "keep_eta": round(k_eta, 6),
+            "keep_latest_s": round(k_last, 6),
+            "replan_eta": round(r_eta, 6),
+            "replan_latest_s": round(r_last, 6),
+            "hyst_eta": round(h_eta, 6),
+            "hyst_latest_s": round(h_last, 6),
+            "delta_replan_minus_keep_s": round(r_last - k_last, 6),
+            "winner": winner,
+            "hyst_winner": hyst_winner,
+        })
     return rows
 
 

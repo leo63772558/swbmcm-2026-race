@@ -12,6 +12,8 @@ To eliminate double-counting and expand spatial coverage beyond the original arc
 
 Finally, to verify that our Problem 4 findings are not artifacts of a small online search budget, we re-executed all 62 deduplicated baseline scenarios across four progressively richer budgets: $(k,w)\in\{(2,3),\,(3,5),\,(5,10),\,(8,20)\}$ (Figure~\ref{fig:p4}c, \texttt{results/P4\_budget\_stability.csv}). Across all four budgets, Reschedule maintains $\eta=1.000$ with identical win/tie/loss counts (57W/4T/1L, 0 hysteresis losses), mean $t_{\mathrm{last}}$ stays tightly invariant within $[29.087,\,29.154]$ s ($<0.07$ s variation), and the V5 single-fault regression remains locked at $12.927041$ s ($+\BVFiveDelay{}$ s)—indicating that the V5 slowdown is an intrinsic physical consequence of cancellation resets rather than a heuristic truncation artifact.
 
+Appendix~A reports the \BHoldCases{} equal-completion cases and the \BStressTrials{}-trial archived stress test. The archived selector averages \BStressSelectorEta{} completion and \BStressSelectorTime{}~s latest start, with a Wilson win-rate interval of $[\BStressWinLow\%,\,\BStressWinHigh\%]$ against Keep.
+
 \ReviewFigure{fig07_p4_resilience.pdf}{78mm}
 {Deduplicated and spatially expanded 115-scenario Problem 4 audit: (a) Keep vs.\ Reschedule completion across 7 categories, (b) hysteresis-gated latest paired start distribution and category means, (c) online search-budget stability across $k\in\{2,3,5,8\}$, and (d) category-level win/tie/loss ledger.}
 {fig:p4}

@@ -464,7 +464,7 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 % ===================== REFERENCES =====================
 \addcontentsline{toc}{section}{References}
 {\small
-\begin{thebibliography}{15}
+\begin{thebibliography}{16}
 \setlength{\itemsep}{1pt}
 \setlength{\parskip}{0pt}
 \bibitem{lozano1983} T. Lozano-P\'{e}rez, ``Spatial planning: A configuration space approach,'' \emph{IEEE Trans. Comput.}, vol. C-32, no. 2, pp. 108--120, Feb. 1983, doi: 10.1109/TC.1983.1676196.
@@ -477,6 +477,7 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 \bibitem{psaraftis1980} H. N. Psaraftis, ``A dynamic programming solution to the single vehicle many-to-many immediate request dial-a-ride problem,'' \emph{Transp. Sci.}, vol. 14, no. 2, pp. 130--154, May 1980, doi: 10.1287/trsc.14.2.130.
 \bibitem{savelsbergh1995} M. W. P. Savelsbergh and M. Sol, ``The general pickup and delivery problem,'' \emph{Transp. Sci.}, vol. 29, no. 1, pp. 17--29, Feb. 1995, doi: 10.1287/trsc.29.1.17.
 \bibitem{jcgm2008} Joint Committee for Guides in Metrology (JCGM), \emph{Evaluation of Measurement Data---Supplement 1 to the Guide to the Expression of Uncertainty in Measurement: Propagation of Distributions Using a Monte Carlo Method}, JCGM 101:2008, BIPM, S\`evres, France, 2008, pp. 1--88, doi: 10.59161/jcgm101-2008.
+\bibitem{dlmf} NIST, \emph{Digital Library of Mathematical Functions}, Sec. 20.5, \url{https://dlmf.nist.gov/20.5}, accessed 21 Nov. 2026.
 \bibitem{wilson1927} E. B. Wilson, ``Probable inference, the law of succession, and statistical inference,'' \emph{J. Amer. Statist. Assoc.}, vol. 22, no. 158, pp. 209--212, Jun. 1927, doi: 10.1080/01621459.1927.10502953.
 \bibitem{brown2001} L. D. Brown, T. T. Cai, and A. DasGupta, ``Interval estimation for a binomial proportion,'' \emph{Statist. Sci.}, vol. 16, no. 2, pp. 101--133, May 2001, doi: 10.1214/ss/1009213286.
 \bibitem{stentz1994} A. Stentz, ``Optimal and efficient path planning for partially-known environments,'' in \emph{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)}, San Diego, CA, USA, May 1994, pp. 3310--3317, doi: 10.1109/ROBOT.1994.351061.
@@ -488,14 +489,14 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 % ===================== AI USAGE DISCLOSURE =====================
 \section*{AI Usage Disclosure}
 \addcontentsline{toc}{section}{AI Usage Disclosure}
-In accordance with the 2026 ShuWei Cup AI Tool Usage Policy, AI tools \cite{archivedai,antigravityai} assisted with solver implementation scaffolding, verification scripting, exact Branch-and-Bound auditing, offline 3D digital twin visualization, Matplotlib figure generation, real-solver parameter perturbation and 3D Pareto scripts, automated \texttt{pytest} testing, LaTeX typesetting, language polishing, and reference DOI checks. All mathematical models, boundary assumptions, proof steps, and physical conclusions were independently verified against deterministic outputs in \texttt{results/*.csv} and \texttt{results/*.json}. Appendix~B presents the complete AI Tool Usage Report (exempt from the 25-page main-body limit), and the supporting archive \texttt{BSWBMCM2613050fj.zip} includes \texttt{AI\_USAGE\_LOG.csv} and \texttt{AI\_Usage\_Report.md}.
+AI tools \cite{archivedai,antigravityai} assisted with solver scaffolding, verification, exact branch-and-bound audits, offline replay, figures, sensitivity and Pareto analysis, tests, typesetting, editing, and DOI checks. Mathematical models, assumptions, proofs, and conclusions were checked against the deterministic CSV and JSON outputs. Appendix~B gives the AI usage report. The support ZIP includes \texttt{AI\_USAGE\_LOG.csv} and \texttt{AI\_Usage\_Report.md}.
 
 % ===================== APPENDICES (EXEMPT FROM 25-PAGE CAP) =====================
 \clearpage
 \appendix
 \section*{Appendix A: Complete P2(2) Vehicle Timelines and P4 Representative Scenarios}
 \addcontentsline{toc}{section}{Appendix A: Complete P2(2) Timelines and P4 Scenarios}
-To ensure full transparency without inflating the 25-page main body, Table~\ref{tab:app-p22} lists all six observation slots and seven event clocks of the certified optimal nominal $k=8$ Beam Search schedule ($t_{\mathrm{last}}=\BBeamEight{}$ s), while Table~\ref{tab:app-p4} records the exact coordinates of the representative Problem~4 pop-up alert locations (\texttt{new\_1}--\texttt{new\_3} and the four building-shadow-edge hard points) alongside the positive-threshold hysteresis sweep ($\delta_{\mathrm{hyst}}\in\{0,0.25,0.5,1.0,2.0\}$ s across all 115 unique scenarios).
+Table~\ref{tab:app-p22} lists the certified nominal schedule ($t_{\mathrm{last}}=\BBeamEight{}$~s). Table~\ref{tab:app-p4} lists representative P4 alert locations and the deterministic hysteresis results.
 
 \begin{table}[htbp]
 \centering\footnotesize
@@ -534,6 +535,30 @@ Probe / Setting & Polar $(\theta, R)$ from $O$ & Cartesian $(x,y,z)$ (m) & Role 
 \texttt{shadow\_B3\_NW} & $(145^\circ,\; 42\text{ m})$ & $(15.60,\; 74.09,\; 50)$ & Shadow edge & Adjacent to B3 \& corner; 100\% covered\\
 \midrule
 \multicolumn{5}{@{}p{0.96\linewidth}@{}}{\footnotesize Hysteresis threshold sweep (\texttt{results/P4\_hysteresis\_sweep.csv}, 115 unique cases): for all $\delta_{\mathrm{hyst}}\in\{0.0, 0.25, 0.5, 1.0, 2.0\}$ s, completion stays $\eta=1.000$ with 0 losses and 110W/5T/0L because every non-tied rescheduling victory strictly improves $\eta$ ($\Delta\eta>0$).}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{Threshold results across \BHoldCases{} equal-completion cases. Cached departures are held on a uniform grid up to \BHoldThresholdMax{}~s.}
+\begin{tabular}{@{}rrr@{}}
+\toprule
+Threshold (s) & Trigger rate & Mean saving (s) \\
+\midrule
+\BHoldThresholdZero{} & \BHoldTriggerZero\% & \BHoldSavingZero{} \\
+\BHoldThresholdMid{} & \BHoldTriggerMid\% & \BHoldSavingMid{} \\
+\BHoldThresholdMax{} & \BHoldTriggerMax\% & \BHoldSavingMax{} \\
+\bottomrule
+\end{tabular}\par\smallskip
+\caption{Archived P4 stress test with \BStressTrials{} trials, seed \BStressSeed{}, and release clocks from commit \texttt{643c22a}. Wins, ties, and losses are scored against Keep.}
+\begin{tabular}{@{}lrrc@{}}
+\toprule
+Policy & Mean completion & Mean latest-start score (s) & Wins / Ties / Losses \\
+\midrule
+Keep & \BStressKeepEta{} & \BStressKeepTime{} & --- \\
+Unconditional Replan & \BStressReplanEta{} & \BStressReplanTime{} & \BStressReplanWins{} / \BStressReplanTies{} / \BStressReplanLosses{} \\
+Zero-threshold Selector & \BStressSelectorEta{} & \BStressSelectorTime{} & \BStressSelectorWins{} / \BStressSelectorTies{} / \BStressSelectorLosses{} \\
 \bottomrule
 \end{tabular}
 \end{table}

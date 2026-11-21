@@ -19,6 +19,7 @@ import b_revision_correctness
 import b_revision_experiments
 import b_revision_figures
 import b_revision_p4_extended
+import b_revision_p4_supplement
 import b_revision_paper
 import b_revision_replay
 import b_revision_sensitivity_pareto
@@ -32,6 +33,11 @@ def content_hash(path):
     if path.suffix.lower() in (".csv", ".json", ".html", ".txt"):
         return sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     return file_hash(path)
+
+
+def pdf_page_hashes(path):
+    return [sha256((page.extract_text() or "").encode("utf-8")).hexdigest()
+            for page in PdfReader(path).pages]
 
 
 def compare(reference, rerun, tex):
@@ -54,10 +60,12 @@ def compare(reference, rerun, tex):
         matched.append(rel.as_posix())
     text_matches=[]
     if tex:
-        for name in ("B_submission.pdf","P1_ERRATA.pdf"):
-            old=PdfReader(reference/"paper"/name)
-            new=PdfReader(rerun/"paper"/name)
-            assert [p.extract_text() for p in old.pages] == [p.extract_text() for p in new.pages]
+        proof = reference / "paper" / "PDF_PAGE_TEXT_SHA256.json"
+        fingerprints = read_json(proof) if proof.is_file() else None
+        for name in ("B_submission.pdf", "P1_ERRATA.pdf"):
+            old = reference / "paper" / name
+            expected_pages = pdf_page_hashes(old) if old.is_file() else fingerprints[name]
+            assert pdf_page_hashes(rerun / "paper" / name) == expected_pages, name
             text_matches.append(name)
     return matched,text_matches
 
@@ -74,7 +82,8 @@ def main(out, reference, bundle, skip_pdf=False):
                        ("2_validation",b_revision_validation.main),
                        ("3_experiments",b_revision_experiments.main),
                        ("3b_sensitivity_pareto",b_revision_sensitivity_pareto.main),
-                       ("3c_p4_extended",b_revision_p4_extended.main)):
+                       ("3c_p4_extended",b_revision_p4_extended.main),
+                       ("3d_p4_supplement",b_revision_p4_supplement.main)):
         tick=perf_counter()
         stage(results)
         times[name]=round(perf_counter()-tick,3)

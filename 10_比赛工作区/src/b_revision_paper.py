@@ -15,6 +15,7 @@ import subprocess
 from PIL import Image
 from pypdf import PdfReader
 
+from b_hardcore_audit import audit_2_minkowski_clearance
 from b_revision_data import DEFAULT_OUTPUT, read_csv, read_json, write_csv, write_json
 
 
@@ -108,6 +109,47 @@ def metrics(root):
         add("GlobalTopSwing", sens["top_swing_pct"], "Global_sensitivity_summary.json", "root", "top_swing_pct", 2)
         add("ParetoConfigs", sens["pareto_configs"], "Global_sensitivity_summary.json", "root", "pareto_configs", None)
         add("ParetoFrontCount", sens["pareto_front_count"], "Global_sensitivity_summary.json", "root", "pareto_front_count", None)
+    sweep_file = "P4_equal_completion_sweep.csv"
+    sweep = {float(row["threshold_s"]): row for row in read_csv(results / sweep_file)}
+    cases_file = "P4_equal_completion_cases.csv"
+    add("HoldCases", len(read_csv(results / cases_file)), cases_file, "file", "row count")
+    for threshold, label in ((0.0, "Zero"), (2.5, "Mid"), (5.0, "Max")):
+        row = sweep[threshold]
+        key = f"threshold_s={threshold}"
+        add("HoldThreshold" + label, row["threshold_s"], sweep_file, key, "threshold_s")
+        add("HoldTrigger" + label, 100 * float(row["trigger_rate"]), sweep_file, key, "100*trigger_rate", 1)
+        add("HoldSaving" + label, row["mean_saving_s"], sweep_file, key, "mean_saving_s", 3)
+
+    stress_file = "P4_monte_carlo_summary.json"
+    stress = read_json(results / stress_file)
+    for name, field in (("StressTrials", "trials"), ("StressSeed", "seed")):
+        add(name, stress[field], stress_file, "root", field)
+    stress_stats = {(row["policy"], row["metric"]): row for row in stress["statistics"]}
+    for policy, label in (("keep", "Keep"), ("replan", "Replan"), ("selector", "Selector")):
+        for metric, suffix, digits in (("eta", "Eta", 4), ("latest_s", "Time", 2)):
+            add(f"Stress{label}{suffix}", stress_stats[policy, metric]["mean"], stress_file,
+                f"{policy}.{metric}", "mean", digits)
+        if policy != "keep":
+            for outcome, suffix in (("win", "Wins"), ("tie", "Ties"), ("loss", "Losses")):
+                count = round(stress["trials"] * stress_stats[policy, outcome]["rate"])
+                add(f"Stress{label}{suffix}", count, stress_file, f"{policy}.{outcome}", "trials*rate")
+    for index, suffix in enumerate(("Low", "High")):
+        bound = stress_stats["selector", "win"]["wilson95"][index]
+        add("StressWin" + suffix, 100 * bound, stress_file, "selector.win", f"100*wilson95[{index}]", 1)
+
+    clearance_file = "P4_vehicle_clearance.json"
+    separation = read_json(results / clearance_file)
+    add("ReplayCount", separation["checked_replays"], clearance_file, "root", "checked_replays")
+    add("ReplayMin", separation["minimum"]["distance_m"], clearance_file, "minimum", "distance_m", 2)
+    add("ReplayMargin", separation["minimum"]["margin_m"], clearance_file, "minimum", "margin_m", 2)
+
+    static = audit_2_minkowski_clearance(root)
+    audit_file = "HARDCORE_AUDIT_REPORT.json"
+    audit_key = "audit_2_minkowski_clearance"
+    add("StaticSegments", static["segments_checked"], audit_file, audit_key, "segments_checked")
+    add("StaticPoints", static["stationary_points_checked"], audit_file, audit_key, "stationary_points_checked", "comma")
+    add("StaticIntrusions", len(static["violations"]), audit_file, audit_key, "violations length")
+
     write_csv(paper/"NUMBER_PROVENANCE.csv",source)
     macro_lines = [f"\\newcommand{{\\B{r['macro']}}}{{{r['rendered']}}}" for r in source]
     (paper/"B_review_metrics.tex").write_text(
@@ -256,7 +298,8 @@ def evidence_tables(root):
 
 def compile_tex(path, bundle):
     engine = which("tectonic")
-    if engine:
+    xe = which("xelatex")
+    if engine and (bundle or not xe):
         command = [engine, "--untrusted", "--only-cached", "--keep-logs", "--keep-intermediates"]
         if bundle:
             command.extend(["--bundle", Path(relpath(bundle.resolve(), path.parent.resolve())).as_posix()])
@@ -267,7 +310,6 @@ def compile_tex(path, bundle):
         if proc.returncode:
             raise RuntimeError(f"Tectonic failed ({proc.returncode}): {proc.stderr[-2000:]}")
         return path.with_suffix(".pdf")
-    xe = which("xelatex")
     if not xe:
         raise RuntimeError("Neither tectonic nor xelatex is available on PATH.")
     logs = []
@@ -279,7 +321,11 @@ def compile_tex(path, bundle):
         if proc.returncode:
             (path.parent / (path.stem + "_compile.txt")).write_text("\n".join(logs), encoding="utf-8")
             raise RuntimeError(f"XeLaTeX failed ({proc.returncode}): {proc.stdout[-2000:]}")
-    (path.parent / (path.stem + "_compile.txt")).write_text("\n".join(logs), encoding="utf-8")
+    compile_log = "\n".join(
+        line.rstrip() for result in logs for line in result.splitlines()
+    ) + "\n"
+    (path.parent / (path.stem + "_compile.txt")).write_text(compile_log, encoding="utf-8")
+    assert not re.search(r"Overfull \\[hv]box", compile_log), f"Overfull TeX box in {path.name}"
     return path.with_suffix(".pdf")
 
 

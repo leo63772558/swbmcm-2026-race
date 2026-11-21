@@ -71,3 +71,35 @@ SavingsMax,0.03193,results/Route_summary.json,root,maximum_saving_m,0.0319262281
 GlobalTopSwing,11.67,results/Global_sensitivity_summary.json,root,top_swing_pct,11.6704
 ParetoConfigs,16,results/Global_sensitivity_summary.json,root,pareto_configs,16
 ParetoFrontCount,8,results/Global_sensitivity_summary.json,root,pareto_front_count,8
+HoldCases,21,results/P4_equal_completion_cases.csv,file,row count,21
+HoldThresholdZero,0.0,results/P4_equal_completion_sweep.csv,threshold_s=0.0,threshold_s,0.0
+HoldTriggerZero,95.2,results/P4_equal_completion_sweep.csv,threshold_s=0.0,100*trigger_rate,95.23809523809523
+HoldSavingZero,2.500,results/P4_equal_completion_sweep.csv,threshold_s=0.0,mean_saving_s,2.5
+HoldThresholdMid,2.5,results/P4_equal_completion_sweep.csv,threshold_s=2.5,threshold_s,2.5
+HoldTriggerMid,47.6,results/P4_equal_completion_sweep.csv,threshold_s=2.5,100*trigger_rate,47.61904761904761
+HoldSavingMid,1.845,results/P4_equal_completion_sweep.csv,threshold_s=2.5,mean_saving_s,1.8452380952380953
+HoldThresholdMax,5.0,results/P4_equal_completion_sweep.csv,threshold_s=5.0,threshold_s,5.0
+HoldTriggerMax,0.0,results/P4_equal_completion_sweep.csv,threshold_s=5.0,100*trigger_rate,0.0
+HoldSavingMax,0.000,results/P4_equal_completion_sweep.csv,threshold_s=5.0,mean_saving_s,0.0
+StressTrials,200,results/P4_monte_carlo_summary.json,root,trials,200
+StressSeed,20261121,results/P4_monte_carlo_summary.json,root,seed,20261121
+StressKeepEta,0.7175,results/P4_monte_carlo_summary.json,keep.eta,mean,0.7175
+StressKeepTime,46.78,results/P4_monte_carlo_summary.json,keep.latest_s,mean,46.779196676447576
+StressReplanEta,1.0000,results/P4_monte_carlo_summary.json,replan.eta,mean,1.0
+StressReplanTime,20.85,results/P4_monte_carlo_summary.json,replan.latest_s,mean,20.84951453565269
+StressReplanWins,146,results/P4_monte_carlo_summary.json,replan.win,trials*rate,146
+StressReplanTies,24,results/P4_monte_carlo_summary.json,replan.tie,trials*rate,24
+StressReplanLosses,30,results/P4_monte_carlo_summary.json,replan.loss,trials*rate,30
+StressSelectorEta,1.0000,results/P4_monte_carlo_summary.json,selector.eta,mean,1.0
+StressSelectorTime,20.27,results/P4_monte_carlo_summary.json,selector.latest_s,mean,20.26508037771161
+StressSelectorWins,146,results/P4_monte_carlo_summary.json,selector.win,trials*rate,146
+StressSelectorTies,54,results/P4_monte_carlo_summary.json,selector.tie,trials*rate,54
+StressSelectorLosses,0,results/P4_monte_carlo_summary.json,selector.loss,trials*rate,0
+StressWinLow,66.5,results/P4_monte_carlo_summary.json,selector.win,100*wilson95[0],66.45656480133158
+StressWinHigh,78.7,results/P4_monte_carlo_summary.json,selector.win,100*wilson95[1],78.67655018531417
+ReplayCount,148,results/P4_vehicle_clearance.json,root,checked_replays,148
+ReplayMin,24.00,results/P4_vehicle_clearance.json,minimum,distance_m,23.999999999999996
+ReplayMargin,21.00,results/P4_vehicle_clearance.json,minimum,margin_m,20.999999999999996
+StaticSegments,892,results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,segments_checked,892
+StaticPoints,"4,503",results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,stationary_points_checked,4503
+StaticIntrusions,0,results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,violations length,0

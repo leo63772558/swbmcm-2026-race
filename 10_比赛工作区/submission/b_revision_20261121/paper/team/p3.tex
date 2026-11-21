@@ -22,35 +22,27 @@ Let the ground position error be isotropic Gaussian $(\delta x, \delta y) \sim \
 \begin{proof}
 For $\sigma > 0$, define the dimensionless signal-to-noise ratio $\kappa = D/\sigma > 0$, so that $\Theta = \operatorname{atan2}(Z_y,\, \kappa + Z_x)$ has distribution depending on $(D,\sigma)$ solely through $\kappa$. Let $\varphi(u)=(2\pi)^{-1/2}e^{-u^2/2}$ and $\Phi(u)=\int_{-\infty}^u\varphi(t)\,\mathrm{d}t$ denote the standard normal density and distribution function.
 
-\emph{Step 1 (Strict stochastic monotonicity of $|\Theta|$ in $\kappa$).} For every angle $\alpha\in(0,\pi)$, the symmetric wedge $W_\alpha=\{(x,y)\in\mathbb{R}^2 : |\operatorname{atan2}(y,x)|\le\alpha\}$ satisfies $(x,y)\in W_\alpha \iff x \ge |y|\cot\alpha$ for all $y\neq 0$ (verified uniformly across acute, right, and obtuse $\alpha\in(0,\pi)$). Hence the cumulative distribution function $F_\Theta(\alpha;\kappa)=\mathbb{P}(|\Theta|\le\alpha)$ takes the exact slice integral form
+\emph{Step 1 (Bearing distribution).}
+For $0<\alpha<\pi$, the event $|\Theta|\le\alpha$ is $\kappa+Z_x\ge |Z_y|\cot\alpha$, up to a null set. Thus
 \[
-F_\Theta(\alpha;\kappa) = \int_{-\infty}^{\infty}\left(\int_{|y|\cot\alpha}^{\infty}\varphi(x-\kappa)\,\mathrm{d}x\right)\varphi(y)\,\mathrm{d}y.
+F_\Theta(\alpha;\kappa)=\int_{\mathbb R}\Phi(\kappa-|y|\cot\alpha)\varphi(y)\,\mathrm{d}y.
 \]
-On any compact interval $[\kappa_1,\kappa_2]\subset(0,\infty)$, $|\partial_\kappa \varphi(x-\kappa)| = |x-\kappa|\varphi(x-\kappa)$ is dominated by an integrable envelope in $(x,y)$. Applying Leibniz's rule under the integral sign and noting $\partial_\kappa \varphi(x-\kappa)=-\partial_x \varphi(x-\kappa)$ yields
-\[
-\frac{\partial F_\Theta(\alpha;\kappa)}{\partial \kappa}
-= \int_{-\infty}^{\infty} \varphi(|y|\cot\alpha - \kappa)\,\varphi(y)\,\mathrm{d}y
-= 2\int_0^\infty \varphi(y\cot\alpha - \kappa)\,\varphi(y)\,\mathrm{d}y.
-\]
-Completing the square via $(y\cot\alpha-\kappa)^2+y^2 = (y\csc\alpha-\kappa\cos\alpha)^2+\kappa^2\sin^2\alpha$ and substituting $u=y\csc\alpha-\kappa\cos\alpha$ ($\mathrm{d}y=\sin\alpha\,\mathrm{d}u$) gives the closed-form strictly positive derivative
-\[
-\frac{\partial F_\Theta(\alpha;\kappa)}{\partial \kappa}
-= \sqrt{\frac{2}{\pi}}\,\sin\alpha\,e^{-\frac{1}{2}\kappa^2\sin^2\alpha}\,\Phi(\kappa\cos\alpha) > 0
-\qquad \forall\,\alpha\in(0,\pi),\;\kappa>0.
-\]
+The derivative of the integrand in $\kappa$ is positive and bounded by $\varphi(y)/\sqrt{2\pi}$ for every $\kappa$. Dominated convergence therefore gives $0<\partial_\kappa F_\Theta\le 1/\sqrt{2\pi}$. Completing the square gives $\partial_\kappa F_\Theta=\sqrt{2/\pi}\sin\alpha\,e^{-\kappa^2\sin^2\alpha/2}\Phi(\kappa\cos\alpha)$.
 
-\emph{Step 2 (Unimodal wrapped gimbal acceptance kernel).} Let $g_W(\phi)=\sum_{m\in\mathbb{Z}}\sigma_g^{-1}\varphi((\phi+2\pi m)/\sigma_g)$ be the wrapped normal density of $\epsilon_g$ on $[-\pi,\pi]$, which is even ($g_W(-\phi)=g_W(\phi)$) and strictly decreasing on $[0,\pi]$ (a standard property of the heat kernel on $S^1$). Define the conditional acceptance kernel $I(\theta)=\mathbb{P}_{\epsilon_g}(|\operatorname{wrap}(\theta+\epsilon_g)|\le\Delta_{\max})=\int_{-\Delta_{\max}}^{\Delta_{\max}}g_W(\theta-\phi)\,\mathrm{d}\phi$. Substituting $u=\theta-\phi$ gives $I(\theta)=\int_{\theta-\Delta_{\max}}^{\theta+\Delta_{\max}}g_W(u)\,\mathrm{d}u$; by the Fundamental Theorem of Calculus, $I(\theta)$ is even and continuously differentiable with
+\emph{Step 2 (Wrapped acceptance).}
+Integrating the periodized Gaussian against $e^{-in\theta}$ unfolds the integral onto $\mathbb R$ and gives Fourier coefficient $q^{n^2}/(2\pi)$, $q=e^{-\sigma_g^2/2}\in(0,1)$ \cite{dlmf}. The Jacobi product gives
 \[
-I'(\theta) = g_W(\theta+\Delta_{\max}) - g_W(\theta-\Delta_{\max}).
+g_W(\theta)=\frac1{2\pi}\prod_{n\ge1}(1-q^{2n})
+   (1+2q^{2n-1}\cos\theta+q^{4n-2}).
 \]
-For every $\theta\in(0,\pi)$ and $\Delta_{\max}\in(0,\pi/2)$, the circular distance from $0$ to $\theta+\Delta_{\max}$ strictly exceeds the circular distance from $0$ to $\theta-\Delta_{\max}$: when $\theta+\Delta_{\max}\le\pi$, $|\theta-\Delta_{\max}|<\theta+\Delta_{\max}$; when $\theta+\Delta_{\max}>\pi$, $2\pi-(\theta+\Delta_{\max})-(\theta-\Delta_{\max})=2(\pi-\theta)>0$. Strict decrease of $g_W$ on $[0,\pi]$ therefore gives $g_W(\theta+\Delta_{\max})<g_W(\theta-\Delta_{\max})$, so $I'(\theta)<0$ for all $\theta\in(0,\pi)$.
+The positive factors yield a positive product since the deviations from one are absolutely summable. Their log derivatives are $-2q^{2n-1}\sin\theta/(1+2q^{2n-1}\cos\theta+q^{4n-2})$, bounded in absolute value by $2q^{2n-1}/(1-q)^2$. The uniform geometric majorant allows termwise differentiation of the log, giving $g_W'<0$ on $(0,\pi)$. For the even acceptance kernel $I(\theta)=\int_{\theta-\Delta_{\max}}^{\theta+\Delta_{\max}} g_W(u)\,\mathrm{d}u$, the continuous integrand gives $I'=g_W(\theta+\Delta_{\max})-g_W(\theta-\Delta_{\max})<0$ there, since the first argument is farther from zero on the circle.
 
 \emph{Step 3 (Continuity at $\sigma=0$, chain rule, and closed-form boundary simplex).} Conditioning on $|\Theta|$ and integrating by parts on $[0,\pi]$ (using $F_\Theta(0;\kappa)=0$ and $F_\Theta(\pi;\kappa)=1$) yields
 \[
 P(\sigma) = \int_0^\pi I(\theta)\,\mathrm{d}F_\Theta(\theta;\kappa)
 = I(\pi) + \int_0^\pi \bigl(-I'(\theta)\bigr)\,F_\Theta(\theta;\kappa)\,\mathrm{d}\theta.
 \]
-As $\sigma\to 0^+$ ($\kappa\to\infty$), $F_\Theta(\theta;\kappa)\uparrow 1$ for every $\theta\in(0,\pi)$; by monotone convergence, $\lim_{\sigma\to 0^+}P(\sigma) = I(\pi) + (I(0)-I(\pi)) = I(0) = P(0) = \mathbb{P}(|\operatorname{wrap}(\epsilon_g)|\le\Delta_{\max})$ (which equals $\operatorname{erf}(5^\circ/(\sqrt{2}\cdot 1^\circ))\approx 0.9999994$ when $\sigma_g=1^\circ,\;\Delta_{\max}=5^\circ$, since $|\epsilon_g|>\pi-\Delta_{\max}=175^\circ$ has mass $<10^{-6000}$), strictly exceeding $P(\sigma)$ for all $\sigma>0$. On $(0,\infty)$, $0 < \partial_\kappa F_\Theta(\theta;\kappa) \le \sqrt{2/\pi}$ uniformly and $-I'(\theta)>0$ is continuous, so differentiating under the integral sign gives $\mathrm{d}P/\mathrm{d}\kappa > 0$ and $\mathrm{d}P/\mathrm{d}\sigma = (-D/\sigma^2)\,\mathrm{d}P/\mathrm{d}\kappa < 0$. As $\sigma\to\infty$ ($\kappa\to 0^+$), $\Theta\xrightarrow{d}\mathrm{Uniform}(-\pi,\pi]$ and $P(\sigma)\to\Delta_{\max}/\pi$. Hence $P:[0,\infty)\to(\Delta_{\max}/\pi,\,P(0)]$ is a continuous, strictly decreasing bijection, yielding a unique critical spread $\sigma^*\ge 0$ with $P(\sigma^*)=0.95$. Statements (1)--(3) follow immediately from $P(a+bs)\ge 0.95 \iff a+bs\le\sigma^*$ (with $s_{\max}=(\sigma^*-a)/b$ when $b>0$ and constant $P(a)\ge 0.95\iff a\le\sigma^*$ when $b=0$, including the zero-intercept boundary $a=0$).
+For $\sigma\downarrow0$, $F_\Theta(\theta;D/\sigma)\uparrow1$ at interior angles, so $P(\sigma)\to I(0)$ by dominated convergence. For $\sigma\uparrow\infty$, the isotropic bearing tends to uniform and coverage tends to $\Delta_{\max}/\pi$. On $[\sigma_1,\sigma_2]\subset(0,\infty)$, the derivative of the integral's integrand in $\sigma$ is strictly negative at interior angles and its absolute value is bounded by $D|I'(\theta)|/(\sigma_1^2\sqrt{2\pi})$. This envelope is integrable since $I'$ is continuous on $[0,\pi]$. Differentiating shows $P'(\sigma)<0$, so the 95\% level is crossed once under the stated bounds, and $P(a+bs)\ge0.95$ is equivalent to $a+bs\le\sigma^*$.
 \end{proof}
 
 \subsection{Analytical-Statistical Dual Closure and Sensor Specification Domain}

@@ -115,3 +115,53 @@ def test_live_hysteresis_sweep_and_case_deduplication():
     assert r1["hyst_winner"] == "tie"
     assert math.isclose(r0["hyst_latest_s"], 11.034062, abs_tol=1e-5)
     assert math.isclose(r1["hyst_latest_s"], 11.034062, abs_tol=1e-5)
+
+
+def test_supplemental_p4_ledgers_and_clearance_geometry():
+    from b_revision_data import read_csv, read_json
+    from b_revision_p4_supplement import overlap_min
+
+    results = REVIEW_DIR / "results"
+    trials = read_csv(results / "P4_monte_carlo.csv")
+    summary = read_json(results / "P4_monte_carlo_summary.json")
+    assert summary["seed"] == 20261121 and summary["trials"] == 200
+    assert len(trials) == 600
+    for i in range(0, len(trials), 3):
+        keep, replan, selector = trials[i:i+3]
+        assert keep["trial"] == replan["trial"] == selector["trial"]
+        assert selector["outcome"] != "loss"
+    sweep = read_csv(results / "P4_equal_completion_sweep.csv")
+    assert len(sweep) == 21
+    assert float(sweep[0]["trigger_rate"]) > float(sweep[-1]["trigger_rate"]) == 0
+    assert overlap_min((0, 2, (0, 0), (1, 0)), (0, 2, (2, 0), (-1, 0))) == (0, 1)
+    clearance = read_json(results / "P4_vehicle_clearance.json")
+    rows = read_csv(results / "P4_vehicle_clearance.csv")
+    assert clearance["checked_replays"] == len(rows) == 148
+    assert clearance["minimum"]["distance_m"] == min(float(row["distance_m"]) for row in rows)
+
+
+def test_supplemental_p4_published_metrics():
+    from b_revision_data import read_csv, read_json
+
+    results = REVIEW_DIR / "results"
+    sweep = {float(row["threshold_s"]): row
+             for row in read_csv(results / "P4_equal_completion_sweep.csv")}
+    for threshold, trigger, saving in ((0.0, 95.2, 2.500), (2.5, 47.6, 1.845), (5.0, 0.0, 0.0)):
+        assert round(100 * float(sweep[threshold]["trigger_rate"]), 1) == trigger
+        assert round(float(sweep[threshold]["mean_saving_s"]), 3) == saving
+
+    stress = read_json(results / "P4_monte_carlo_summary.json")
+    stats = {(row["policy"], row["metric"]): row for row in stress["statistics"]}
+    assert [round(stats[policy, "eta"]["mean"], 4) for policy in ("keep", "replan", "selector")] == [0.7175, 1.0, 1.0]
+    assert [round(stats[policy, "latest_s"]["mean"], 2) for policy in ("keep", "replan", "selector")] == [46.78, 20.85, 20.27]
+    assert [round(200 * stats["replan", key]["rate"]) for key in ("win", "tie", "loss")] == [146, 24, 30]
+    assert [round(200 * stats["selector", key]["rate"]) for key in ("win", "tie", "loss")] == [146, 54, 0]
+    assert [round(100 * bound, 1) for bound in stats["selector", "win"]["wilson95"]] == [66.5, 78.7]
+
+    separation = read_json(results / "HARDCORE_AUDIT_REPORT.json")["audit_2_minkowski_clearance"]
+    assert (separation["segments_checked"], separation["stationary_points_checked"], separation["violations"]) == (892, 4503, [])
+    dynamic = separation["vehicle_clearance_posthoc"]
+    assert dynamic["passed"] and not dynamic["enforced_by_scheduler"]
+    assert dynamic["safety_diameter_m"] == 3.0
+    assert round(dynamic["minimum"]["distance_m"], 2) == 24.0
+    assert round(dynamic["minimum"]["margin_m"], 2) == 21.0

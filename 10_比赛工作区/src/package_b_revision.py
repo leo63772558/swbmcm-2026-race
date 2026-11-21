@@ -21,9 +21,10 @@ from pypdf import PdfReader
 
 from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
+from reproduce_b_revision import pdf_page_hashes
 
 
-BASELINE = "9c2fef86ae38a5b6b472c7750d2451faf9df5d27"
+BASELINE = "be4c12e7aa2d90f4526c7af97e247d5b69a377f2"
 STEM = "BSWBMCM2613050"
 LIMIT = 20_000_000
 BEIJING = timezone(timedelta(hours=8))
@@ -74,6 +75,7 @@ def support_entries(review, *, official_clean=False):
     entries = {
         **{path.relative_to(ROOT).as_posix(): path
            for path in (ROOT / "data").glob(data_glob) if path.is_file()},
+        "03_code/run_all.py": ROOT.parent / "03_code" / "run_all.py",
         **{f"results/{name}": ROOT / "results" / name for name in REFERENCE_NAMES},
         **{f"src/{name}": ROOT / "src" / name for name in SOURCE_NAMES},
         **{f"src/{path.name}": path for pattern in ("b_revision_*.py", "b_replay*")
@@ -112,7 +114,10 @@ def inspect_paper(path):
             appendix_start = idx
             break
     main_pages = (appendix_start - 1) if appendix_start is not None else len(paper.pages)
-    assert 2 < main_pages <= 25, f"Main body {main_pages} pages exceeds 25-page official cap"
+    assert len(paper.pages) == 27 and main_pages == 25, (len(paper.pages), main_pages)
+    for page, heading in ((2, "Content"), (26, "Appendix A:"), (27, "Appendix B:")):
+        lines = (paper.pages[page - 1].extract_text() or "").splitlines()
+        assert lines[1].strip().startswith(heading), (page, lines[:2])
     page_one = re.sub(r"\s+", "", paper.pages[0].extract_text() or "")
     assert "Summary" in page_one and "Keywords" in page_one
     assert path.stat().st_size < LIMIT
@@ -151,21 +156,26 @@ def build(review, bundle=None):
     )
     with TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent) as folder:
         temp = Path(folder)
-        payload = support_entries(review, official_clean=False)
+        official_payload = support_entries(review, official_clean=True)
+        fingerprints = temp / "PDF_PAGE_TEXT_SHA256.json"
+        write_json(fingerprints, {
+            name: pdf_page_hashes(review / "paper" / name)
+            for name in ("B_submission.pdf", "P1_ERRATA.pdf")
+        })
+        official_payload["artifacts/paper/" + fingerprints.name] = fingerprints
         seed = temp / "staged.zip"
-        write_zip(seed, payload)
+        write_zip(seed, official_payload)
         extracted = temp / "clean"
         with ZipFile(seed) as archive:
             archive.extractall(extracted)
         rerun = temp / "rerun"
-        cmd = [sys.executable, "-B", str(extracted / "src" / "reproduce_b_revision.py"), "--out", str(rerun)]
+        cmd = [sys.executable, "-B", str(extracted / "03_code" / "run_all.py"), "--out", str(rerun)]
         if bundle:
             cmd.extend(["--tex-bundle", str(bundle)])
         subprocess.run(cmd, cwd=extracted, check=True)
         proof = rerun / "REPRODUCTION_CHECK.json"
         results = read_json(proof)
         assert len(results["pdf_text_matches"]) == 2
-        official_payload = support_entries(review, official_clean=True)
         upload = temp / (STEM + "fj.zip")
         manifest = write_zip(upload, {**official_payload, "qa/REPRODUCTION_CHECK.json": proof})
         acceptance = temp / "RELEASE_ACCEPTANCE.json"

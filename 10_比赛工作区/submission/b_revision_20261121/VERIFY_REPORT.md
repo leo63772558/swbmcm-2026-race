@@ -1,6 +1,6 @@
 # 数维杯 B 题工程验收报告
 
-基线为赛时仓库 `9c2fef8`。本轮对应原计划 §4.4、§5.4、§5.5 和第 6 阶段，产物用于队内工程交接。正式推导、结论、英文正文与平台提交由队员签收。
+本轮以 `be4c12e` 为基线，从 `643c22a` 迁回三个补充成果。本轮对应原计划 §4.4、§5.4、§5.5 和第 6 阶段，产物用于队内工程交接。正式推导、结论、英文正文与平台提交由队员签收。
 
 ## 实跑检查
 
@@ -9,24 +9,32 @@
 | 1 数学与边界 | `b_revision_correctness.py` | 车体可接触和 LOS 禁接触分离。T1 弧端和有限段复算通过。T2 有限差分协方差、临界几何和双车 30 s 均通过。60 s 恰值及两侧通过。 |
 | 2 数值验证 | `b_revision_validation.py` | T1 多网格与 250,000 点抽样一致。2925 条车辆到站路线逐段核净距。P3 三阶数值夹逼、484 点扫描、远端概率上界和三组各 2,000,000 次抽样通过。 |
 | 3 实验与数据流 | `b_revision_experiments.py` | P2 两策略同源站池、逐任务逐车阶段、k 与束宽对照。P4 73 个场景编号双策略逐事件验分。存档 56 行中变化 0 行。 |
-| 4 仿真与图 | `b_revision_figures.py`、`b_revision_replay.py` | 单 HTML 内联 Plotly，提供 Canvas 2.5D 备用，也可切换俯视、斜视和车辆跟踪。八组 Matplotlib 图和三帧具有矢量 PDF 与高清 PNG；来源见 `figures/FIGURE_SOURCES.csv`，浏览器证据见 `qa/SIMULATOR_CHECKS.json`。 |
+| 4 仿真与图 | `b_revision_figures.py`、`b_revision_replay.py` | 单 HTML 内联 Plotly，提供 Canvas 2.5D 备用，也可切换俯视、斜视和车辆跟踪。十一组 Matplotlib 图和三帧具有矢量 PDF 与高清 PNG；来源见 `figures/FIGURE_SOURCES.csv`，浏览器证据见 `qa/SIMULATOR_CHECKS.json`。 |
 | 5 编译与 PDF | `b_revision_paper.py` | 12 pt Times New Roman、全篇 A4、首页无页眉。后续页眉采用项目统一的 `Team#SWBMCM2613050` 与自动页码。页数、页面栅格边界、字体和数字绑定见 `qa/PDF_CHECKS.json`。 |
 | 6 复跑与交付 | `reproduce_b_revision.py`、`package_b_revision.py` | 前三阶段独立复跑的 32 份 CSV 和 JSON 与基线一致（统一换行后比较）；回放元数据另行核对。解包后全流程复跑、PDF 文本比较、归档体积和成员校验见 `qa/REPRODUCTION_CHECK.json` 与 `RELEASE_ACCEPTANCE.json`。 |
+
+## 合龙验证
+
+- P3 恢复 Jacobi 三重积、对数导数一致收敛与控制收敛上界。P3 主干条件、192 节点和三组独立 2,000,000 次抽样继续适用。
+- P4 等完成率补充实验共 21 例，滞回阈值 0、2.5、5 s 对应触发率 95.2%、47.6%、0%，平均省时 2.500、1.845、0 s。原 115 例确定性结果和滞回扫描沿用主干。
+- P4 随机压力测试复现 `643c22a` 的 200 个固定种子试验及其车辆释放时钟。Replan 和 Selector 的平均最晚启动评分分别为 20.85 s、20.27 s。若采用 `be4c12e` 已修复的复位阶段释放时钟，同批样本得到 20.84 s、20.25 s。附录表采用历史口径，现行调度继续使用已修复的复位逻辑。
+- 静态建筑净空核对了 892 个执行线段和 4,503 个静止点，侵入数为 0。148 条回放的独立连续相对运动审计得到最小车距 24.00 m，对 3.0 m 安全直径的裕度为 21.00 m。车距审计在执行后计算，调度器未内置该约束。
+- 洁净 ZIP 提供 `03_code/run_all.py`，解压后可复跑生成物 SHA-256 和两份 PDF 的逐页文本 SHA-256。验收证据见 `qa/REPRODUCTION_CHECK.json`，成员哈希见 `RELEASE_ACCEPTANCE.json`。
 
 ## 前后对照
 
 - 浏览器验证（暗黑 3D 数字孪生指挥大屏 v2）：Headless Chromium 156 独立离线打开 `file://` 单文件 `B_Simulator.html`（3.08 MB），WebGL（SwiftShader）与禁用 WebGL 的暗黑 Canvas 2.5D 回退模式分别渲染并导出 3 组 `1800×1250` 高清关键帧（含三视角切换、强制 WebGL 上下文丢失回退、P1 地面叠加与双策略路径对比）。零外部网络请求、零页面报错；892 段行车路径与 4,503 个静止点均与建筑底面零穿模；Node.js 770 条状态断言全部通过。
-- 图件与新增计算验证：新增 `b_revision_sensitivity_pareto.py` 实跑生成全局敏感性（OAT/龙卷风/6×6 交互矩阵）与 16 组多目标 Pareto 权衡数据（`Global_sensitivity_oat.csv`、`Global_sensitivity_interaction.csv`、`Pareto_tradeoff.csv`），不改动既有 P1–P4 基线结果。全套 **10 组多面板科研图（`fig01`–`fig10`）** 与 3 组独立关键帧均以矢量 PDF + 320 dpi PNG 输出，色板与 3D 指挥大屏完全统一（V1–V5：`#0EA5E9/#38BDF8`、`#F59E0B`、`#10B981`、`#A855F7`、`#F43F5E`）。
-- 论文排版与终极收官成稿（基于 `afdddee` 完成）：全面改写全部 13 个 `paper/team/*.tex` 为连贯出版级英文学术成稿（零提纲 bullet、零蓝图提示、零 `[FILL` 占位符），含完整严格的 P3 **Theorem 1** `\begin{proof}...\end{proof}` 数学证明、**tcolorbox** 顶刊细线高亮框（包装 Theorem 1 + Proof 与 P4 Eq. (5) 滞回条件重调度准则）、2 个 IEEE 三线伪代码框（**Algorithm 1** 精确分支定界与束搜索协同调度、**Algorithm 2** 滞回门控事件驱动动态重调度）、Section 3 末尾新增 4×4 “5 秒速览全篇核心战绩”总表（Table 3），并修复 `fig04_p2_paths` 的 0-indexed 车辆索引偏差与全套 10 组图表的 LaTeX 数学符号统一及 Fig. 10(b) 暗黑 3D 关键帧白底印刷适配（`0.6pt` 细灰外框 + 白底外置子图标题条）。XeLaTeX 实编译 **24 页 A4**（严守 ≤ 25 页，12 pt Times New Roman，首页 91% 满版无页眉，第 2 页 `Content`，第 2–24 页统一 `Team#SWBMCM2613050` + `Page N of 24`，零 `Overfull \hbox/\vbox`、零缺字、零中文、72/72 绑定宏与 15/15 条文献 100% 一致）。
+- 图件与新增计算验证：新增 `b_revision_sensitivity_pareto.py` 实跑生成全局敏感性（OAT/龙卷风/6×6 交互矩阵）与 16 组多目标 Pareto 权衡数据（`Global_sensitivity_oat.csv`、`Global_sensitivity_interaction.csv`、`Pareto_tradeoff.csv`），不改动既有 P1–P4 基线结果。全套 **11 组多面板科研图（`fig01`–`fig11`）** 与 3 组独立关键帧均以矢量 PDF + 320 dpi PNG 输出，色板与 3D 指挥大屏完全统一（V1–V5：`#0EA5E9/#38BDF8`、`#F59E0B`、`#10B981`、`#A855F7`、`#F43F5E`）。
+- 论文排版：XeLaTeX 三遍编译得到 **27 页 A4**。摘要、目录、正文及参考文献与 AI 声明共 25 页，Appendix A 和 Appendix B 分别在第 26、27 页。首页无页眉，第 2 页为 Content。零 Overfull hbox/vbox，104/104 个数值宏及 16/16 条文献通过一致性审计。
 - 暗黑 3D 指挥大屏新增一键演示模式：在 `B_Simulator.html` 左上角 HUD 增加 **“▶ Auto-Tour: V5 Fault & Dual-Strategy Demo”** 按钮，自动切换斜 45° 透视视角并加载 V5 故障双策略对比场景，平滑播放并在 $t=5.000$ s 故障触发时刻短暂停顿高亮红色脉冲告警与分叉轨迹。Headless Chromium 156 离线双模式（WebGL + Canvas 2.5D 回退）实测 `"auto_tour_verified": true`，零报错、零外网请求、892 段行车路径与 4,503 个静止点零碰撞。
-- 六项底层硬核审计与 30 问评委反向审计（`b_hardcore_audit.py`、`results/HARDCORE_AUDIT_REPORT.json`、`FINAL_JUDGE_REVIEW.md`）：(1) 585 候选站、20 路网点、6,215 轨迹点全部严格落于 $[1.5, 98.5]^2$（0 越界）；(2) 882 执行段与 4,451 静止点连续欧氏圆角净距余量最小 `+1.122154 m`（2,925 审计路线最小 `+0.000447 m`），名义双车间距 `38.425493 m >> 3.0 m`；(3) 全求解器统一就绪优先平局规则；(4) 独立零截断精确分支定界覆盖全部 $\binom{5}{2}^3=1{,}000$ 种合法车辆配对（全部 6 种复用模式与 `4,200` 种无环服务顺序），seeded（`initial_ub=11.034162 s`）与 unseeded（`initial_ub=+\infty`）均证成 `11.034062 s` 在 `k=8` 池与全 585 站离散池上均为精确全局最优（gap = `0.000000 s`）；(5) 真实 P1–P4 求解器参数扰动与 5 组权重稳定性 + 3D Pareto 审计通过；(6) 72 宏与 15 条文献三方 100% 一致。
+- 六项底层硬核审计与 30 问评委反向审计（`b_hardcore_audit.py`、`results/HARDCORE_AUDIT_REPORT.json`、`FINAL_JUDGE_REVIEW.md`）：(1) 585 候选站、20 路网点、6,215 轨迹点全部严格落于 $[1.5, 98.5]^2$（0 越界）；(2) 892 执行段与 4,503 静止点连续欧氏圆角净距余量最小 `+1.122154 m`（2,925 审计路线最小 `+0.000447 m`），名义双车间距 `38.425493 m >> 3.0 m`；(3) 全求解器统一就绪优先平局规则；(4) 独立零截断精确分支定界覆盖全部 $\binom{5}{2}^3=1{,}000$ 种合法车辆配对（全部 6 种复用模式与 `4,200` 种无环服务顺序），seeded（`initial_ub=11.034162 s`）与 unseeded（`initial_ub=+\infty`）均证成 `11.034062 s` 在 `k=8` 池与全 585 站离散池上均为精确全局最优（gap = `0.000000 s`）；(5) 真实 P1–P4 求解器参数扰动与 5 组权重稳定性 + 3D Pareto 审计通过；(6) 104 宏与 16 条文献三方 100% 一致。
 - **第二轮专项硬核整改闭环（P0-1 至 P1 全部落地实跑）**：
   1. **P0-1 全空间 1,000 配对 B&B**：`b_hardcore_audit.py` 扩展至全部 1,000 种合法配对（含单车 3 告警、双车各 2 告警及闲置车辆模式）与 4,200 种无环服务顺序；seeded 剪枝 Layer-0 `4,133` 个拓扑与内层 `5,784` 分支，独立 unseeded 剪枝 Layer-0 `3,693` 个拓扑与 `4,479,089` 内层分支，最优解仍精确为 `11.034062 s`（零间隙）。
   2. **P0-2 真实求解器参数扰动与 5 权重稳定性**：彻底删除 `b_revision_sensitivity_pareto.py` 中的 P4 线性代理公式，改为真实调用 `solve_p4` 事件仿真；严格拆分 Pan/Tilt 独立轴并并列输出 Fixed-Plan Local 与 Re-Optimized P2 敏感性（诚实披露 `pan_speed=36°/s` 时贪心束搜索 P2 退化至 `12.210 s` vs 固定方案 `10.708 s`，而真实 P4 缩短至 `25.304 s`）；新增 5 组权重扰动对照（`Global_sensitivity_weight_check.csv`）；全篇消除夸大的“Sobol”表述。
   3. **P0-3 三维 Pareto 与拆分 Fig. 10 / Fig. 11**：引入平均观测质量 $\bar{Q}=\frac{1}{6}\sum 1/r$ 构建三维 Pareto 前沿（`Pareto_tradeoff_3d.csv`，16 组配置中 8 组三维非支配），严格证成 `Beam k=5`（`36.15 m`）与 `Beam k=8`（$\bar{Q}=0.02008\text{ m}^{-1}$）同为三维非支配解；拆分并重绘高清大图 **Fig. 10**（三维 Pareto + 二维投影）与 **Fig. 11**（放大并提亮印刷对比度的 3D 指挥大屏三联图）。
   4. **P0-4 数学闭环**：在 `p2-precision.tex` 补齐 `Proposition 1` 解析下界 $\sqrt{2}\sigma_\theta r_{\min}=0.143623\text{ m}$ 严格证明；在 `p3.tex` 扩展 `Theorem 1` 覆盖 $a\ge 0, b\ge 0$ 边界闭环并严格推导出 80 m 闭式可行域 $a\ge 0, b\ge 0, a+80b\le 1.63674517\text{ m}$（同步标注入 Fig. 6）；`p1.tex` 彻底融合全部 P1 勘误条目。
   5. **P0-5 工程与合规整改**：`03_code/run_all.py` 改为严格 fail-fast 桥接 `reproduce_b_revision.py`（零静默跳过）；新增仓库根 9 文件 `pytest` 套件（`tests/test_*.py`）全覆盖几何/可见性/圆角路径/定位/调度/概率/事件/重调度/提交包匿名与合规；修复所有 `AI_USAGE_LOG.csv` 为严格 11 列并清理个人姓名；新增独立 `AI_Usage_Report.md` 纳入支撑包；同步更新根目录 `README.md`、`requirements.txt` 及匿名化 `03_code/**/README.md`。
-  6. **P1 P4 去重扩充与 11 组图重绘**：`b_revision_p4_extended.py` 去除 73 归档中的 11 组重复项得 62 唯一基线，叠加 53 组多方位/多距离/建筑阴影边缘高难场景共 **115 唯一场景**（Keep $\eta=0.642$，Replan $\eta=1.000$，110W/4T/1L，滞回 0 损失）；实跑 `k=2/3/5/8` 预算稳定性确认 V5 `+1.893 s` 退化严格不变。最终编译 `B_submission.pdf` 为 **25 页 A4**（严守 ≤ 25 页，11/11 图、72/72 宏、15/15 文献、零告警）。
+  6. **P1 P4 去重扩充与 11 组图重绘**：`b_revision_p4_extended.py` 去除 73 归档中的 11 组重复项得 62 唯一基线，叠加 53 组多方位/多距离/建筑阴影边缘高难场景共 **115 唯一场景**（Keep $\eta=0.642$，Replan $\eta=1.000$，110W/4T/1L，滞回 0 损失）；实跑 `k=2/3/5/8` 预算稳定性确认 V5 `+1.893 s` 退化严格不变。排版验收见上。
 
 | 指标 | 原基线 | 工程复核 |
 |---|---|---|

@@ -32,9 +32,10 @@ from pathlib import Path
 
 CODE_DIR = Path(__file__).resolve().parent
 REPO = CODE_DIR.parent
-SRC_DIR = REPO / "10_比赛工作区" / "src"
+PACKAGED = (REPO / "artifacts").is_dir()
+SRC_DIR = REPO / "src" if PACKAGED else REPO / "10_比赛工作区" / "src"
 REPRO_SCRIPT = SRC_DIR / "reproduce_b_revision.py"
-DEFAULT_REF = REPO / "10_比赛工作区" / "submission" / "b_revision_20261121"
+DEFAULT_REF = REPO / "artifacts" if PACKAGED else REPO / "10_比赛工作区" / "submission" / "b_revision_20261121"
 
 PIPELINE_STAGES = [
     ("1_correctness", "10_比赛工作区/src/b_revision_correctness.py", "P1 可观测区域、圆角 Minkowski 净距与 readiness-first 校验"),
@@ -57,13 +58,16 @@ def main() -> int:
     args = ap.parse_args()
 
     # Fail-fast check that every required pipeline module exists
-    missing = [rel for _, rel, _ in PIPELINE_STAGES if not (REPO / rel).is_file()]
+    missing = [rel for _, rel, _ in PIPELINE_STAGES if not (SRC_DIR / Path(rel).name).is_file()]
+    supplement = SRC_DIR / "b_revision_p4_supplement.py"
+    if not supplement.is_file():
+        missing.append(str(supplement.relative_to(REPO)))
     if not REPRO_SCRIPT.is_file():
         missing.insert(0, str(REPRO_SCRIPT.relative_to(REPO)))
 
     if args.list:
         for key, rel, desc in PIPELINE_STAGES:
-            status = "READY" if (REPO / rel).is_file() else "MISSING"
+            status = "MISSING" if rel in missing else "READY"
             print(f"  [{status}] {key:<22} {desc} ({rel})")
         return 1 if missing else 0
 

@@ -1,0 +1,135 @@
+{
+  "seed": 20261121,
+  "trials": 200,
+  "statistics": [
+    {
+      "policy": "keep",
+      "metric": "eta",
+      "mean": 0.7175,
+      "median": 0.6666666666666666,
+      "iqr": 0.5,
+      "p95": 1.0
+    },
+    {
+      "policy": "keep",
+      "metric": "latest_s",
+      "mean": 46.779196676447576,
+      "median": 60.0,
+      "iqr": 48.96593823537935,
+      "p95": 60.0
+    },
+    {
+      "policy": "keep",
+      "metric": "win",
+      "rate": 0.0,
+      "wilson95": [
+        1.734723475976807e-18,
+        0.018845326377266575
+      ]
+    },
+    {
+      "policy": "keep",
+      "metric": "tie",
+      "rate": 1.0,
+      "wilson95": [
+        0.9811546736227335,
+        1.0
+      ]
+    },
+    {
+      "policy": "keep",
+      "metric": "loss",
+      "rate": 0.0,
+      "wilson95": [
+        1.734723475976807e-18,
+        0.018845326377266575
+      ]
+    },
+    {
+      "policy": "replan",
+      "metric": "eta",
+      "mean": 1.0,
+      "median": 1.0,
+      "iqr": 0.0,
+      "p95": 1.0
+    },
+    {
+      "policy": "replan",
+      "metric": "latest_s",
+      "mean": 20.84951453565269,
+      "median": 20.752373460147997,
+      "iqr": 12.056648366544366,
+      "p95": 32.8404481740312
+    },
+    {
+      "policy": "replan",
+      "metric": "win",
+      "rate": 0.73,
+      "wilson95": [
+        0.6645656480133157,
+        0.7867655018531416
+      ]
+    },
+    {
+      "policy": "replan",
+      "metric": "tie",
+      "rate": 0.12,
+      "wilson95": [
+        0.08197992706375512,
+        0.17234252098296743
+      ]
+    },
+    {
+      "policy": "replan",
+      "metric": "loss",
+      "rate": 0.15,
+      "wilson95": [
+        0.10713593562241995,
+        0.20605579284166659
+      ]
+    },
+    {
+      "policy": "selector",
+      "metric": "eta",
+      "mean": 1.0,
+      "median": 1.0,
+      "iqr": 0.0,
+      "p95": 1.0
+    },
+    {
+      "policy": "selector",
+      "metric": "latest_s",
+      "mean": 20.26508037771161,
+      "median": 20.752373460147997,
+      "iqr": 15.074577363175123,
+      "p95": 32.8404481740312
+    },
+    {
+      "policy": "selector",
+      "metric": "win",
+      "rate": 0.73,
+      "wilson95": [
+        0.6645656480133157,
+        0.7867655018531416
+      ]
+    },
+    {
+      "policy": "selector",
+      "metric": "tie",
+      "rate": 0.27,
+      "wilson95": [
+        0.21323449814685846,
+        0.33543435198668425
+      ]
+    },
+    {
+      "policy": "selector",
+      "metric": "loss",
+      "rate": 0.0,
+      "wilson95": [
+        1.734723475976807e-18,
+        0.018845326377266575
+      ]
+    }
+  ]
+}

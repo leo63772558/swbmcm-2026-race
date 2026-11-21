@@ -21,10 +21,10 @@ Extract `BSWBMCM2613050fj.zip` into an empty directory and install the pinned Py
 
 ```text
 python -m pip install -r requirements-review.txt
-python -B src/reproduce_b_revision.py --out _b_rerun
+python 03_code/run_all.py --out _b_rerun
 ```
 
-If XeLaTeX is unavailable on a machine and you wish to verify only the numerical, figure, and simulator stages, pass `--skip-pdf` explicitly (the runner refuses to silently skip PDF compilation).
+To use the lower-level runner for only the numerical, figure, and simulator stages, pass `--skip-pdf` explicitly (the runner refuses to silently skip PDF compilation).
 
 From the full repository root, the strict fail-fast entry point is:
 

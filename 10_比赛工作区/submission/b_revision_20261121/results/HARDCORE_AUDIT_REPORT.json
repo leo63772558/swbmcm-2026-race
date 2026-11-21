@@ -22,7 +22,24 @@
     "audited_routes_count": 2925,
     "audited_min_route_margin_m": 0.00044710363518452034,
     "detour_caveat": "Direct legs are exact Euclidean shortest paths; multi-segment detours are continuous-clearance-verified feasible upper bounds on the corner waypoint graph.",
-    "violations": []
+    "violations": [],
+    "vehicle_clearance_posthoc": {
+      "checked_replays": 148,
+      "minimum": {
+        "case": "new_1_V3_recovery_5",
+        "policy": "reschedule",
+        "distance_m": 23.999999999999996,
+        "time_s": 14.515238646417963,
+        "vehicle_1": 3,
+        "vehicle_2": 5,
+        "margin_m": 20.999999999999996
+      },
+      "replays_below_diameter": 0,
+      "method": "continuous piecewise linear relative-motion minimization",
+      "safety_diameter_m": 3.0,
+      "enforced_by_scheduler": false,
+      "passed": true
+    }
   },
   "audit_3_tie_break_uniqueness": {
     "passed": true,
@@ -326,10 +343,10 @@
   },
   "audit_6_three_way_consistency": {
     "passed": true,
-    "bound_macros": 72,
+    "bound_macros": 104,
     "missing_macros": [],
     "missing_in_pdf": [],
-    "bibitems_total": 15,
+    "bibitems_total": 16,
     "uncited_bibitems": [],
     "citation_order_exact": true
   }

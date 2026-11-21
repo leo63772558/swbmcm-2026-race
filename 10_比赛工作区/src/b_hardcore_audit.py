@@ -113,9 +113,34 @@ def audit_2_minkowski_clearance(review_dir):
     for case_name, case in timeline["cases"].items():
         for pol, rows in case["policies"].items():
             _check_rows(case_name, pol, rows)
-    route_summary = read_json(review_dir / "results" / "Route_summary.json")
+    results = review_dir / "results"
+    route_summary = read_json(results / "Route_summary.json")
+    separation = read_json(results / "P4_vehicle_clearance.json")
+    replay_rows = read_csv(results / "P4_vehicle_clearance.csv")
+    expected_replays = {
+        ("nominal", policy) for policy in timeline["nominal_policies"]
+    } | {
+        (case_name, policy)
+        for case_name, case in timeline["cases"].items()
+        for policy in case["policies"]
+    }
+    actual_replays = {(row["case"], row["policy"]) for row in replay_rows}
+    minimum = min(float(row["distance_m"]) for row in replay_rows)
+    below_diameter = sum(float(row["distance_m"]) < 2 * model.RADIUS - tol for row in replay_rows)
+    dynamic_clearance = {
+        **separation,
+        "safety_diameter_m": 2 * model.RADIUS,
+        "enforced_by_scheduler": False,
+        "passed": (
+            actual_replays == expected_replays
+            and len(replay_rows) == len(actual_replays) == separation["checked_replays"]
+            and abs(minimum - separation["minimum"]["distance_m"]) <= tol
+            and abs(minimum - 2 * model.RADIUS - separation["minimum"]["margin_m"]) <= tol
+            and below_diameter == separation["replays_below_diameter"] == 0
+        ),
+    }
     return {
-        "passed": len(violations) == 0 and min_pair_sep >= 2 * model.RADIUS - tol,
+        "passed": not violations and min_pair_sep >= 2 * model.RADIUS - tol and dynamic_clearance["passed"],
         "segments_checked": seg_count,
         "stationary_points_checked": pt_count,
         "min_continuous_segment_margin_m": round(min_seg_margin, 9),
@@ -125,6 +150,7 @@ def audit_2_minkowski_clearance(review_dir):
         "audited_min_route_margin_m": route_summary["minimum_margin_m"],
         "detour_caveat": "Direct legs are exact Euclidean shortest paths; multi-segment detours are continuous-clearance-verified feasible upper bounds on the corner waypoint graph.",
         "violations": violations[:10],
+        "vehicle_clearance_posthoc": dynamic_clearance,
     }
 
 

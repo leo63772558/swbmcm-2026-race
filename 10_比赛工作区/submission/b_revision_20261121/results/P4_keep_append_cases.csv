@@ -1,0 +1,116 @@
+suite,case,category,failed_vehicle,recovery_s,alerts,keep_eta,keep_latest_s,append_eta,append_latest_s,replan_eta,replan_latest_s,select_policy,select_eta,select_latest_s,append_vs_keep,replan_vs_append,replan_vs_keep,append_gain_s,replan_gain_over_append_s
+baseline_unique,new_1,New Alert Only,,5.0,4,0.75,60.0,1.0,19.047768,1.0,18.323821,replan,1.0,18.323821,candidate,candidate,candidate,,0.723947
+baseline_unique,new_2,New Alert Only,,5.0,4,0.75,60.0,1.0,18.639073,1.0,19.435824,append,1.0,18.639073,candidate,base,candidate,,-0.796751
+baseline_unique,new_3,New Alert Only,,5.0,4,0.75,60.0,1.0,19.052396,1.0,20.263169,append,1.0,19.052396,candidate,base,candidate,,-1.210773
+baseline_unique,failure_V1,Vehicle Failure Only,1,5.0,3,0.666667,60.0,1.0,21.086091,1.0,13.398808,replan,1.0,13.398808,candidate,candidate,candidate,,7.687282
+baseline_unique,failure_V2,Vehicle Failure Only,2,5.0,3,0.666667,60.0,1.0,19.948046,1.0,13.398808,replan,1.0,13.398808,candidate,candidate,candidate,,6.549238
+baseline_unique,failure_V3,Vehicle Failure Only,3,5.0,3,0.666667,60.0,1.0,20.752373,1.0,13.398808,replan,1.0,13.398808,candidate,candidate,candidate,,7.353565
+baseline_unique,failure_V4,Vehicle Failure Only,4,5.0,3,0.666667,60.0,1.0,19.381517,1.0,13.398808,replan,1.0,13.398808,candidate,candidate,candidate,,5.982709
+baseline_unique,failure_V5,Vehicle Failure Only,5,5.0,3,1.0,11.034062,1.0,11.034062,1.0,12.927041,keep,1.0,11.034062,tie,base,base,0.0,-1.89298
+baseline_unique,outage_interior,Comms Outage Only (cached),,17.5,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,keep,1.0,11.034062,tie,tie,tie,0.0,0.0
+baseline_unique,outage_upper_time,Comms Outage Only (cached),,30.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,keep,1.0,11.034062,tie,tie,tie,0.0,0.0
+baseline_unique,outage_upper_duration,Comms Outage Only (cached),,35.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,keep,1.0,11.034062,tie,tie,tie,0.0,0.0
+baseline_unique,new_failure_V1,Failure + New Alert,1,5.0,4,0.5,60.0,1.0,27.486797,1.0,24.510119,replan,1.0,24.510119,candidate,candidate,candidate,,2.976678
+baseline_unique,failure_outage_V1,Failure + Comms Outage,1,30.0,3,0.666667,60.0,1.0,35.908465,1.0,35.908465,append,1.0,35.908465,candidate,tie,candidate,,0.0
+baseline_unique,all_V1,All Three Combined,1,30.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,append,1.0,36.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_failure_V2,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,24.624435,1.0,20.573869,replan,1.0,20.573869,candidate,candidate,candidate,,4.050566
+baseline_unique,failure_outage_V2,Failure + Comms Outage,2,30.0,3,0.666667,60.0,1.0,33.72718,1.0,33.72718,append,1.0,33.72718,candidate,tie,candidate,,0.0
+baseline_unique,all_V2,All Three Combined,2,30.0,4,0.5,60.0,1.0,34.82608,1.0,34.82608,append,1.0,34.82608,candidate,tie,candidate,,0.0
+baseline_unique,new_failure_V3,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,25.22872,replan,1.0,25.22872,candidate,candidate,candidate,,1.402754
+baseline_unique,failure_outage_V3,Failure + Comms Outage,3,30.0,3,0.666667,60.0,1.0,34.11667,1.0,34.11667,append,1.0,34.11667,candidate,tie,candidate,,0.0
+baseline_unique,all_V3,All Three Combined,3,30.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,append,1.0,36.461082,candidate,tie,candidate,,0.0
+baseline_unique,new_failure_V4,Failure + New Alert,4,5.0,4,0.5,60.0,1.0,27.486797,1.0,21.086091,replan,1.0,21.086091,candidate,candidate,candidate,,6.400706
+baseline_unique,failure_outage_V4,Failure + Comms Outage,4,30.0,3,0.666667,60.0,1.0,33.095037,1.0,33.095037,append,1.0,33.095037,candidate,tie,candidate,,0.0
+baseline_unique,all_V4,All Three Combined,4,30.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,append,1.0,36.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_failure_V5,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,19.691935,1.0,20.573869,append,1.0,19.691935,candidate,base,candidate,,-0.881933
+baseline_unique,failure_outage_V5,Failure + Comms Outage,5,30.0,3,1.0,11.034062,1.0,11.034062,1.0,11.034062,keep,1.0,11.034062,tie,tie,tie,0.0,0.0
+baseline_unique,all_V5,All Three Combined,5,30.0,4,0.75,60.0,1.0,32.00337,1.0,32.00337,append,1.0,32.00337,candidate,tie,candidate,,0.0
+baseline_unique,new_outage,New Alert + Comms Outage,,30.0,4,0.75,60.0,1.0,32.00337,1.0,32.00337,append,1.0,32.00337,candidate,tie,candidate,,0.0
+baseline_unique,all_duration_sensitivity,All Three Combined,2,35.0,4,0.5,60.0,1.0,39.82608,1.0,39.82608,append,1.0,39.82608,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V2_recovery_5,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,23.089893,1.0,22.627916,replan,1.0,22.627916,candidate,candidate,candidate,,0.461977
+baseline_unique,new_1_V3_recovery_5,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,24.864809,replan,1.0,24.864809,candidate,candidate,candidate,,1.766664
+baseline_unique,new_1_V5_recovery_5,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,23.089893,1.0,22.124113,replan,1.0,22.124113,candidate,candidate,candidate,,0.965781
+baseline_unique,new_2_V1_recovery_5,Failure + New Alert,1,5.0,4,0.5,60.0,1.0,27.50457,1.0,24.795616,replan,1.0,24.795616,candidate,candidate,candidate,,2.708953
+baseline_unique,new_2_V3_recovery_5,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,24.795616,replan,1.0,24.795616,candidate,candidate,candidate,,1.835857
+baseline_unique,new_2_V4_recovery_5,Failure + New Alert,4,5.0,4,0.5,60.0,1.0,27.50457,1.0,20.573869,replan,1.0,20.573869,candidate,candidate,candidate,,6.930701
+baseline_unique,new_3_V1_recovery_5,Failure + New Alert,1,5.0,4,0.5,60.0,1.0,28.180103,1.0,25.22872,replan,1.0,25.22872,candidate,candidate,candidate,,2.951384
+baseline_unique,new_3_V2_recovery_5,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,26.259436,1.0,21.086091,replan,1.0,21.086091,candidate,candidate,candidate,,5.173346
+baseline_unique,new_3_V4_recovery_5,Failure + New Alert,4,5.0,4,0.5,60.0,1.0,26.641241,1.0,21.086091,replan,1.0,21.086091,candidate,candidate,candidate,,5.55515
+baseline_unique,new_3_V5_recovery_5,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,20.887684,1.0,21.086091,append,1.0,20.887684,candidate,base,candidate,,-0.198406
+baseline_unique,new_1_V2_recovery_30,All Three Combined,2,30.0,4,0.5,60.0,1.0,34.11667,1.0,34.11667,append,1.0,34.11667,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V3_recovery_30,All Three Combined,3,30.0,4,0.5,60.0,1.0,36.154029,1.0,36.154029,append,1.0,36.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V5_recovery_30,All Three Combined,5,30.0,4,0.75,60.0,1.0,33.291539,1.0,33.291539,append,1.0,33.291539,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V1_recovery_30,All Three Combined,1,30.0,4,0.5,60.0,1.0,36.171802,1.0,36.171802,append,1.0,36.171802,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V3_recovery_30,All Three Combined,3,30.0,4,0.5,60.0,1.0,35.298706,1.0,35.298706,append,1.0,35.298706,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V4_recovery_30,All Three Combined,4,30.0,4,0.5,60.0,1.0,36.171802,1.0,36.171802,append,1.0,36.171802,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V1_recovery_30,All Three Combined,1,30.0,4,0.5,60.0,1.0,35.908465,1.0,35.908465,append,1.0,35.908465,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V2_recovery_30,All Three Combined,2,30.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,append,1.0,36.461082,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V4_recovery_30,All Three Combined,4,30.0,4,0.5,60.0,1.0,35.308473,1.0,35.308473,append,1.0,35.308473,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V5_recovery_30,All Three Combined,5,30.0,4,0.75,60.0,1.0,32.89663,1.0,32.89663,append,1.0,32.89663,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V1_recovery_35,All Three Combined,1,35.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,append,1.0,41.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V2_recovery_35,All Three Combined,2,35.0,4,0.5,60.0,1.0,39.11667,1.0,39.11667,append,1.0,39.11667,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V3_recovery_35,All Three Combined,3,35.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,append,1.0,41.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V4_recovery_35,All Three Combined,4,35.0,4,0.5,60.0,1.0,41.154029,1.0,41.154029,append,1.0,41.154029,candidate,tie,candidate,,0.0
+baseline_unique,new_1_V5_recovery_35,All Three Combined,5,35.0,4,0.75,60.0,1.0,38.291539,1.0,38.291539,append,1.0,38.291539,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V1_recovery_35,All Three Combined,1,35.0,4,0.5,60.0,1.0,41.171802,1.0,41.171802,append,1.0,41.171802,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V3_recovery_35,All Three Combined,3,35.0,4,0.5,60.0,1.0,40.298706,1.0,40.298706,append,1.0,40.298706,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V4_recovery_35,All Three Combined,4,35.0,4,0.5,60.0,1.0,41.171802,1.0,41.171802,append,1.0,41.171802,candidate,tie,candidate,,0.0
+baseline_unique,new_2_V5_recovery_35,All Three Combined,5,35.0,4,0.75,60.0,1.0,37.00337,1.0,37.00337,append,1.0,37.00337,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V1_recovery_35,All Three Combined,1,35.0,4,0.5,60.0,1.0,40.908465,1.0,40.908465,append,1.0,40.908465,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V2_recovery_35,All Three Combined,2,35.0,4,0.5,60.0,1.0,41.461082,1.0,41.461082,append,1.0,41.461082,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V3_recovery_35,All Three Combined,3,35.0,4,0.5,60.0,1.0,41.461082,1.0,41.461082,append,1.0,41.461082,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V4_recovery_35,All Three Combined,4,35.0,4,0.5,60.0,1.0,40.308473,1.0,40.308473,append,1.0,40.308473,candidate,tie,candidate,,0.0
+baseline_unique,new_3_V5_recovery_35,All Three Combined,5,35.0,4,0.75,60.0,1.0,37.89663,1.0,37.89663,append,1.0,37.89663,candidate,tie,candidate,,0.0
+expanded_spatial,spatial_az000_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,18.299039,1.0,17.930735,replan,1.0,17.930735,candidate,candidate,candidate,,0.368305
+expanded_spatial,spatial_az000_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,18.864697,1.0,17.787634,replan,1.0,17.787634,candidate,candidate,candidate,,1.077063
+expanded_spatial,spatial_az045_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,17.879225,1.0,19.116187,append,1.0,17.879225,candidate,base,candidate,,-1.236962
+expanded_spatial,spatial_az045_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,17.906307,1.0,19.092422,append,1.0,17.906307,candidate,base,candidate,,-1.186114
+expanded_spatial,spatial_az045_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,17.928237,1.0,18.617398,append,1.0,17.928237,candidate,base,candidate,,-0.689161
+expanded_spatial,spatial_az090_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,18.386497,1.0,19.387426,append,1.0,18.386497,candidate,base,candidate,,-1.000929
+expanded_spatial,spatial_az090_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,18.525349,1.0,19.473658,append,1.0,18.525349,candidate,base,candidate,,-0.948309
+expanded_spatial,spatial_az135_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,18.774816,1.0,20.093927,append,1.0,18.774816,candidate,base,candidate,,-1.319112
+expanded_spatial,spatial_az135_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,19.072141,1.0,20.747475,append,1.0,19.072141,candidate,base,candidate,,-1.675334
+expanded_spatial,spatial_az135_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,19.327345,1.0,22.069788,append,1.0,19.327345,candidate,base,candidate,,-2.742443
+expanded_spatial,spatial_az180_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,18.699954,1.0,20.263169,append,1.0,18.699954,candidate,base,candidate,,-1.563216
+expanded_spatial,spatial_az180_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,19.258705,1.0,20.263169,append,1.0,19.258705,candidate,base,candidate,,-1.004464
+expanded_spatial,spatial_az180_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,19.888858,1.0,20.263169,append,1.0,19.888858,candidate,base,candidate,,-0.374311
+expanded_spatial,spatial_az225_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,18.678457,1.0,20.263169,append,1.0,18.678457,candidate,base,candidate,,-1.584712
+expanded_spatial,spatial_az225_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,18.957536,1.0,20.263169,append,1.0,18.957536,candidate,base,candidate,,-1.305633
+expanded_spatial,spatial_az225_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,19.170979,1.0,20.263169,append,1.0,19.170979,candidate,base,candidate,,-1.09219
+expanded_spatial,spatial_az270_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,18.176332,1.0,20.263169,append,1.0,18.176332,candidate,base,candidate,,-2.086837
+expanded_spatial,spatial_az270_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,18.154296,1.0,20.263169,append,1.0,18.154296,candidate,base,candidate,,-2.108873
+expanded_spatial,spatial_az270_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,18.093689,1.0,20.263169,append,1.0,18.093689,candidate,base,candidate,,-2.169481
+expanded_spatial,spatial_az315_r30,New Alert Only,,5.0,4,0.75,60.0,1.0,19.553432,1.0,19.158818,replan,1.0,19.158818,candidate,candidate,candidate,,0.394614
+expanded_spatial,spatial_az315_r40,New Alert Only,,5.0,4,0.75,60.0,1.0,19.546977,1.0,17.757204,replan,1.0,17.757204,candidate,candidate,candidate,,1.789772
+expanded_spatial,spatial_az315_r50,New Alert Only,,5.0,4,0.75,60.0,1.0,19.541732,1.0,18.773083,replan,1.0,18.773083,candidate,candidate,candidate,,0.768649
+expanded_hard,hard_shadow_B2_NE,New Alert Only,,5.0,4,0.75,60.0,1.0,19.163237,1.0,18.378428,replan,1.0,18.378428,candidate,candidate,candidate,,0.784809
+expanded_hard,hard_shadow_B2_NE_out30,New Alert + Comms Outage,,30.0,4,0.75,60.0,1.0,32.77903,1.0,32.77903,append,1.0,32.77903,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B2_NE_V2_act,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,24.628018,1.0,19.516472,replan,1.0,19.516472,candidate,candidate,candidate,,5.111546
+expanded_hard,hard_shadow_B2_NE_V2_out30,All Three Combined,2,30.0,4,0.5,60.0,1.0,34.829663,1.0,34.829663,append,1.0,34.829663,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B2_NE_V3_act,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,23.071652,replan,1.0,23.071652,candidate,candidate,candidate,,3.559821
+expanded_hard,hard_shadow_B2_NE_V3_out30,All Three Combined,3,30.0,4,0.5,60.0,1.0,35.298706,1.0,35.298706,append,1.0,35.298706,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B2_NE_V5_act,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,20.320098,1.0,19.516472,replan,1.0,19.516472,candidate,candidate,candidate,,0.803626
+expanded_hard,hard_shadow_B2_NE_V5_out30,All Three Combined,5,30.0,4,0.75,60.0,1.0,33.684395,1.0,33.684395,append,1.0,33.684395,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B5_SW_out30,New Alert + Comms Outage,,30.0,4,0.75,60.0,1.0,32.504263,1.0,32.504263,append,1.0,32.504263,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B5_SW_V2_act,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,26.259436,1.0,21.042587,replan,1.0,21.042587,candidate,candidate,candidate,,5.216849
+expanded_hard,hard_shadow_B5_SW_V2_out30,All Three Combined,2,30.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,append,1.0,36.461082,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B5_SW_V3_act,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,24.881449,replan,1.0,24.881449,candidate,candidate,candidate,,1.750025
+expanded_hard,hard_shadow_B5_SW_V3_out30,All Three Combined,3,30.0,4,0.5,60.0,1.0,36.461082,1.0,36.461082,append,1.0,36.461082,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B5_SW_V5_act,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,20.495317,1.0,21.086091,append,1.0,20.495317,candidate,base,candidate,,-0.590774
+expanded_hard,hard_shadow_B5_SW_V5_out30,All Three Combined,5,30.0,4,0.75,60.0,1.0,32.504263,1.0,32.504263,append,1.0,32.504263,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B4_SE,New Alert Only,,5.0,4,0.75,60.0,1.0,19.548159,1.0,19.085882,replan,1.0,19.085882,candidate,candidate,candidate,,0.462277
+expanded_hard,hard_shadow_B4_SE_out30,New Alert + Comms Outage,,30.0,4,0.75,60.0,1.0,33.256015,1.0,33.256015,append,1.0,33.256015,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B4_SE_V2_act,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,23.05437,1.0,21.824247,replan,1.0,21.824247,candidate,candidate,candidate,,1.230122
+expanded_hard,hard_shadow_B4_SE_V2_out30,All Three Combined,2,30.0,4,0.5,60.0,1.0,33.777151,1.0,33.777151,append,1.0,33.777151,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B4_SE_V3_act,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,25.014134,1.0,24.439071,replan,1.0,24.439071,candidate,candidate,candidate,,0.575062
+expanded_hard,hard_shadow_B4_SE_V3_out30,All Three Combined,3,30.0,4,0.5,60.0,1.0,34.11667,1.0,34.11667,append,1.0,34.11667,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B4_SE_V5_act,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,20.412855,1.0,21.086091,append,1.0,20.412855,candidate,base,candidate,,-0.673236
+expanded_hard,hard_shadow_B4_SE_V5_out30,All Three Combined,5,30.0,4,0.75,60.0,1.0,33.256015,1.0,33.256015,append,1.0,33.256015,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B3_NW,New Alert Only,,5.0,4,0.75,60.0,1.0,19.232381,1.0,21.277266,append,1.0,19.232381,candidate,base,candidate,,-2.044885
+expanded_hard,hard_shadow_B3_NW_out30,New Alert + Comms Outage,,30.0,4,0.75,60.0,1.0,32.621602,1.0,32.621602,append,1.0,32.621602,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B3_NW_V2_act,Failure + New Alert,2,5.0,4,0.5,60.0,1.0,25.745047,1.0,22.415311,replan,1.0,22.415311,candidate,candidate,candidate,,3.329736
+expanded_hard,hard_shadow_B3_NW_V2_out30,All Three Combined,2,30.0,4,0.5,60.0,1.0,35.946692,1.0,35.946692,append,1.0,35.946692,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B3_NW_V3_act,Failure + New Alert,3,5.0,4,0.5,60.0,1.0,26.631474,1.0,26.336116,replan,1.0,26.336116,candidate,candidate,candidate,,0.295358
+expanded_hard,hard_shadow_B3_NW_V3_out30,All Three Combined,3,30.0,4,0.5,60.0,1.0,35.946692,1.0,35.946692,append,1.0,35.946692,candidate,tie,candidate,,0.0
+expanded_hard,hard_shadow_B3_NW_V5_act,Failure + New Alert,5,5.0,4,0.75,60.0,1.0,20.612656,1.0,22.415311,append,1.0,20.612656,candidate,base,candidate,,-1.802654
+expanded_hard,hard_shadow_B3_NW_V5_out30,All Three Combined,5,30.0,4,0.75,60.0,1.0,32.621602,1.0,32.621602,append,1.0,32.621602,candidate,tie,candidate,,0.0

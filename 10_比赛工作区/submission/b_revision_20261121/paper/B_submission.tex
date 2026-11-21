@@ -208,7 +208,7 @@ Stage & Core Mathematical Model & Verified Quantitative Metric & Validation \& C
 \textbf{P1} & Minkowski rounded free space $B_k\oplus D(0,1.5)$, closed-prism LOS, Eq.~\eqref{eq:p1-quality} & $r_{\min}=\BMinRange{}$ m, $Q=\BQuality{}$ m\textsuperscript{$-1$}, V4 ready \BReadyTime{} s, \BRestoredCount{} restored / \BShortenedCount{} shorter & 0.1 m grid + 250,000-sample MC; $\sec^2\beta_{\max}$ drives \BPitchLoss{}\% loss per $1^\circ$ pitch drop\\
 \textbf{P2(1--2)} & Bearing Jacobian Eq.~\eqref{eq:p2-rms} \& Prop.~\ref{prop:p21-lb}; 5-vehicle 6-slot dispatch Eq.~\eqref{eq:p2-dispatch} \& Alg.~\ref{alg:p2-dispatch} & T2 RMS \BFirstRMS{} m ($\gamma=\BCrossing{}^\circ$); $k=8$ beam \BBeamEight{} s vs.\ nearest \BNearestEight{} s & Analytical lower bound attained; exact 1,000-pair (4,200-order) B\&B certifies 0.000 s gap on 585-station pool\\
 \textbf{P3} & Wrapped offset-normal azimuth error Eq.~\eqref{eq:p3-prob} \& Theorem~\ref{thm:p3-monotone} ($a,b\ge 0$) & Unique $s_{\max}=\BIntegratedCrossing{}$ m ($\sigma^*=\BSigmaCrossing{}$ m), far-tail $\le\BFarBound{}$ & Strict proof + $3\times 2{,}000{,}000$ Bonferroni--Wilson CIs; exact 80 m bound $a+80b\le\BSigmaCrossing{}$ m\\
-\textbf{P4} & Discrete-event replay, Eq.~\eqref{eq:p4-score} hysteresis gate \& Alg.~\ref{alg:p4-reschedule} & 115 unique cases (\BCaseCount{} raw$\to$62+53): 110W/4T/1L; V5 $+\BVFiveDelay{}$ s & Budget-invariant ($k=2/3/5/8$); cached plans save 22.69 s; hysteresis yields 0 losses\\
+\textbf{P4} & Discrete-event replay, Eq.~\eqref{eq:p4-score} three-way gate \& Alg.~\ref{alg:p4-reschedule} & 115 unique cases (\BCaseCount{} raw$\to$62+53): 110W/4T/1L vs.\ Keep, 34W/55T/26L vs.\ Append; V5 $+\BVFiveDelay{}$ s & Budget-invariant ($k=2/3/5/8$); cached plans save 22.69 s; three-way gate serves 115/115\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -308,6 +308,7 @@ Nearest Baseline ($k_{\mathrm{cand}}=3$ or $8$) & \BNearestEight{} & $+0.690$ & 
 Beam Search ($k_{\mathrm{cand}}=8$, $w=20$) & \BBeamEight{} & $0.000$ & V3 (T1$\to$T3, 0 s wait)\\
 Exact B\&B ($k_{\mathrm{cand}}=8$, 1,000 pairings) & \BBeamEight{} & $0.000$ (exact) & V3 (T1$\to$T3, T2 V1/V4)\\
 Exact B\&B (Full 585-station pool, unseeded) & \BBeamEight{} & $0.000$ (exact) & Identical discrete optimum\\
+Exact B\&B ($\gamma\!\in\![45,135]^\circ$) & 12.006612 & $0.000$ (exact) & Worst RMS $2.086$ m ($+8.8\%$)\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -377,21 +378,21 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \begin{table}[htbp]
 \centering\footnotesize
 \setlength{\tabcolsep}{4pt}
-\caption{Categorized performance summary across all 115 strictly unique Problem 4 scenarios (62 deduplicated from \BCaseCount{} archived IDs + 53 multi-azimuth/range/shadow-edge stress cases; ledger in \texttt{results/P4\_dedup\_expanded\_cases.csv}).}
+\caption{Categorized three-policy summary across all 115 strictly unique Problem 4 scenarios (62 deduplicated from \BCaseCount{} archived IDs + 53 multi-azimuth/range/shadow-edge stress cases). Append freezes the nominal timeline and queues unserved alerts after the last cached slot; the last column counts Reschedule wins / ties / losses against Append (ledgers in \texttt{results/P4\_dedup\_expanded\_cases.csv} and \texttt{results/P4\_keep\_append\_cases.csv}).}
 \label{tab:p4cat}
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}lrrrrc@{}}
 \toprule
-Disturbance Category & Cases & Keep $\eta$ & Replan $\eta$ & Replan / Keep / Tie & Hyst.\ Loss\\
+Disturbance Category & Cases & Keep $\eta$ & Append $\eta$ & Replan $\eta$ & Replan vs.\ Append (W/T/L)\\
 \midrule
-Vehicle Failure Only & 5 & 0.733 & 1.000 & 4 / 1 / 0 & 0\\
-New Alert Only & 28 & 0.750 & 1.000 & 28 / 0 / 0 & 0\\
-Comms Outage Only (cached) & 3 & 1.000 & 1.000 & 0 / 0 / 3 & 0\\
-Failure + New Alert & 27 & 0.565 & 1.000 & 27 / 0 / 0 & 0\\
-Failure + Comms Outage & 5 & 0.733 & 1.000 & 4 / 0 / 1 & 0\\
-New Alert + Comms Outage & 5 & 0.750 & 1.000 & 5 / 0 / 0 & 0\\
-All Three Combined & 42 & 0.560 & 1.000 & 42 / 0 / 0 & 0\\
+Vehicle Failure Only & 5 & 0.733 & 1.000 & 1.000 & 4 / 0 / 1\\
+New Alert Only & 28 & 0.750 & 1.000 & 1.000 & 8 / 0 / 20\\
+Comms Outage Only (cached) & 3 & 1.000 & 1.000 & 1.000 & 0 / 3 / 0\\
+Failure + New Alert & 27 & 0.565 & 1.000 & 1.000 & 22 / 0 / 5\\
+Failure + Comms Outage & 5 & 0.733 & 1.000 & 1.000 & 0 / 5 / 0\\
+New Alert + Comms Outage & 5 & 0.750 & 1.000 & 1.000 & 0 / 5 / 0\\
+All Three Combined & 42 & 0.560 & 1.000 & 1.000 & 0 / 42 / 0\\
 \midrule
-\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{110 / 1 / 4} & \textbf{0}\\
+\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{1.000} & \textbf{34 / 55 / 26}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -448,7 +449,7 @@ Operational Priority & Recommended Setting & Verified Engineering Basis\\
 Rapid + High Quality & Beam $k=8$, $w=20$ (3D Pareto) & Exact discrete optimum \BBeamEight{} s; highest $\bar{Q}=0.02008$ m\textsuperscript{$-1$} (59.92 m range) at min time\\
 Low-Drift / Energy & $k=5$ ($w=20$) or Nearest & 3D Pareto: cuts travel to 36.15 m ($k=5$, tied \BBeamEight{} s) or 21.11 m (Nearest, \BNearestEight{} s)\\
 Sensor Spec (80 m) & $a,b\ge 0,\; a+80b\le\BSigmaCrossing{}$ m & Exact closed-form $\ge 95\%$ coverage boundary (Theorem~\ref{thm:p3-monotone})\\
-Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 115 unique cases; eliminates V5 $+\BVFiveDelay{}$ s penalty\\
+Dynamic Recourse & Three-way gate over Keep, Append, Replan & Serves 115/115 cases at mean $t_{\mathrm{last}}=26.77$ s; eliminates V5 $+\BVFiveDelay{}$ s penalty\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -486,13 +487,14 @@ Dynamic Recourse & Hysteresis-gated Eq.~\eqref{eq:p4-score} & 110W/5T/0L across 
 \bibitem{stentz1994} A. Stentz, ``Optimal and efficient path planning for partially-known environments,'' in \emph{Proc. IEEE Int. Conf. Robot. Autom. (ICRA)}, San Diego, CA, USA, May 1994, pp. 3310--3317, doi: 10.1109/ROBOT.1994.351061.
 \bibitem{archivedai} ChatGPT (Codex), GPT-5.4 / GPT-6.2 Sol, OpenAI, used 20--21 Nov. 2026.
 \bibitem{antigravityai} Antigravity (Gemini), Gemini 3.1 Pro, Google DeepMind, used 21 Nov. 2026.
+\bibitem{workbuddyai} WorkBuddy Agent, DeepSeek-V4.1-Flash, Tencent, used 17 and 21 Nov. 2026.
 \end{thebibliography}
 \endgroup
 
 % ===================== AI USAGE DISCLOSURE =====================
 \section*{AI Usage Disclosure}
 \addcontentsline{toc}{section}{AI Usage Disclosure}
-Codex \cite{archivedai} assisted with code, checks (Sections~4--8), and typesetting. Antigravity \cite{antigravityai} assisted with dispatch and P4 audits, sensitivity, Pareto, replay (Sections~6, 8--9), and Figures~1--11. WorkBuddy Agent (DeepSeek-V4.1-Flash, DeepSeek, 17 Nov. 2026) checked submission and AI rules for the pre-contest checklist. Appendix~B and the ZIP give details.
+Codex \cite{archivedai} assisted with code, checks (Sections~4--8), and typesetting; Antigravity \cite{antigravityai} with dispatch and P4 audits, sensitivity, Pareto, replay (Sections~6, 8--9), and Figures~1--11; WorkBuddy \cite{workbuddyai} with rule checking and the crossing-angle and keep-append studies (Sections~6, 8). Model design and interpretation remain the team's; Appendix~B and the ZIP give details.
 
 % ===================== APPENDICES (EXEMPT FROM 25-PAGE CAP) =====================
 \clearpage
@@ -582,7 +584,7 @@ Tool \& Version & Provider & Usage Date & Task Stage & Prompt / Operation Summar
 \midrule
 ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, and packaging; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
 Antigravity (Gemini 3.1 Pro) & Google DeepMind & 2026-11-21 & Audit, 3D Twin, Sensitivity, Pareto, Figures, Editing & Built offline 3D digital twin (\texttt{B\_Simulator.html}), 1,000-pair exact B\&B audit, 115-case P4 expansion, real-solver sensitivity/3D Pareto, 11-figure suite, and LaTeX QA fixes. & Adapted \& integrated into \texttt{src/*.py} and \texttt{paper/} & Verified via 6/6 hardcore audits, offline Chromium QA, and \texttt{pytest} & Simulator, Audit, Figs.~1--11, Paper formatting\\
-WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek & 2026-11-17 & Pre-contest rule verification & Checked official submission workflow and AI disclosure requirements. & Findings used in the team rules checklist & Checked against official rule PDFs & AI Usage Disclosure; team checklist and usage log\\
+WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek & 2026-11-17; 2026-11-21 & Pre-contest rule verification; precision-aware dispatch and keep-append studies & Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep and the keep-append baseline, re-ran the exact B\&B and the 115-case suite, and typeset the resulting tables. & Adapted into two scripts under \texttt{src/} and Tables~\ref{tab:p22},~\ref{tab:p4cat} & Results re-verified by the team against the P2 precision and P4 keep-append result files; model design and interpretation remained team work & Sections~6 and~8; AI Usage Disclosure; usage log\\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -215,7 +215,7 @@ def _topological_orders_for_pairing(pairing, alerts):
     return valid
 
 
-def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
+def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf"), crossing_min=0.0, crossing_max=180.0):
     """Independent zero-truncation exact Branch-and-Bound over ALL C(5,2)^3 = 1,000 legal vehicle pairings
     and ALL acyclic service-order permutations (covering 1-vehicle 3-alert, 2-vehicle 2-alert, 3-vehicle
     2-alert, idle-vehicle patterns, and the 360 1-reused-vehicle topologies).
@@ -233,6 +233,8 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
         patch.object(solver, "road_clear", rounded.road_clear),
         patch.object(solver, "route", rounded.route),
         patch.object(solver, "candidate_stations", rounded.stations),
+        patch.object(solver, "CROSSING_MIN_DEG", crossing_min),
+        patch.object(solver, "CROSSING_MAX_DEG", crossing_max),
     ):
         all_stations = {a_i: rounded.stations(goals[a_i]) for a_i in range(3)}
         total_pool_size = sum(len(v) for v in all_stations.values())
@@ -286,7 +288,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                         if p1 == p2:
                             continue
                         g = solver._crossing_angle(solver._station_bearing(p2, goal) - b1)
-                        if 1e-6 < g < 180.0 - 1e-6:
+                        if solver.crossing_admissible(g):
                             best_t = t_st
                             best_st = (p1, p2)
                             break
@@ -438,7 +440,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                             if su == sw:
                                 continue
                             g = solver._crossing_angle(solver._station_bearing(sw, goal) - bu)
-                            if not (1e-6 < g < 180.0 - 1e-6):
+                            if not solver.crossing_admissible(g):
                                 continue
 
                             # Check post-observation release lower bounds for vehicles reused later

@@ -26,6 +26,22 @@ RESULTS = ROOT / "results"
 INITIAL = tuple((point, 0.0) for point in VEHICLES)
 NORMAL = NormalDist()
 
+# Precision-aware dispatch guard (Problem 2(2) sensitivity study).
+# Defaults reproduce the purely time-optimal formulation; the revision study raises
+# the lower bound to reject shallow-angle pairs whose localization RMS diverges.
+CROSSING_MIN_DEG = 0.0
+CROSSING_MAX_DEG = 180.0
+
+
+def crossing_admissible(gamma):
+    """Closed interval test on the crossing angle (degrees).
+
+    With the default bounds this reduces to the historical 0 < gamma < 180 test.
+    """
+    low = max(CROSSING_MIN_DEG, 1e-6)
+    high = min(CROSSING_MAX_DEG, 180.0 - 1e-6)
+    return low <= gamma <= high
+
 
 @dataclass(frozen=True)
 class Visit:
@@ -136,7 +152,7 @@ def dispatch(states, alert, goal, station_limit, *, nearest=False):
             first_bearing = _station_bearing(point_a, goal)
             for arr_b, ready_b, point_b, path_b in second_options:
                 gamma = _crossing_angle(_station_bearing(point_b, goal) - first_bearing)
-                if point_a == point_b or not 1e-6 < gamma < 180 - 1e-6:
+                if point_a == point_b or not crossing_admissible(gamma):
                     continue
                 start = max(ready_a, ready_b)
                 end = start + OBSERVE

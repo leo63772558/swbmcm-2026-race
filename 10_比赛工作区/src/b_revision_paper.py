@@ -163,7 +163,7 @@ def metrics(root):
         key = row["policy"] + "/" + row["metric"]
         macro = row["policy"].title() + ("Eta" if row["metric"] == "eta" else "Time")
         for field in ("mean", "median", "iqr", "p95"):
-            add("Stress" + macro + field.title(), row[field], extra, key, field,
+            add("Stress" + macro + ("Percentile" if field == "p95" else field.title()), row[field], extra, key, field,
                 3 if row["metric"] == "eta" else 2)
     bounds = next(r for r in mc["statistics"] if r["policy"] == "selector" and r["metric"] == "win")
     for i, suffix in enumerate(("Low", "High")):
@@ -386,7 +386,7 @@ def inspect_pdf(path, qa, *, paper=True):
             assert ("Team#" in cleaned) == (i > 2), (i, cleaned[:100])
             if i > 2:
                 assert f"Team#B{TEAM_NUMBER}" in cleaned, (i, cleaned[:100])
-                assert f"Page{i - 2}of{len(reader.pages) - 2}" in cleaned, (i, cleaned[:100])
+                assert f"Page{i}of{len(reader.pages)}" in cleaned, (i, cleaned[:100])
             elif i == 1:
                 for label in ("ProblemChosen", "2026ShuWeiCupSummarySheet", "TeamControlNumber",
                               TEAM_NUMBER, "Summary", "Keywords"):

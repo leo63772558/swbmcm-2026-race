@@ -14,7 +14,7 @@
 \definecolor{boxrule}{HTML}{D6E0EB}
 
 \renewcommand{\contentsname}{Content}
-\linespread{1.08}
+\linespread{1.096}
 \setcounter{tocdepth}{1}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{3.6pt plus .5pt}
@@ -128,7 +128,7 @@
 
 \begingroup
 \setlength{\parskip}{6pt plus 1pt}
-\setlength{\baselineskip}{14.5pt}
+\setlength{\baselineskip}{14.3pt}
 \section*{Summary}
 \TeamText{summary}{Summary sheet}
 
@@ -143,7 +143,6 @@
 \tableofcontents
 \thispagestyle{contentpage}
 \clearpage
-\setcounter{page}{1}
 
 % ===================== SECTION 1 =====================
 \section{Introduction and Problem Restatement}
@@ -353,17 +352,17 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \label{tab:p4cat}
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Disturbance Category & Cases & Keep $\eta$ & Replan $\eta$ & Replan / Keep / Tie & Hyst.\ Loss\\
+Disturbance Category & Cases & Keep $\eta$ & Replan $\eta$ & Replan W / T / L & Hyst.\ Loss\\
 \midrule
-Vehicle Failure Only & 5 & 0.733 & 1.000 & 4 / 1 / 0 & 0\\
+Vehicle Failure Only & 5 & 0.733 & 1.000 & 4 / 0 / 1 & 0\\
 New Alert Only & 28 & 0.750 & 1.000 & 28 / 0 / 0 & 0\\
-Comms Outage Only (cached) & 3 & 1.000 & 1.000 & 0 / 0 / 3 & 0\\
+Comms Outage Only (cached) & 3 & 1.000 & 1.000 & 0 / 3 / 0 & 0\\
 Failure + New Alert & 27 & 0.565 & 1.000 & 27 / 0 / 0 & 0\\
-Failure + Comms Outage & 5 & 0.733 & 1.000 & 4 / 0 / 1 & 0\\
+Failure + Comms Outage & 5 & 0.733 & 1.000 & 4 / 1 / 0 & 0\\
 New Alert + Comms Outage & 5 & 0.750 & 1.000 & 5 / 0 / 0 & 0\\
 All Three Combined & 42 & 0.560 & 1.000 & 42 / 0 / 0 & 0\\
 \midrule
-\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{110 / 1 / 4} & \textbf{0}\\
+\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{110 / 4 / 1} & \textbf{0}\\
 \bottomrule
 \end{tabular}
 \end{table}

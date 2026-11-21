@@ -422,7 +422,7 @@
   },
   "audit_6_three_way_consistency": {
     "passed": true,
-    "bound_macros": 93,
+    "bound_macros": 125,
     "missing_macros": [],
     "missing_in_pdf": [],
     "bibitems_total": 17,

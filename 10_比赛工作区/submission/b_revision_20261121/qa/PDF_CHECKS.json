@@ -5,7 +5,7 @@
     "pages": [
       {
         "page": 1,
-        "text_characters": 2719,
+        "text_characters": 2750,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -19,12 +19,12 @@
           127,
           126,
           1033,
-          1435
+          1451
         ]
       },
       {
         "page": 2,
-        "text_characters": 589,
+        "text_characters": 590,
         "fonts": [
           "/GEUUKA+TimesNewRomanPS-BoldMT",
           "/XJHBQP+TimesNewRomanPSMT"
@@ -53,7 +53,7 @@
           127,
           48,
           1031,
-          1499
+          1517
         ]
       },
       {
@@ -75,7 +75,7 @@
           127,
           48,
           1031,
-          1464
+          1481
         ]
       },
       {
@@ -117,7 +117,7 @@
           127,
           48,
           1031,
-          1447
+          1456
         ]
       },
       {
@@ -142,12 +142,12 @@
           127,
           48,
           1031,
-          1487
+          1499
         ]
       },
       {
         "page": 8,
-        "text_characters": 2831,
+        "text_characters": 2749,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -167,18 +167,39 @@
           125,
           48,
           1031,
-          1520
+          1517
         ]
       },
       {
         "page": 9,
-        "text_characters": 2351,
+        "text_characters": 2196,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
           "/MAHZGR+CMSY10",
           "/MMZZCO+CMR6",
           "/MOXWGR+CMMI8",
+          "/NLERRI+CMEX10",
+          "/OULSRP+CMR8",
+          "/QCFXVX+TimesNewRomanPS-ItalicMT",
+          "/QKHQNT+CMSY8",
+          "/RPFDBW+CMR12",
+          "/XJHBQP+TimesNewRomanPSMT"
+        ],
+        "raster_bbox_px": [
+          127,
+          48,
+          1031,
+          1460
+        ]
+      },
+      {
+        "page": 10,
+        "text_characters": 2818,
+        "fonts": [
+          "/AVUTEB+CMMI12",
+          "/GEUUKA+TimesNewRomanPS-BoldMT",
+          "/MAHZGR+CMSY10",
           "/NLERRI+CMEX10",
           "/OULSRP+CMR8",
           "/QCFXVX+TimesNewRomanPS-ItalicMT",
@@ -189,40 +210,21 @@
         "raster_bbox_px": [
           126,
           48,
-          1031,
-          1518
-        ]
-      },
-      {
-        "page": 10,
-        "text_characters": 1918,
-        "fonts": [
-          "/AVUTEB+CMMI12",
-          "/GEUUKA+TimesNewRomanPS-BoldMT",
-          "/MAHZGR+CMSY10",
-          "/RPFDBW+CMR12",
-          "/XJHBQP+TimesNewRomanPSMT"
-        ],
-        "raster_bbox_px": [
-          127,
-          48,
-          1031,
-          1469
+          1033,
+          1519
         ]
       },
       {
         "page": 11,
-        "text_characters": 3100,
+        "text_characters": 2325,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
-          "/IDEOZR+MSBM10",
           "/MAHZGR+CMSY10",
           "/MMZZCO+CMR6",
           "/MOXWGR+CMMI8",
           "/NLERRI+CMEX10",
           "/OULSRP+CMR8",
-          "/QCFXVX+TimesNewRomanPS-ItalicMT",
           "/QKHQNT+CMSY8",
           "/RPFDBW+CMR12",
           "/WIBWMX+LMMono12-Regular-Identity-H",
@@ -231,8 +233,8 @@
         "raster_bbox_px": [
           127,
           48,
-          1033,
-          1489
+          1031,
+          1431
         ]
       },
       {
@@ -257,12 +259,12 @@
           127,
           48,
           1031,
-          1441
+          1445
         ]
       },
       {
         "page": 13,
-        "text_characters": 2382,
+        "text_characters": 2283,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -281,12 +283,12 @@
           126,
           48,
           1031,
-          1516
+          1527
         ]
       },
       {
         "page": 14,
-        "text_characters": 2453,
+        "text_characters": 2460,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -306,19 +308,18 @@
           127,
           48,
           1033,
-          1499
+          1472
         ]
       },
       {
         "page": 15,
-        "text_characters": 2357,
+        "text_characters": 2352,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
           "/IAHIRC+CMR10",
           "/MAHZGR+CMSY10",
           "/MOXWGR+CMMI8",
-          "/QKHQNT+CMSY8",
           "/RPFDBW+CMR12",
           "/TEAUWY+CMMI10",
           "/XJHBQP+TimesNewRomanPSMT"
@@ -332,7 +333,25 @@
       },
       {
         "page": 16,
-        "text_characters": 2401,
+        "text_characters": 2774,
+        "fonts": [
+          "/AVUTEB+CMMI12",
+          "/GEUUKA+TimesNewRomanPS-BoldMT",
+          "/RPFDBW+CMR12",
+          "/TEAUWY+CMMI10",
+          "/WIBWMX+LMMono12-Regular-Identity-H",
+          "/XJHBQP+TimesNewRomanPSMT"
+        ],
+        "raster_bbox_px": [
+          127,
+          48,
+          1031,
+          1466
+        ]
+      },
+      {
+        "page": 17,
+        "text_characters": 1882,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -347,23 +366,7 @@
           127,
           48,
           1031,
-          1413
-        ]
-      },
-      {
-        "page": 17,
-        "text_characters": 1784,
-        "fonts": [
-          "/GEUUKA+TimesNewRomanPS-BoldMT",
-          "/TEAUWY+CMMI10",
-          "/WIBWMX+LMMono12-Regular-Identity-H",
-          "/XJHBQP+TimesNewRomanPSMT"
-        ],
-        "raster_bbox_px": [
-          127,
-          48,
-          1031,
-          1412
+          1420
         ]
       },
       {
@@ -386,12 +389,12 @@
           127,
           48,
           1033,
-          1409
+          1426
         ]
       },
       {
         "page": 19,
-        "text_characters": 2170,
+        "text_characters": 2009,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -408,12 +411,12 @@
           127,
           48,
           1031,
-          1512
+          1455
         ]
       },
       {
         "page": 20,
-        "text_characters": 2694,
+        "text_characters": 2856,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -428,12 +431,12 @@
           127,
           48,
           1031,
-          1450
+          1520
         ]
       },
       {
         "page": 21,
-        "text_characters": 1544,
+        "text_characters": 1545,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -447,14 +450,13 @@
           127,
           48,
           1031,
-          1492
+          1493
         ]
       },
       {
         "page": 22,
-        "text_characters": 2488,
+        "text_characters": 2509,
         "fonts": [
-          "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
           "/IAHIRC+CMR10",
           "/MAHZGR+CMSY10",
@@ -468,12 +470,12 @@
           127,
           48,
           1031,
-          1464
+          1473
         ]
       },
       {
         "page": 23,
-        "text_characters": 2689,
+        "text_characters": 2585,
         "fonts": [
           "/AVUTEB+CMMI12",
           "/GEUUKA+TimesNewRomanPS-BoldMT",
@@ -487,13 +489,13 @@
         "raster_bbox_px": [
           127,
           48,
-          1033,
-          1444
+          1031,
+          1454
         ]
       },
       {
         "page": 24,
-        "text_characters": 2527,
+        "text_characters": 2705,
         "fonts": [
           "/GEUUKA+TimesNewRomanPS-BoldMT",
           "/QCFXVX+TimesNewRomanPS-ItalicMT",
@@ -504,7 +506,7 @@
           127,
           48,
           1033,
-          1386
+          1438
         ]
       }
     ]
@@ -530,5 +532,5 @@
       }
     ]
   },
-  "bound_numbers": 93
+  "bound_numbers": 125
 }

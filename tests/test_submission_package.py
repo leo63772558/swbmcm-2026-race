@@ -66,8 +66,8 @@ def test_submission_pdf_format_figures_and_anonymity():
         assert label in " ".join(pages_text[0].split())
     assert "Content" in pages_text[1]
     assert not re.search(r"Station-\s*ing|Admissi-\s*ble", pages_text[1], re.IGNORECASE)
-    for number, page in enumerate(compact_pages[2:], start=1):
-        assert header in page and f"Page{number}of22" in page
+    for number, page in enumerate(compact_pages[2:], start=3):
+        assert header in page and f"Page{number}of24" in page
 
     full_text = "\n".join(pages_text)
     for fig_idx in range(1, 12):

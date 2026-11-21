@@ -34,3 +34,25 @@ Positive threshold & 5.00 & \BHystMeanCompletion{} & \BHystMeanTlast{} & \BHystW
 \ReviewFigure{fig07_p4_resilience.pdf}{86mm}
 {Problem 4 stress cases. (a) Completion across seven categories, (b) latest paired starts, (c) win, tie, and loss counts across the archived search budgets, and (d) the hysteresis decision rule.}
 {fig:p4}
+
+\subsection{Time-Only Switching and Random Stress}
+A controlled test postpones all cached departures by 0--5~s in quarter-second increments. An immediate replan may cancel the hold using the same initial fleet state. Completion is one in all 21 cases. At a zero threshold, 20 cases switch and mean saving is 2.500~s. At 2.5~s the trigger fraction is \BHoldTrigger{} and mean saving is \BHoldSaving{}~s. At 5~s both are zero. The breakpoints arise from the imposed hold grid.
+
+We also drew \BStressTrials{} independent scenarios (seed 20261121). Disturbance clocks are uniform on 1--12~s. Outage is either zero or uniform on 1--25~s with equal probability. Fault status is uniform over no fault and the five vehicles. With probability one half, a new alert uses a uniform bearing and an independently uniform 30--50~m range. The latest-start score is 60~s for incomplete cases. Against Keep, unconditional Replan records $146/24/30$ W/T/L, while the zero-threshold selector records $146/54/0$. Its win rate has Wilson 95\% interval $[\BStressWinLow{},\BStressWinHigh{}]$ under this sampling design.
+
+\begin{table}[htbp]
+\centering
+\caption{Random stress scores, reported as mean, median, interquartile range, and 95th percentile.}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Policy & Score & Mean & Median & IQR & P95\\
+\midrule
+Keep & $\eta$ & \BStressKeepEtaMean{} & \BStressKeepEtaMedian{} & \BStressKeepEtaIqr{} & \BStressKeepEtaPercentile{}\\
+Keep & Time (s) & \BStressKeepTimeMean{} & \BStressKeepTimeMedian{} & \BStressKeepTimeIqr{} & \BStressKeepTimePercentile{}\\
+Replan & $\eta$ & \BStressReplanEtaMean{} & \BStressReplanEtaMedian{} & \BStressReplanEtaIqr{} & \BStressReplanEtaPercentile{}\\
+Replan & Time (s) & \BStressReplanTimeMean{} & \BStressReplanTimeMedian{} & \BStressReplanTimeIqr{} & \BStressReplanTimePercentile{}\\
+Selector & $\eta$ & \BStressSelectorEtaMean{} & \BStressSelectorEtaMedian{} & \BStressSelectorEtaIqr{} & \BStressSelectorEtaPercentile{}\\
+Selector & Time (s) & \BStressSelectorTimeMean{} & \BStressSelectorTimeMedian{} & \BStressSelectorTimeIqr{} & \BStressSelectorTimePercentile{}\\
+\bottomrule
+\end{tabular}
+\end{table}

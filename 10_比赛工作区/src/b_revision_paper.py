@@ -66,6 +66,33 @@ def metrics(root):
         ("PrecisionTightIncrease", "rms_increase_pct", 2),
     ):
         add(macro, pitch[field], pitch_file, "elevation_ceiling_deg=79", field, digits)
+    corner_file = "P2_corner_arc_comparison.csv"
+    corner, = read_csv(results / corner_file)
+    for macro, field, digits in (
+        ("CornerGraphLength", "graph_length_m", 4),
+        ("CornerArcLength", "tangent_arc_length_m", 4),
+        ("CornerAbsoluteGap", "absolute_gap_m", 4),
+        ("CornerRelativeGap", "relative_gap_pct", 3),
+    ):
+        add(macro, corner[field], corner_file, "nominal P2(1) detour", field, digits)
+    pan_file = "P2_pan_speed_benchmark.csv"
+    pan = {row["method"]: row for row in read_csv(results / pan_file)}
+    for suffix, method in (
+        ("Fixed", "fixed_nominal_plan"), ("Beam", "greedy_beam"), ("Exact", "exact_full_pool"),
+    ):
+        add("Pan" + suffix, pan[method]["latest_start_s"], pan_file, method, "latest_start_s", 2)
+    angle_file = "P2_angle_constrained_tradeoff.csv"
+    angle = read_csv(results / angle_file)
+    latest = {}
+    for suffix, method in (("Unrestricted", "exact_unconstrained"), ("Guarded", "exact_angle_floor")):
+        rows = [row for row in angle if row["method"] == method]
+        latest[method] = float(rows[0]["latest_start_s"])
+        worst = max(rows, key=lambda row: float(row["horizontal_rms_m"]))
+        add("Angle" + suffix, rows[0]["latest_start_s"], angle_file, method, "latest_start_s", 2)
+        add("Angle" + suffix + "Rms", worst["horizontal_rms_m"], angle_file,
+            method + "; alert=" + worst["alert"], "horizontal_rms_m", 3)
+    add("AngleDelay", latest["exact_angle_floor"] - latest["exact_unconstrained"],
+        angle_file, "exact_angle_floor minus exact_unconstrained", "latest_start_s difference", 3)
     trials = [r for r in read_csv(results/"P2_trials.csv") if r["routing"]=="rounded" and r["beam_width"]=="20"]
     for k,label in (("3","Three"),("8","Eight")):
         for policy,name in (("beam","Beam"),("nearest","Nearest")):
@@ -101,6 +128,15 @@ def metrics(root):
     run = read_json(results/"priority_3.json")
     for name,field,places in (("CaseCount","P4_case_count",None),("VFiveDelay","V5_delay_s",3)):
         add(name,run[field],"priority_3.json","root",field,places)
+    sweep_file = "P4_hysteresis_sweep.csv"
+    sweep_zero = next(row for row in read_csv(results / sweep_file) if float(row["threshold_s"]) == 0)
+    for name, field, digits in (
+        ("HystMeanTlast", "mean_latest_start_s", 2),
+        ("HystMeanCompletion", "mean_eta", 3),
+        ("HystWins", "wins", None), ("HystTies", "ties", None), ("HystLosses", "losses", None),
+    ):
+        add(name, sweep_zero[field], sweep_file, "threshold_s=0 (same at every tested threshold)",
+            field, digits)
     for policy,name in (("keep","KeepLast"),("reschedule","ReplanLast")):
         add(name,run["V5_scores"][policy]["latest_start_s"],"priority_3.json",
             f"V5_scores.{policy}","latest_start_s",3)

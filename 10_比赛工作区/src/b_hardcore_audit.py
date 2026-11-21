@@ -176,15 +176,23 @@ def _topological_orders_for_pairing(pairing, alerts):
     return valid
 
 
-def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
+def _p2_crossing_allowed(gamma, min_crossing_deg):
+    return 1e-6 < gamma < 180.0 - 1e-6 and gamma >= min_crossing_deg
+
+
+def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf"), *, min_crossing_deg=0.0, slew_time=None):
     """Independent zero-truncation exact Branch-and-Bound over ALL C(5,2)^3 = 1,000 legal vehicle pairings
     and ALL acyclic service-order permutations (covering 1-vehicle 3-alert, 2-vehicle 2-alert, 3-vehicle
     2-alert, idle-vehicle patterns, and the 360 1-reused-vehicle topologies).
 
     If shortlist_k is an int (e.g. 8), uses the exact arrival-sorted top-k stations per (vehicle, alert).
     If shortlist_k is None, searches the ENTIRE 585-station discrete candidate pool.
+    The crossing floor applies to both fresh and reused vehicle pairs.
+    A supplied slew_time replaces both the pointing and reset duration.
     """
     orig_opts = solver.station_options
+    if slew_time is None:
+        slew_time = solver._station_slew_time
     alerts = tuple(model.TARGETS.keys())  # ("T1", "T2", "T3")
     goals = tuple(model.TARGETS[a] for a in alerts)
     n_veh = len(model.VEHICLES)
@@ -194,6 +202,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
         patch.object(solver, "road_clear", rounded.road_clear),
         patch.object(solver, "route", rounded.route),
         patch.object(solver, "candidate_stations", rounded.stations),
+        patch.object(solver, "_station_slew_time", slew_time),
     ):
         all_stations = {a_i: rounded.stations(goals[a_i]) for a_i in range(3)}
         total_pool_size = sum(len(v) for v in all_stations.values())
@@ -247,7 +256,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                         if p1 == p2:
                             continue
                         g = solver._crossing_angle(solver._station_bearing(p2, goal) - b1)
-                        if 1e-6 < g < 180.0 - 1e-6:
+                        if _p2_crossing_allowed(g, min_crossing_deg):
                             best_t = t_st
                             best_st = (p1, p2)
                             break
@@ -403,7 +412,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                             if su == sw:
                                 continue
                             g = solver._crossing_angle(solver._station_bearing(sw, goal) - bu)
-                            if not (1e-6 < g < 180.0 - 1e-6):
+                            if not _p2_crossing_allowed(g, min_crossing_deg):
                                 continue
 
                             # Check post-observation release lower bounds for vehicles reused later
@@ -455,8 +464,8 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
         }
 
 
-def _p2_replay_witness(run):
-    """Check the logged P2 witness through the nominal travel and reset clocks."""
+def _p2_replay_witness(run, *, min_crossing_deg=0.0, slew_time=model.slew_time):
+    """Check the logged P2 witness through the specified pointing and reset clocks."""
     witness = run["witness"]
     if witness is None:
         return False
@@ -473,7 +482,7 @@ def _p2_replay_witness(run):
             return False
         first, second = stations.values()
         _, gamma = solver.accuracy(first, second, goal)
-        if first == second or not 1e-6 < gamma < 180.0 - 1e-6:
+        if first == second or not _p2_crossing_allowed(gamma, min_crossing_deg):
             return False
         candidates = set(rounded.stations(goal))
         legs = []
@@ -482,7 +491,7 @@ def _p2_replay_witness(run):
                 return False
             origin, available = states[vehicle]
             distance, _ = rounded.route(origin, station)
-            slew = model.slew_time(station, goal)
+            slew = slew_time(station, goal)
             legs.append((vehicle, station, slew, available + distance / model.SPEED + slew))
         start = max(leg[3] for leg in legs)
         replayed[alert] = round(start, 6)

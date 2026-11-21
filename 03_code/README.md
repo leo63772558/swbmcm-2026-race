@@ -5,9 +5,13 @@
 ## 入口
 
 ```bash
-python 03_code/run_all.py          # 跑全部（P1→P2→P3→P4）
-python 03_code/run_all.py --only P2 # 只跑某一问
+python 03_code/run_all.py             # 在洁净目录复跑、编译并核验正式清单
+python 03_code/run_all.py --list      # 查看必跑阶段和脚本
 ```
+
+P2 对照包括 79° 站位边界、名义绕角路线、36°/s 云台速度与 30° 交角下限。
+P3 处理零漂移的无界情形。P4 用同一 115 场景扫描 21 档滞回阈值。
+候选稿旁的复现说明列出实际实现、输入和结果的路径。
 
 ## 目录
 

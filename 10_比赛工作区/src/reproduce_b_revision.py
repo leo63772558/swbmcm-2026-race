@@ -13,10 +13,12 @@ from time import perf_counter
 from pypdf import PdfReader
 
 import b_hardcore_audit
+import b_revision_corner_routes
 import b_revision_correctness
 import b_revision_experiments
 import b_revision_figures
 import b_revision_p4_extended
+import b_revision_p2_tradeoffs
 import b_revision_paper
 import b_revision_replay
 import b_revision_sensitivity_pareto
@@ -150,7 +152,9 @@ def main(out, reference, bundle):
                        ("2_validation",b_revision_validation.main),
                        ("3_experiments",b_revision_experiments.main),
                        ("3b_sensitivity_pareto",b_revision_sensitivity_pareto.main),
-                       ("3c_p4_extended",b_revision_p4_extended.main)):
+                       ("3c_p4_extended",b_revision_p4_extended.main),
+                       ("3d_corner_routes",b_revision_corner_routes.main),
+                       ("3e_dispatch_tradeoffs",b_revision_p2_tradeoffs.main)):
         tick=perf_counter()
         stage(results)
         times[name]=round(perf_counter()-tick,3)

@@ -102,7 +102,7 @@ def test_code_readmes_anonymized_and_run_all_fail_fast():
     )
     assert proc.returncode == 0, f"run_all.py --list failed: {proc.stderr}"
     assert "MISSING" not in proc.stdout
-    assert proc.stdout.count("[READY]") == 7
+    assert proc.stdout.count("[READY]") == 9
 
 
 def test_supporting_zip_size_contents_and_full_anonymity_scan():

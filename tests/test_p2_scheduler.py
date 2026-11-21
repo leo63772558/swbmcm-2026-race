@@ -102,3 +102,47 @@ def test_nominal_k8_schedule_satisfies_constraints():
         vlist.sort(key=lambda x: x["depart"])
         for a, b in zip(vlist, vlist[1:]):
             assert b["depart"] >= a["reset"] - 1e-6
+
+
+def test_faster_pan_benchmark_retains_exact_fixed_witness():
+    with (REVIEW_DIR / "results" / "P2_pan_speed_benchmark.csv").open(encoding="utf-8", newline="") as file:
+        rows = {row["method"]: row for row in csv.DictReader(file)}
+    fixed = rows["fixed_nominal_plan"]
+    greedy = rows["greedy_beam"]
+    exact = rows["exact_full_pool"]
+    assert all(float(row["pan_deg_s"]) == 36.0 and float(row["tilt_deg_s"]) == 30.0 for row in rows.values())
+    assert {int(row["station_alert_candidates"]) for row in rows.values()} == {585}
+    assert int(greedy["arrival_shortlist_k"]) == 8 and int(greedy["beam_width"]) == 20
+    assert not exact["arrival_shortlist_k"]
+    assert int(exact["vehicle_pairings_evaluated"]) == 1000
+    assert int(exact["acyclic_orders_evaluated"]) == 4200
+    assert float(exact["latest_start_s"]) == float(fixed["latest_start_s"]) == 10.707896
+    assert float(greedy["latest_start_s"]) == 12.210374
+
+
+def test_exact_crossing_floor_trades_latency_for_lower_worst_alert_rms():
+    with (REVIEW_DIR / "results" / "P2_angle_constrained_tradeoff.csv").open(encoding="utf-8", newline="") as file:
+        rows = list(csv.DictReader(file))
+    by_method = {}
+    for row in rows:
+        by_method.setdefault(row["method"], []).append(row)
+        first = tuple(float(row[f"{axis}_1_m"]) for axis in ("x", "y"))
+        second = tuple(float(row[f"{axis}_2_m"]) for axis in ("x", "y"))
+        rms, gamma = s.accuracy(first, second, g.TARGETS[row["alert"]])
+        assert math.isclose(gamma, float(row["crossing_deg"]), abs_tol=1e-7)
+        assert math.isclose(rms, float(row["horizontal_rms_m"]), abs_tol=1e-7)
+    assert set(by_method) == {"archived_nominal_beam", "exact_unconstrained", "exact_angle_floor"}
+    assert all({row["alert"] for row in group} == set(g.TARGETS) and len(group) == 3 for group in by_method.values())
+    assert min(float(row["crossing_deg"]) for row in by_method["archived_nominal_beam"]) < 30.0
+    unconstrained = by_method["exact_unconstrained"]
+    constrained = by_method["exact_angle_floor"]
+    for group in (unconstrained, constrained):
+        assert {int(row["station_alert_candidates"]) for row in group} == {585}
+        assert {int(row["vehicle_pairings_evaluated"]) for row in group} == {1000}
+        assert {int(row["acyclic_orders_evaluated"]) for row in group} == {4200}
+    assert {float(row["latest_start_s"]) for row in unconstrained} == {11.034062}
+    assert {float(row["latest_start_s"]) for row in constrained} == {12.006612}
+    assert all(float(row["crossing_deg"]) >= 30.0 for row in constrained)
+    assert max(float(row["horizontal_rms_m"]) for row in constrained) < max(
+        float(row["horizontal_rms_m"]) for row in unconstrained
+    )

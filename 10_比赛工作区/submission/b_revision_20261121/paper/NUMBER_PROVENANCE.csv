@@ -38,6 +38,18 @@ TravelSecond,15.365,results/P2_precision.csv,first row,rounded_travel_2_s,15.365
 PrecisionTightRange,6.4146,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,minimum_radius_m,6.414550201544714
 PrecisionTightRMS,0.15833,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,horizontal_rms_m,0.15832830914668486
 PrecisionTightIncrease,10.24,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,rms_increase_pct,10.23855133044127
+CornerGraphLength,19.3762,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,graph_length_m,19.376151620236826
+CornerArcLength,19.2215,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,tangent_arc_length_m,19.221467482372113
+CornerAbsoluteGap,0.1547,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,absolute_gap_m,0.15468413786471302
+CornerRelativeGap,0.805,results/P2_corner_arc_comparison.csv,nominal P2(1) detour,relative_gap_pct,0.8047467655972307
+PanFixed,10.71,results/P2_pan_speed_benchmark.csv,fixed_nominal_plan,latest_start_s,10.707896
+PanBeam,12.21,results/P2_pan_speed_benchmark.csv,greedy_beam,latest_start_s,12.210374
+PanExact,10.71,results/P2_pan_speed_benchmark.csv,exact_full_pool,latest_start_s,10.707896
+AngleUnrestricted,11.03,results/P2_angle_constrained_tradeoff.csv,exact_unconstrained,latest_start_s,11.034062
+AngleUnrestrictedRms,5.066,results/P2_angle_constrained_tradeoff.csv,exact_unconstrained; alert=T1,horizontal_rms_m,5.066208097
+AngleGuarded,12.01,results/P2_angle_constrained_tradeoff.csv,exact_angle_floor,latest_start_s,12.006612
+AngleGuardedRms,2.409,results/P2_angle_constrained_tradeoff.csv,exact_angle_floor; alert=T2,horizontal_rms_m,2.408629927
+AngleDelay,0.973,results/P2_angle_constrained_tradeoff.csv,exact_angle_floor minus exact_unconstrained,latest_start_s difference,0.97255
 BeamThree,13.069,results/P2_trials.csv,rounded; k=3; beam,latest_start_s,13.06918272205157
 NearestThree,11.724,results/P2_trials.csv,rounded; k=3; nearest,latest_start_s,11.724421648941432
 BeamEight,11.034,results/P2_trials.csv,rounded; k=8; beam,latest_start_s,11.034061764620652
@@ -66,6 +78,11 @@ MCLimitLow,0.914575,results/P3_MC.csv,distance_m=80.0,simultaneous_95_lower,0.91
 MCLimitHigh,0.915519,results/P3_MC.csv,distance_m=80.0,simultaneous_95_upper,0.9155192800321292
 CaseCount,73,results/priority_3.json,root,P4_case_count,73
 VFiveDelay,1.893,results/priority_3.json,root,V5_delay_s,1.8929796073746736
+HystMeanTlast,27.05,results/P4_hysteresis_sweep.csv,threshold_s=0 (same at every tested threshold),mean_latest_start_s,27.047373
+HystMeanCompletion,1.000,results/P4_hysteresis_sweep.csv,threshold_s=0 (same at every tested threshold),mean_eta,1.0
+HystWins,110,results/P4_hysteresis_sweep.csv,threshold_s=0 (same at every tested threshold),wins,110
+HystTies,5,results/P4_hysteresis_sweep.csv,threshold_s=0 (same at every tested threshold),ties,5
+HystLosses,0,results/P4_hysteresis_sweep.csv,threshold_s=0 (same at every tested threshold),losses,0
 KeepLast,11.034,results/priority_3.json,V5_scores.keep,latest_start_s,11.034061764620652
 ReplanLast,12.927,results/priority_3.json,V5_scores.reschedule,latest_start_s,12.927041371995326
 RouteCount,2925,results/Route_summary.json,root,compared_routes,2925

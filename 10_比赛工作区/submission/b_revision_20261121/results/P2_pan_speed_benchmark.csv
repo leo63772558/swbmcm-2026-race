@@ -1,0 +1,4 @@
+method,pan_deg_s,tilt_deg_s,latest_start_s,station_alert_candidates,arrival_shortlist_k,beam_width,vehicle_pairings_evaluated,acyclic_orders_evaluated
+fixed_nominal_plan,36.0,30.0,10.707896,585,,,,
+greedy_beam,36.0,30.0,12.210374,585,8,20,,
+exact_full_pool,36.0,30.0,10.707896,585,,,1000,4200

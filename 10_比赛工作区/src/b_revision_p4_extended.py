@@ -7,7 +7,6 @@ deduplicated category statistics, expanded spatial stress results, and k=3/5/8 s
 from argparse import ArgumentParser
 from collections import defaultdict
 from contextlib import ExitStack
-from math import isclose
 from pathlib import Path
 from unittest.mock import patch
 
@@ -21,6 +20,8 @@ from check_b_p4_cross import crossed_cases
 DISTURBANCE = model.number("p4", "disturbance", "occurrence_time")   # 5.0 s
 HORIZON = model.number("p4", "evaluation", "window_end")            # 60.0 s
 T4_ALT = model.number("p4", "new_alert", "altitude")                # 50.0 m
+TIME_TOLERANCE_S = 1e-9
+HYSTERESIS_THRESHOLDS_S = tuple(step / 4 for step in range(21))
 
 
 def _case_signature(new_alert, failed, recovery):
@@ -121,9 +122,9 @@ def build_dedup_and_expanded_specs():
     return dedup_base, expanded, duplicate_count
 
 
-def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
-    """Evaluate a list of (suite, name, alert, failed, rec) specs under Keep, Reschedule, and Hysteresis."""
-    rows = []
+def _evaluate_cases(nominal_visits, specs, stations, beam_width):
+    """Solve the same Keep and Replan timelines once for each scenario."""
+    cases = []
     with ExitStack() as stack:
         stack.enter_context(patch.object(solver, "road_clear", rounded.road_clear))
         stack.enter_context(patch.object(solver, "route", rounded.route))
@@ -140,22 +141,9 @@ def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
             solver.validate_visits(revised, goals)
             revised_starts = locked | solver.observation_starts(revised, None, DISTURBANCE)
 
-            k_cnt, k_eta, k_last = window_score(preserved, set(goals), 0.0, HORIZON, HORIZON)
-            r_cnt, r_eta, r_last = window_score(revised_starts, set(goals), 0.0, HORIZON, HORIZON)
-
-            # Hysteresis-gated Eq. (5) decision
-            trigger = (r_eta > k_eta + 1e-12) or (
-                abs(r_eta - k_eta) <= 1e-12 and (k_last - r_last) > hyst_delta + 1e-9
-            )
-            h_eta, h_last = (r_eta, r_last) if trigger else (k_eta, k_last)
-
-            score_k = (k_cnt, -k_last)
-            score_r = (r_cnt, -r_last)
-            winner = "reschedule" if score_r > score_k else ("keep" if score_k > score_r else "tie")
-            score_h = (round(h_eta * len(goals)), -h_last)
-            hyst_winner = "hyst_replan" if score_h > score_k else ("keep" if score_k > score_h else "tie")
-
-            rows.append({
+            keep = window_score(preserved, set(goals), 0.0, HORIZON, HORIZON)
+            replan = window_score(revised_starts, set(goals), 0.0, HORIZON, HORIZON)
+            fields = {
                 "suite": suite,
                 "case": name,
                 "category": _category_of(new_alert, failed, rec),
@@ -163,16 +151,67 @@ def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
                 "recovery_s": rec,
                 "outage_duration_s": round(rec - DISTURBANCE, 6),
                 "alerts": len(goals),
-                "keep_eta": round(k_eta, 6),
-                "keep_latest_s": round(k_last, 6),
-                "replan_eta": round(r_eta, 6),
-                "replan_latest_s": round(r_last, 6),
-                "hyst_eta": round(h_eta, 6),
-                "hyst_latest_s": round(h_last, 6),
-                "delta_replan_minus_keep_s": round(r_last - k_last, 6),
-                "winner": winner,
-                "hyst_winner": hyst_winner,
-            })
+            }
+            cases.append((fields, keep, replan))
+    return cases
+
+
+def _select_score(keep, replan, threshold_s):
+    keep_count, _, keep_last = keep
+    replan_count, _, replan_last = replan
+    use_replan = replan_count > keep_count or (
+        replan_count == keep_count and keep_last - replan_last > threshold_s + TIME_TOLERANCE_S
+    )
+    return replan if use_replan else keep
+
+
+def _compare_score(keep, candidate, win_label):
+    rank_keep = (keep[0], -keep[2])
+    rank_candidate = (candidate[0], -candidate[2])
+    return win_label if rank_candidate > rank_keep else ("keep" if rank_keep > rank_candidate else "tie")
+
+
+def _suite_rows(cases, threshold_s):
+    rows = []
+    for fields, keep, replan in cases:
+        guarded = _select_score(keep, replan, threshold_s)
+        rows.append({
+            **fields,
+            "keep_eta": round(keep[1], 6),
+            "keep_latest_s": round(keep[2], 6),
+            "replan_eta": round(replan[1], 6),
+            "replan_latest_s": round(replan[2], 6),
+            "hyst_eta": round(guarded[1], 6),
+            "hyst_latest_s": round(guarded[2], 6),
+            "delta_replan_minus_keep_s": round(replan[2] - keep[2], 6),
+            "winner": _compare_score(keep, replan, "reschedule"),
+            "hyst_winner": _compare_score(keep, guarded, "hyst_replan"),
+        })
+    return rows
+
+
+def _run_suite(nominal_visits, specs, stations=2, beam_width=3, hyst_delta=0.0):
+    return _suite_rows(_evaluate_cases(nominal_visits, specs, stations, beam_width), hyst_delta)
+
+
+def _hysteresis_sweep(cases):
+    rows = []
+    for threshold_s in HYSTERESIS_THRESHOLDS_S:
+        guarded = [_select_score(keep, replan, threshold_s) for _, keep, replan in cases]
+        verdicts = [_compare_score(keep, score, "hyst_replan")
+                    for (_, keep, _), score in zip(cases, guarded, strict=True)]
+        full_completion = sum(score[0] == fields["alerts"]
+                              for (fields, _, _), score in zip(cases, guarded, strict=True))
+        rows.append({
+            "threshold_s": threshold_s,
+            "cases": len(cases),
+            "completed_all_cases": full_completion,
+            "mean_eta": sum(score[1] for score in guarded) / len(cases),
+            "mean_latest_start_s": round(sum(score[2] for score in guarded) / len(cases), 6),
+            "wins": verdicts.count("hyst_replan"),
+            "ties": verdicts.count("tie"),
+            "losses": verdicts.count("keep"),
+        })
     return rows
 
 
@@ -229,8 +268,11 @@ def main(results_dir=None):
     dedup_base, expanded, dup_count = build_dedup_and_expanded_specs()
     all_unique_specs = dedup_base + expanded
 
-    # 1. Run full deduplicated + expanded unique suite at baseline P4 rescheduler settings (k=2, bw=3)
-    full_rows = _run_suite(nominal_visits, all_unique_specs, stations=2, beam_width=3, hyst_delta=0.0)
+    # Run the canonical suite at the archived P4 search budget and reuse the raw scores for every threshold.
+    assert len(all_unique_specs) == len({_case_signature(*spec[2:]) for spec in all_unique_specs}) == 115
+    cases = _evaluate_cases(nominal_visits, all_unique_specs, stations=2, beam_width=3)
+    full_rows = _suite_rows(cases, threshold_s=0.0)
+    sweep_rows = _hysteresis_sweep(cases)
     dedup_only_rows = [r for r in full_rows if r["suite"] == "baseline_unique"]
     cat_summary_all = _summarize_categories(full_rows)
     cat_summary_dedup = _summarize_categories(dedup_only_rows)
@@ -243,7 +285,9 @@ def main(results_dir=None):
         ("budget_k5_bw10", 5, 10),
         ("budget_k8_bw20", 8, 20),
     ):
-        run_r = _run_suite(nominal_visits, dedup_base, stations=k_val, beam_width=bw_val, hyst_delta=0.0)
+        run_r = dedup_only_rows if (k_val, bw_val) == (2, 3) else _run_suite(
+            nominal_visits, dedup_base, stations=k_val, beam_width=bw_val, hyst_delta=0.0
+        )
         v5_row = next(r for r in run_r if r["case"] == "failure_V5")
         n = len(run_r)
         budget_rows.append({
@@ -266,6 +310,7 @@ def main(results_dir=None):
     write_csv(results_dir / "P4_category_summary_expanded.csv", cat_summary_all)
     write_csv(results_dir / "P4_category_summary_dedup62.csv", cat_summary_dedup)
     write_csv(results_dir / "P4_budget_stability.csv", budget_rows)
+    write_csv(results_dir / "P4_hysteresis_sweep.csv", sweep_rows)
     write_json(results_dir / "P4_extended_summary.json", {
         "raw_archived_case_count": len(dedup_base) + dup_count,
         "duplicates_removed": dup_count,

@@ -8,3 +8,4 @@ Antigravity (Gemini),Gemini 3.1 Pro,Google DeepMind,2026-11-21,七大专家只�
 ChatGPT (Codex),GPT-6.2,OpenAI,2026-11-21,历史成果迁回与复现,以 be4c12e 为底座迁回 643c22a 三项成果并执行验收,定理证明片段迁回、补充统计实验及连续车距审计接线、封箱复现,按提交来源移植并记录归档试验口径,待队员审核,P3/P4、Appendix A、限制、支撑包与自动化校验,参赛队
 ChatGPT (Codex),GPT-6.2 Sol,OpenAI,2026-11-21,封箱排版与披露核验,按六项封箱补丁修参考文献字号与锚点、披露和文字口径,核对 P3 数值、P4 时钟、页数和支撑包,排版与披露改动纳入本版候选稿,待队员签收,论文、AI Usage Disclosure、Appendix B、验收报告和支撑包,Codex（应队员请求）
 ChatGPT (Codex),GPT-6,OpenAI,2026-11-21,WP1 术语、披露与排版核验,按 WP1 对齐已验证的三策略口径、页眉及 AI 披露，正文段落只给队员修改清单,核对 P1 相切、P2 一阶 RMS 与交角守卫、P3 弧度及 P4 两套选择规则,局部术语、公式、表格、页眉及披露；数值取自既有结果,正文成段改写由队员完成，WP1 标注待复核,B_submission.tex；paper/team/；AI_Usage_Report.md；WP1 XeLaTeX 核验,Codex（应队员请求）
+ChatGPT (Codex),GPT-6,OpenAI,2026-11-21,WP2 去重与排版验证,按 WP2 删除已在正文、表格及附录复现的文字，疏排标题、公式与图表，检验 12 pt 字号,24 个计入页、26 个物理页；三遍 XeLaTeX、字体提取与逐页光栅检查,保留核心推导和数据；采用局部去重、分页和排版修订,段落改写与结论判断由队员负责,paper/B_submission.tex；paper/team/；AI Usage Disclosure；Appendix B,Codex（应队员请求）

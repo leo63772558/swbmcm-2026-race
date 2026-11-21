@@ -10,14 +10,14 @@
   2. P2/P3 数值与 3x2M 蒙特卡洛独立校验 (`b_revision_validation.py`)
   3. P2(2) k=3 vs k=8 调度对比与 P4 73 场景实验 (`b_revision_experiments.py`)
   4. 真实求解器参数扰动、5 组权重稳定性与 3D Pareto (`b_revision_sensitivity_pareto.py`)
-  5. P4 去重 (62) + 扩充 (115) 唯一场景与 k=2/3/5/8 预算稳定性 (`b_revision_p4_extended.py`)
+  5. P4 去重 (62) + 扩充 (115) 唯一场景与 k=2/3/5/8 预算稳定性 (`b_revision_p4_extended.py` / `b_revision_p4_append.py`)
   6. 11 组 Matplotlib 高清科研图 + 暗黑 3D 数字孪生回放校验 (`b_revision_figures.py` / `b_revision_replay.py`)
   7. XeLaTeX 论文编译 + 6 项硬核审计（含 1,000 配对 / 4,200 顺序精确 B&B）+ 逐文件哈希复跑核对
 
 用法：
     python 03_code/run_all.py                      # 在临时洁净目录跑通全链路并自动核对哈希
     python 03_code/run_all.py --out <全新输出目录>   # 输出并保留至指定全新洁净目录
-    python 03_code/run_all.py --list               # 列出全部 7 个强制执行阶段
+    python 03_code/run_all.py --list               # 列出全部 8 个强制执行阶段
 """
 
 from __future__ import annotations
@@ -43,6 +43,7 @@ PIPELINE_STAGES = [
     ("3_experiments", "10_比赛工作区/src/b_revision_experiments.py", "P2(2) k=3 vs k=8 同池调度与 P4 73 归档场景对照"),
     ("3b_sensitivity_pareto", "10_比赛工作区/src/b_revision_sensitivity_pareto.py", "真实 P1-P4 参数扰动、Fixed vs ReOpt、5 权重稳定性与 3D Pareto"),
     ("3c_p4_extended", "10_比赛工作区/src/b_revision_p4_extended.py", "P4 去重 (62) + 扩充 (115) 唯一场景与 k=2/3/5/8 预算稳定性"),
+    ("3e_p4_append", "10_比赛工作区/src/b_revision_p4_append.py", "P4 三策略账本（图 7d 输入）"),
     ("4_visuals", "10_比赛工作区/src/b_revision_figures.py", "11 组 PDF/PNG 顶刊图 + 离线 3D 数字孪生回放与 Node 一致性核验"),
     ("5_pdf_and_audit", "10_比赛工作区/src/b_hardcore_audit.py", "XeLaTeX 论文编译 + 6 项硬核审计（含 1,000 配对 / 4,200 顺序精确 B&B）"),
 ]

@@ -15,5 +15,6 @@ Finally, to verify that our Problem 4 findings are not artifacts of a small onli
 Appendix~A reports the \BHoldCases{} equal-completion cases and the \BStressTrials{}-trial archived stress test. The archived selector averages \BStressSelectorEta{} completion and \BStressSelectorTime{}~s latest start, with a Wilson win-rate interval of $[\BStressWinLow\%,\,\BStressWinHigh\%]$ against Keep.
 
 \ReviewFigure{fig07_p4_resilience.pdf}{78mm}
-{Deduplicated and spatially expanded 115-scenario Problem 4 audit: (a) Keep vs.\ Reschedule completion across 7 categories, (b) two-way threshold selector latest paired start distribution and category means, (c) online search-budget stability across $k\in\{2,3,5,8\}$, and (d) category-level ledger for the two-way threshold selector versus Keep. Table~\ref{tab:p4cat} compares Replan with Keep-Append.}
+{P4 completion (a), two-way timing checks (b--c), and pairwise outcomes (d).}
 {fig:p4}
+{Replan wins \BReplanBeatsAppend{}, ties \BReplanTiesAppend{}, and loses \BReplanLosesAppend{} against Keep-Append.}

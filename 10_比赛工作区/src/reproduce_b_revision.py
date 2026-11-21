@@ -3,6 +3,7 @@
 AI assistance:
   - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
   - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+  - ChatGPT (Codex, GPT-6), OpenAI, 2026-11-21: reproduce the P4 ledger before drawing Figure 7.
 Scope: strict fail-fast clean-room reproduction & hash verification.
 """
 from argparse import ArgumentParser
@@ -18,6 +19,7 @@ import b_hardcore_audit
 import b_revision_correctness
 import b_revision_experiments
 import b_revision_figures
+import b_revision_p4_append
 import b_revision_p4_extended
 import b_revision_p4_supplement
 import b_revision_paper
@@ -83,7 +85,8 @@ def main(out, reference, bundle, skip_pdf=False):
                        ("3_experiments",b_revision_experiments.main),
                        ("3b_sensitivity_pareto",b_revision_sensitivity_pareto.main),
                        ("3c_p4_extended",b_revision_p4_extended.main),
-                       ("3d_p4_supplement",b_revision_p4_supplement.main)):
+                       ("3d_p4_supplement",b_revision_p4_supplement.main),
+                       ("3e_p4_append",b_revision_p4_append.main)):
         tick=perf_counter()
         stage(results)
         times[name]=round(perf_counter()-tick,3)

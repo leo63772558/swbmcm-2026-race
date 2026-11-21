@@ -16,12 +16,14 @@ A naive comparison across heuristics can easily conflate search quality with can
 At $k_{\mathrm{cand}}=3$ (beam width $w=20$), Beam Search delivers $t_{\mathrm{last}}=\BBeamThree{}$ s—actually $1.345$ s \emph{slower} than the Nearest baseline ($\BNearestThree{}$ s). Inspecting the per-vehicle phase ledger (Figure~\ref{fig:p22}c--d) exposes the exact structural cause: pruning to three stations per vehicle excludes two pivotal synchronization stations—V1's rank-8 station at $(4,20)$ m for T2 and V2's rank-5 station at $(84,4)$ m for T3. Deprived of those stations, Beam Search assigns reused vehicle V3 to observe T3 first and T1 second ($\mathrm{T3}\!\to\!\mathrm{T1}$), forcing V3 to wait $1.063$ s for partner V4 on T3 before resetting at $12.085$ s and finally opening T1 at $\BBeamThree{}$ s.
 
 \ReviewFigure{fig04_p2_paths.pdf}{76mm}
-{Four-panel multi-vehicle cooperative path comparison under Euclidean rounded clearance: zoomed local insets for (a) reused vehicle V3, (b) V4--V5 assignments, (c) V1--V2 unlocked stations, and (d) global 5-vehicle routing.}
+{Vehicle routes and stations unlocked by the larger shortlist.}
 {fig:p2paths}
+{At $k=8$, V3 serves T1 and T3 from the same station.}
 
 \ReviewFigure{fig05_p2_dispatch.pdf}{78mm}
-{Shared-shortlist cooperative dispatch Gantt schedules, trajectory coordination, and aggregated pre-$t_{\mathrm{last}}$ phase budgets explaining the $k=3$ vs.\ $k=8$ ranking reversal.}
+{Shared-shortlist schedules and phase budgets for $k=3$ and $k=8$.}
 {fig:p22}
+{Beam search cuts latest start from \BBeamThree{} to \BBeamEight{} s.}
 
 Expanding the shared shortlist to $k_{\mathrm{cand}}=8$ immediately restores those two higher-rank stations (Figure~\ref{fig:p2paths}c) and flips the critical reuse chain on V3 to $\mathrm{T1}\!\to\!\mathrm{T3}$ (Figure~\ref{fig:p2paths}a). Under this unlocked topology, V3 drives to $(12,92)$ m, slews, and initiates paired observation of T1 with V5 (\emph{zero partner wait}); after dwelling and resetting, V3 remains stationary at $(12,92)$ m (zero inter-alert transit), slews directly onto T3, and starts paired observation with V2 at exactly $t_{\mathrm{last}}=\BBeamEight{}$ s, while V1 and V4 complete T2 in parallel (full seven-clock schedule in Appendix~A, Table~\ref{tab:app-p22}).
 

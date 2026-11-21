@@ -100,10 +100,10 @@
   \IfFileExists{team/#1.tex}{\input{team/#1.tex}}{%
     \par\noindent{\color{quiet}\itshape [Missing section file: #1.tex]}\par}}
 
-\newcommand{\ReviewFigure}[4]{%
+\newcommand{\ReviewFigure}[5]{%
   \begin{figure}[!htbp]\centering
   \includegraphics[width=\linewidth,height=#2,keepaspectratio]{#1}
-  \caption{#3}\label{#4}\end{figure}}
+  \caption[{#3}]{#3\par\textbf{Takeaway:} #5}\label{#4}\end{figure}}
 
 \input{B_review_metrics.tex}
 \raggedbottom
@@ -196,8 +196,9 @@ $\eta, t_{\mathrm{last}}, N, k$ & Completion fraction, latest paired start, tota
 \TeamText{framework}{Interdisciplinary framework}
 
 \ReviewFigure{fig01_framework.pdf}{70mm}
-{Interdisciplinary architecture and verified data flow across Problems 1--4. The nominal $k=8$ dispatch plan is frozen prior to all P4 disturbance replays.}
+{Verified data flow across Problems 1--4.}
 {fig:framework}
+{The frozen \BBeamEight{} s dispatch anchors \BExpandedCases{} replay cases.}
 
 \begin{table}[htbp]
 \centering\footnotesize
@@ -271,8 +272,9 @@ Local first-order horizontal RMS (analytical \& finite-difference) & \BFirstRMS{
 \end{table}
 
 \ReviewFigure{fig03_p2_precision.pdf}{72mm}
-{T2 local first-order horizontal RMS contour field over $\mathcal{F}(T_2)$ and optimal dual-station 95\% analytical error circle.}
+{Fixed-pair RMS contours and the local 95\% Gaussian error circle.}
 {fig:p21}
+{The $\BCrossing{}^\circ$ pair attains \BFirstRMS{} m local first-order RMS.}
 
 % ===================== SECTION 6 =====================
 \section{Problem 2(2): Multi-Alert Cooperative Dispatch and Beam-Search Mechanism}
@@ -343,8 +345,9 @@ Travel $s$ (m) & Samples $n$ & Coverage & Simultaneous \BMCConfidence\% Wilson C
 \end{table}
 
 \ReviewFigure{fig06_p3_risk.pdf}{73mm}
-{Problem 3 independent Monte Carlo position-error diagnostic, 95\% analytical ellipse, coverage curve with zoomed inset around \BIntegratedCrossing{} m, and admissible $(a,b)$ parameter domain.}
+{Monte Carlo coverage, threshold bracket, and admissible odometry region.}
 {fig:p3}
+{The 95\% coverage threshold is \BIntegratedCrossing{} m.}
 
 % ===================== SECTION 8 =====================
 \section{Problem 4: Event-Driven Dynamic Rescheduling and V5 Counterexample Mechanism}
@@ -397,7 +400,7 @@ Failure + Comms Outage & 5 & 0.733 & 1.000 & 1.000 & 0 / 5 / 0\\
 New Alert + Comms Outage & 5 & 0.750 & 1.000 & 1.000 & 0 / 5 / 0\\
 All Three Combined & 42 & 0.560 & 1.000 & 1.000 & 0 / 42 / 0\\
 \midrule
-\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{1.000} & \textbf{34 / 55 / 26}\\
+\textbf{Total Unique Suite} & \textbf{115} & \textbf{0.642} & \textbf{1.000} & \textbf{1.000} & \textbf{\BReplanBeatsAppend{} / \BReplanTiesAppend{} / \BReplanLosesAppend{}}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -589,7 +592,7 @@ Pursuant to Article~6 of the 2026 ShuWei Cup AI Tool Usage Policy (exempt from t
 \toprule
 Tool \& Version & Provider & Usage Date & Task Stage & Prompt / Operation Summary & Adoption & Verification & Role / Location\\
 \midrule
-ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol / GPT-6) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, packaging, terminology, and repeated text; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
+ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol / GPT-6) & OpenAI & 2026-11-20 to 2026-11-21 & Code, Verification, Replay, Figures, Typesetting & Checked final typography, disclosures, pagination, packaging, terminology, repeated text, figure captions, and plotting; scaffolded P1--P4 solvers, rounded geometry checks, quadrature/MC scripts, replay generator, and LaTeX metric binding. & Adapted \& integrated into \texttt{src/*.py} & Cross-checked via exact B\&B, MC Wilson CIs, and \texttt{pytest} & Code (\texttt{src/*.py}), Figures, LaTeX macros\\
 Antigravity (Gemini 3.1 Pro) & Google DeepMind & 2026-11-21 & Audit, 3D Twin, Sensitivity, Pareto, Figures, Editing & Built offline 3D digital twin (\texttt{B\_Simulator.html}), 1,000-pair exact B\&B audit, 115-case P4 expansion, real-solver sensitivity/3D Pareto, 11-figure suite, and LaTeX QA fixes. & Adapted \& integrated into \texttt{src/*.py} and \texttt{paper/} & Verified via 6/6 hardcore audits, offline Chromium QA, and \texttt{pytest} & Simulator, Audit, Figs.~1--11, Paper formatting\\
 WorkBuddy Agent (DeepSeek-V4.1-Flash) & DeepSeek / Tencent & 2026-11-17; 2026-11-21 & Pre-contest rule verification; precision-aware dispatch and keep-append studies & Checked the submission workflow and AI disclosure rules; implemented the crossing-angle guard sweep and the keep-append baseline, re-ran the exact B\&B and the 115-case suite, and typeset the resulting tables. & Adapted into two scripts under \texttt{src/} and Tables~\ref{tab:p22},~\ref{tab:p4cat} & Results re-verified by the team against the P2 precision and P4 keep-append result files; model design and interpretation remained team work & Sections~6 and~8; AI Usage Disclosure; usage log\\
 \bottomrule

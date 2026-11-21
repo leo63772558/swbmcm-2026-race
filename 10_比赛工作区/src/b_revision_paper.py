@@ -3,6 +3,7 @@
 AI assistance:
   - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
   - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+  - ChatGPT (Codex, GPT-6), OpenAI, 2026-11-21: bind Figure 7 counts to the P4 ledger.
 Scope: deterministic metric macro binding, LaTeX compilation, and PDF verification.
 """
 from argparse import ArgumentParser
@@ -149,6 +150,15 @@ def metrics(root):
     add("StaticSegments", static["segments_checked"], audit_file, audit_key, "segments_checked")
     add("StaticPoints", static["stationary_points_checked"], audit_file, audit_key, "stationary_points_checked", "comma")
     add("StaticIntrusions", len(static["violations"]), audit_file, audit_key, "violations length")
+
+    ledger_file = "P4_keep_append_summary.csv"
+    total_key = "Total Unique Suite"
+    total = next(row for row in read_csv(results / ledger_file) if row["category"] == total_key)
+    for name, field in (("ExpandedCases", "cases"),
+                        ("ReplanBeatsAppend", "replan_wins_vs_append"),
+                        ("ReplanTiesAppend", "replan_ties_vs_append"),
+                        ("ReplanLosesAppend", "replan_losses_vs_append")):
+        add(name, total[field], ledger_file, "category=" + total_key, field)
 
     write_csv(paper/"NUMBER_PROVENANCE.csv",source)
     macro_lines = [f"\\newcommand{{\\B{r['macro']}}}{{{r['rendered']}}}" for r in source]
@@ -363,7 +373,7 @@ def inspect_pdf(path, qa, *, paper=True):
         cleaned = re.sub(r"\s+","",text)
         assert len(cleaned)>60 and "\ufffd" not in text and not re.search(r"[\u3400-\u9fff]",text), i
         if paper:
-            assert (f"Team#{TEAM_NUMBER}" in cleaned) == (i>1)
+            assert (f"Team#B{TEAM_NUMBER}" in cleaned) == (i>1)
             if i>1:
                 assert f"Page{i}of{len(reader.pages)}" in cleaned, (i,cleaned[:100])
             if i==1:

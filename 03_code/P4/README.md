@@ -22,3 +22,7 @@
 - 窗口内无法开始观测 → `t_last = 60 s`
 - 已开始观测的告警不可重排；已派出未开始观测的可改派
 - t=0 排程时两个方案都不知道扰动
+
+## B 题图 7 复现
+
+`python 03_code/run_all.py` 先从 P2 名义时间轴生成 P4 三策略的逐场景结果，再绘制图 7(d)。账本读 `results/P4_keep_append_cases.csv`，图注总计和表 8 使用 `results/P4_keep_append_summary.csv`。

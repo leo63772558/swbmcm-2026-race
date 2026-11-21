@@ -103,3 +103,7 @@ ReplayMargin,21.00,results/P4_vehicle_clearance.json,minimum,margin_m,20.9999999
 StaticSegments,892,results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,segments_checked,892
 StaticPoints,"4,503",results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,stationary_points_checked,4503
 StaticIntrusions,0,results/HARDCORE_AUDIT_REPORT.json,audit_2_minkowski_clearance,violations length,0
+ExpandedCases,115,results/P4_keep_append_summary.csv,category=Total Unique Suite,cases,115
+ReplanBeatsAppend,34,results/P4_keep_append_summary.csv,category=Total Unique Suite,replan_wins_vs_append,34
+ReplanTiesAppend,55,results/P4_keep_append_summary.csv,category=Total Unique Suite,replan_ties_vs_append,55
+ReplanLosesAppend,26,results/P4_keep_append_summary.csv,category=Total Unique Suite,replan_losses_vs_append,26

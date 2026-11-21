@@ -3,6 +3,7 @@
 AI assistance:
   - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
   - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+  - ChatGPT (Codex, GPT-6), OpenAI, 2026-11-21: three-policy ledger and high-resolution export.
 Scope: scientific visualization, grayscale/print compatibility, and deterministic figure provenance.
 """
 from argparse import ArgumentParser
@@ -74,8 +75,8 @@ FIGURE_MAP = (
      "P2(2) shared-k schedule Gantt, vehicle trajectories and k=3 vs k=8 ranking-reversal breakdown"),
     ("fig06_p3_risk", "P3_MC.csv; P3_curve.csv; P3_verification.json; P3_parameters.csv; B题题面参数.csv",
      "P3 Monte Carlo scatter, analytical ellipse, 66.837 m coverage threshold inset and (a,b) admissible domain"),
-    ("fig07_p4_resilience", "P4_dedup_expanded_cases.csv; P4_category_summary_expanded.csv; P4_budget_stability.csv",
-     "P4 115-scenario deduplicated & spatially expanded resilience, search-budget stability, and win/tie/loss ledger"),
+    ("fig07_p4_resilience", "P4_dedup_expanded_cases.csv; P4_category_summary_expanded.csv; P4_budget_stability.csv; P4_keep_append_cases.csv",
+     "P4 resilience, search-budget stability, and the pairwise Keep / Keep-Append / Replan ledger"),
     ("fig08_v5_timeline", "P4_V5_event_comparison.csv; Executed_timeline.json; priority_3.json",
      "V5 single-fault counterexample aligned dual-policy Gantt showing +1.893 s bottleneck shift"),
     ("fig09_global_sensitivity", "Global_sensitivity_oat.csv; Global_sensitivity_fixed_vs_reopt.csv; Global_sensitivity_interaction.csv; Global_sensitivity_weight_check.csv",
@@ -131,7 +132,9 @@ def panel(ax, letter, title):
 
 def save(fig, directory, stem):
     directory.mkdir(parents=True, exist_ok=True)
-    fig.savefig(directory / f"{stem}.pdf", metadata=PLOT_METADATA)
+    # The precision mesh and its color scale are raster layers within the PDF.
+    pdf_options = {"dpi": 320} if stem == "fig03_p2_precision" else {}
+    fig.savefig(directory / f"{stem}.pdf", metadata=PLOT_METADATA, **pdf_options)
     fig.savefig(directory / f"{stem}.png", dpi=320, metadata={"Software": "Matplotlib"})
     plt.close(fig)
 
@@ -689,12 +692,57 @@ def p3_risk(results):
     return fig
 
 
+def p4_policy_ledger(ax, categories, short_names, rows):
+    """Show every pairwise outcome in candidate-versus-baseline order."""
+    comparisons = (
+        ("Keep-Append\nvs Keep", "append_vs_keep"),
+        ("Replan\nvs Keep", "replan_vs_keep"),
+        ("Replan\nvs Keep-Append", "replan_vs_append"),
+    )
+    outcome_order = ("candidate", "tie", "base")
+    category_rows = [
+        (short_names[category], [row for row in rows if row["category"] == category])
+        for category in categories
+    ]
+    assert all(group for _, group in category_rows)
+    assert sum(len(group) for _, group in category_rows) == len(rows)
+    category_rows.append((f"All {len(rows)}", rows))
+
+    panel(ax, "d", "Pairwise outcomes (W / T / L)")
+    ax.set_axis_off()
+    transform = ax.transAxes
+    centers = (.34, .59, .85)
+    ax.text(.02, .92, "Case type", transform=transform, va="center", fontsize=11, weight="bold")
+    for center, (label, _) in zip(centers, comparisons):
+        ax.text(center, .92, label, transform=transform, ha="center", va="center",
+                fontsize=11, weight="bold")
+
+    for i, (label, group) in enumerate(category_rows):
+        y = .79 - i * .10
+        total = i == len(category_rows) - 1
+        if i % 2 == 0 or total:
+            ax.add_patch(Rectangle((0, y - .047), 1, .094, transform=transform,
+                                   color="#DCE4ED" if total else "#F1F5F9", linewidth=0))
+        weight = "bold" if total else "normal"
+        ax.text(.02, y, label, transform=transform, va="center", fontsize=12.5, weight=weight)
+        for center, (_, key) in zip(centers, comparisons):
+            counts = Counter(row[key] for row in group)
+            assert counts.keys() <= set(outcome_order)
+            cell = " / ".join(str(counts[outcome]) for outcome in outcome_order)
+            ax.text(center, y, cell, transform=transform, ha="center", va="center",
+                    fontsize=12.5, weight=weight)
+
+
 def p4_resilience(results):
     """Fig. 7: Faceted P4 resilience analysis across 115 deduplicated & spatially expanded scenarios
     plus search-budget stability (k=2/3/5/8) and category-level win/tie/loss ledger."""
     cases = read_csv(results / "P4_dedup_expanded_cases.csv")
     cats = [r for r in read_csv(results / "P4_category_summary_expanded.csv") if r["category"] != "Total Unique Suite"]
     budgets = read_csv(results / "P4_budget_stability.csv")
+    append_cases = read_csv(results / "P4_keep_append_cases.csv")
+    assert Counter((row["case"], row["category"]) for row in append_cases) == Counter(
+        (row["case"], row["category"]) for row in cases
+    )
     # Preserve P4_PANEL_INDEX.csv provenance for all unique cases
     index = [
         {
@@ -720,7 +768,7 @@ def p4_resilience(results):
 
     fig, gs = layout(
         f"P4  |  Deduplicated & spatially expanded resilience ({len(cases)} unique scenarios)",
-        (11.4, 8.2), 2, 2, height_ratios=(1.12, 1.02), wspace=0.24, hspace=0.30,
+        (11.4, 7.0), 2, 2, height_ratios=(1.12, 1.02), wspace=0.24, hspace=0.21,
     )
 
     # Panel (a): Completion fraction eta by disturbance category
@@ -730,7 +778,7 @@ def p4_resilience(results):
     keep_eta = [float(r["mean_keep_eta"]) for r in cats]
     rep_eta = [float(r["mean_replan_eta"]) for r in cats]
     ax_a.bar(x - w / 2, keep_eta, width=w, color=ORANGE, edgecolor="#7C2D12", hatch="///", alpha=0.92, label="Keep Plan")
-    ax_a.bar(x + w / 2, rep_eta, width=w, color=TEAL, edgecolor="white", alpha=0.94, label="Reschedule / Hysteresis")
+    ax_a.bar(x + w / 2, rep_eta, width=w, color=TEAL, edgecolor="white", alpha=0.94, label="Replan / two-way selector")
     for idx, (ke, re_v) in enumerate(zip(keep_eta, rep_eta)):
         ax_a.text(idx - w / 2, ke + 0.025, f"{ke:.2f}", ha="center", va="bottom", fontsize=7.4, color=INK, fontweight="bold")
         ax_a.text(idx + w / 2, re_v + 0.025, f"{re_v:.2f}", ha="center", va="bottom", fontsize=7.2, color=TEAL, fontweight="bold")
@@ -740,9 +788,9 @@ def p4_resilience(results):
     ax_a.set_ylim(0, 1.20)
     ax_a.legend(loc="lower right", frameon=True, facecolor="white", fontsize=8.1)
 
-    # Panel (b): Response latency t_last distribution under Hysteresis-Gated policy (consistent boxplot + mean!)
+    # Panel (b): Response latency t_last distribution under the two-way selector
     ax_b = fig.add_subplot(gs[0, 1])
-    panel(ax_b, "b", r"Latest paired start $t_{\mathrm{last}}$ (Hysteresis-Gated, 115 cases)")
+    panel(ax_b, "b", r"Latest paired start $t_{\mathrm{last}}$ (two-way selector)")
     grouped_t = [[float(r["hyst_latest_s"]) for r in cases if r["category"] == c["category"]] for c in cats]
     bp = ax_b.boxplot(
         grouped_t, positions=x, widths=0.50, patch_artist=True,
@@ -758,7 +806,7 @@ def p4_resilience(results):
     means = [float(c["mean_hyst_tlast_s"]) if "mean_hyst_tlast_s" in c else float(np.mean(g))
              for c, g in zip(cats, grouped_t)]
     ax_b.plot(x, means, marker="D", markersize=5.2, color=CORAL, markeredgecolor="white",
-              markeredgewidth=0.6, linestyle="none", label="Category mean (Hysteresis)", zorder=6)
+              markeredgewidth=0.6, linestyle="none", label="Category mean", zorder=6)
     ax_b.set_xticks(x)
     ax_b.set_xticklabels(labels, fontsize=7.8)
     ax_b.set_ylabel(r"Latest paired start $t_{\mathrm{last}}$ (s)")
@@ -777,7 +825,7 @@ def p4_resilience(results):
     rep_wtl = f"{rw}W/{ti}T/{kw}L"
     hyst_wtl = f"{rw}W/{ti + kw - hl}T/{hl}L"
     ax_c.plot(bx, t_rep, marker="o", color=BLUE, lw=2.0, label=rf"Unconditional Replan ({rep_wtl})")
-    ax_c.plot(bx, t_hyst, marker="s", color=TEAL, lw=2.0, ls="--", label=rf"Hysteresis-Gated ({hyst_wtl})")
+    ax_c.plot(bx, t_hyst, marker="s", color=TEAL, lw=2.0, ls="--", label=rf"Two-way selector ({hyst_wtl})")
     for i, (tr, th) in enumerate(zip(t_rep, t_hyst)):
         ax_c.annotate(f"{tr:.3f} s", (i, tr), xytext=(0, 7), textcoords="offset points",
                       ha="center", fontsize=8.0, color=BLUE, fontweight="bold")
@@ -792,39 +840,13 @@ def p4_resilience(results):
               fontsize=10.5, fontweight="bold", color=INK, clip_on=False)
     ax_c.text(0.03, 0.07,
               "Zoomed 0.28 s band (<0.9% spread); 100% completion across all budgets\n"
-              "V5 delay invariant (+1.893 s), 0 losses under hysteresis gate",
+              "V5 delay invariant (+1.893 s); two-way selector has no losses",
               transform=ax_c.transAxes, fontsize=7.6, color=INK,
               bbox={"fc": "#F8FAFC", "ec": GRID, "boxstyle": "round,pad=.28"})
     ax_c.legend(loc="upper right", frameon=True, facecolor="white", fontsize=7.9)
 
-    # Panel (d): Data-driven category-level Win / Tie / Loss breakdown across all 115 unique scenarios
     ax_d = fig.add_subplot(gs[1, 1])
-    panel(ax_d, "d", r"Win / Tie / Loss ledger (Hysteresis, 115 cases)")
-    y_cat = np.arange(len(cats))
-    h_wins = np.array([int(c["hyst_wins"]) for c in cats])
-    h_ties = np.array([int(c["hyst_ties"]) for c in cats])
-    raw_losses = np.array([int(c["keep_wins"]) for c in cats])
-    cat_names = [short_cat.get(c["category"], c["category"]) for c in cats]
-    ax_d.barh(y_cat, h_wins, height=0.60, color=TEAL, edgecolor="white", label=f"Hysteresis Wins ({int(h_wins.sum())})")
-    ax_d.barh(y_cat, h_ties, left=h_wins, height=0.60, color=GOLD, edgecolor="#78350F", hatch="///",
-              label=f"Ties / Protected Keep ({int(h_ties.sum())})")
-    for i, (wn, ti, rl) in enumerate(zip(h_wins, h_ties, raw_losses)):
-        tot = wn + ti
-        note = f"{wn}W / {ti}T" + (f" (1 V5 loss blocked)" if rl > 0 else "")
-        ax_d.text(tot + 0.6, i, note, va="center", ha="left", fontsize=7.6,
-                  fontweight="bold" if rl > 0 else "normal", color=CORAL if rl > 0 else INK)
-    ax_d.set_yticks(y_cat)
-    ax_d.set_yticklabels(cat_names, fontsize=8.2)
-    ax_d.invert_yaxis()
-    ax_d.set_xlabel("Unique disturbance scenarios")
-    ax_d.set_xlim(0, max(int(c["cases"]) for c in cats) * 1.48)
-    ax_d.grid(False, axis="y")
-    ax_d.legend(loc="center right", bbox_to_anchor=(0.99, 0.56), frameon=True, facecolor="white", fontsize=7.6)
-    ax_d.text(0.99, 0.24,
-              f"Raw Replan: {sum(int(c['replan_wins']) for c in cats)}W / {sum(int(c['ties']) for c in cats)}T / {int(raw_losses.sum())}L\n"
-              f"Hysteresis: {int(h_wins.sum())}W / {int(h_ties.sum())}T / 0L",
-              transform=ax_d.transAxes, ha="right", va="bottom", fontsize=7.5, fontweight="bold", color=INK,
-              bbox={"fc": "#F8FAFC", "ec": TEAL, "boxstyle": "round,pad=.28"})
+    p4_policy_ledger(ax_d, [row["category"] for row in cats], short_cat, append_cases)
     return fig, index
 
 
@@ -1285,6 +1307,7 @@ def dashboard_3d(results):
     first = min(float(e["start_s"]) for e in nominal if e["phase"] == "observe")
     t_fault = float(v5["failure_s"])
     last = float(v5["scores"]["reschedule"]["latest_start_s"])
+    v5_delay = last - float(v5["scores"]["keep"]["latest_start_s"])
 
     fig, gs = layout(
         "Offline 3D digital twin verification  |  Verified states (0/892 static building-obstacle collisions)",
@@ -1296,7 +1319,7 @@ def dashboard_3d(results):
         ("b", rf"V5 Fault Trigger ($t = {t_fault:.3f}$ s)", v5["policies"]["reschedule"], v5["targets"], t_fault, True,
          "V5 failed at 5.000 s\nReplan triggers V1/V2/V4 cancel-reset"),
         ("c", rf"Reschedule Recovery ($t = {last:.3f}$ s)", v5["policies"]["reschedule"], v5["targets"], last, True,
-         "3/3 paired alerts completed\nHysteresis Eq. (5) blocks +1.893 s loss"),
+         f"3/3 paired alerts completed\nReplan is {v5_delay:.3f} s later than Keep"),
     ]
     for col_i, (tag, subtitle, tl, targs, t_now, h_fault, badge) in enumerate(stages):
         ax3 = fig.add_subplot(gs[0, col_i])
@@ -1344,10 +1367,14 @@ def generate(root):
             write_csv(directory / "P4_PANEL_INDEX.csv", index)
         save(out, directory, stem)
     write_csv(directory / "FIGURE_SOURCES.csv", (
-        {"figure": name, "source": inputs, "purpose": description, "formats": "Vector PDF; PNG 320 dpi"}
+        {
+            "figure": name, "source": inputs, "purpose": description,
+            "formats": ("PDF with 320 dpi raster layers; PNG 320 dpi" if name == "fig03_p2_precision"
+                        else "Vector PDF; PNG 320 dpi"),
+        }
         for name, inputs, description in FIGURE_MAP
     ))
-    print("Rendered 11 publication-grade analytical figures and 3 replay keyframe groups as vector PDF and 320 dpi PNG.")
+    print("Rendered 11 publication-grade analytical figures and 3 replay keyframe groups as PDF and 320 dpi PNG.")
 
 
 if __name__ == "__main__":

@@ -34,16 +34,23 @@ def _p1_quality(pitch_deg):
 
 
 def _p3_crossing(a_val, b_val, n=48):
-    """Exact bisection for 95% coverage distance using b_revision_probability.coverage."""
+    """Bisect the 95% crossing; return inf for admissible zero drift.
+
+    The sensitivity score uses zero for a parameter pair already infeasible at
+    departure. The initial 240 m bracket is extended for small positive drift.
+    """
     if a_val < 0 or b_val < 0:
         raise ValueError("Position error parameters a and b must be non-negative")
-    lo, hi = 0.0, 240.0
-    if prob.coverage(a_val + b_val * lo, n=n) < prob.REQUIRED:
+    initial_coverage = prob.coverage(a_val, n=n)
+    if initial_coverage < prob.REQUIRED:
         return 0.0
     if b_val == 0.0:
-        return hi
-    if prob.coverage(a_val + b_val * hi, n=n) >= prob.REQUIRED:
-        return hi
+        return float("inf")
+    if initial_coverage == prob.REQUIRED:
+        return 0.0
+    lo, hi = 0.0, 240.0
+    while prob.coverage(a_val + b_val * hi, n=n) >= prob.REQUIRED:
+        lo, hi = hi, hi * 2.0
     for _ in range(30):
         mid = 0.5 * (lo + hi)
         if prob.coverage(a_val + b_val * mid, n=n) >= prob.REQUIRED:

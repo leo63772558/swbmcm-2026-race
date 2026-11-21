@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 
 import b_revision_probability as rp
+from b_revision_sensitivity_pareto import _p3_crossing
 
 REVIEW_DIR = Path(__file__).resolve().parent.parent / "10_比赛工作区" / "submission" / "b_revision_20261121"
 
@@ -39,6 +40,17 @@ def test_unique_travel_threshold_and_80m_closed_form_simplex():
     assert math.isclose(rp.coverage(0.0 + b_max * 80.0), 0.95, abs_tol=1e-7)
     assert rp.coverage(0.0 + (b_max - 1e-4) * 80.0) > 0.95
     assert rp.coverage(0.0 + (b_max + 1e-4) * 80.0) < 0.95
+
+
+def test_sensitivity_crossing_checks_zero_drift_and_extends_finite_bracket():
+    assert _p3_crossing(0.0, 0.0) == math.inf
+    assert _p3_crossing(rp.A, 0.0) == math.inf
+    assert _p3_crossing(2.0, 0.0) == 0.0
+
+    slope = rp.B / 10.0
+    distance = _p3_crossing(rp.A, slope, n=96)
+    assert distance > 240.0
+    assert math.isclose(distance, 10.0 * rp.find_crossing(96), abs_tol=1e-5)
 
 
 def test_bonferroni_wilson_mc_dual_closure():

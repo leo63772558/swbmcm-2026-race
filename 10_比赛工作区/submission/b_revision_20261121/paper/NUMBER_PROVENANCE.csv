@@ -11,6 +11,7 @@ AltArrival,1.224247,results/P1_station.csv,tie=arrival,arrival_s,1.2242471655165
 ArcStart,236.896047,results/P1_arc.csv,first row,start_deg,236.8960468538305
 ArcEnd,520.747873,results/P1_arc.csv,first row,end_deg,520.7478733283226
 ArcLength,37.562656,results/P1_arc.csv,first row,length_m,37.56265550648976
+ArcGap,76.15,results/P1_arc.csv,first row,360-(end_deg-start_deg),76.1481735255079
 GridArea,5610.4,results/P1_area.csv,step_m=0.1 phase=0.5,intersection_area_m2,5610.4000000000015
 PitchLoss,9.2876,results/P1_pitch_checks.csv,ceiling=79.0,100*relative_quality_loss,9.287632327234718
 FromA,236.896,results/P1_ready_branches.csv,from_deg=236.8960468538305,from_deg,236.8960468538305
@@ -34,6 +35,9 @@ BaseLength,8.229,results/P2_precision.csv,first row,baseline_m,8.229012248496929
 Crossing,90,results/P2_precision.csv,first row,crossing_deg,89.9999999999999
 TravelFirst,6.459,results/P2_precision.csv,first row,rounded_travel_1_s,6.458717206745608
 TravelSecond,15.365,results/P2_precision.csv,first row,rounded_travel_2_s,15.365392516536396
+PrecisionTightRange,6.4146,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,minimum_radius_m,6.414550201544714
+PrecisionTightRMS,0.15833,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,horizontal_rms_m,0.15832830914668486
+PrecisionTightIncrease,10.24,results/P2_precision_pitch_checks.csv,elevation_ceiling_deg=79,rms_increase_pct,10.23855133044127
 BeamThree,13.069,results/P2_trials.csv,rounded; k=3; beam,latest_start_s,13.06918272205157
 NearestThree,11.724,results/P2_trials.csv,rounded; k=3; nearest,latest_start_s,11.724421648941432
 BeamEight,11.034,results/P2_trials.csv,rounded; k=8; beam,latest_start_s,11.034061764620652
@@ -41,7 +45,7 @@ NearestEight,11.724,results/P2_trials.csv,rounded; k=8; nearest,latest_start_s,1
 TravelThreshold,66.837,results/P3_verification.json,root,archived_distance_m,66.83717727661133
 IntegratedCrossing,66.837258,results/P3_verification.json,root,independent_crossing_m,66.83725842856802
 SigmaCrossing,1.636745,results/P3_verification.json,root,sigma_at_crossing_m,1.6367451685713605
-FarBound,0.8765,results/P3_verification.json,root,tail_probability_upper_bound,0.8765168902004593
+FarBound,0.87652,results/P3_verification.json,root,tail_probability_upper_bound,0.8765168902004593
 BracketLow,66.837158,results/P3_verification.json,root,bracket_m[0],66.83715842856802
 BracketHigh,66.837358,results/P3_verification.json,root,bracket_m[1],66.83735842856802
 MCConfidence,95,results/P3_MC.csv,header,simultaneous_95_lower,95

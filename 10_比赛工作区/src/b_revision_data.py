@@ -26,7 +26,7 @@ def write_csv(path, rows):
         raise ValueError(f"Empty evidence table: {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=rows[0])
+        writer = csv.DictWriter(file, fieldnames=rows[0], lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -38,7 +38,7 @@ def read_json(path):
 def write_json(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
-                    encoding="utf-8")
+                    encoding="utf-8", newline="\n")
 
 
 def digest(value):

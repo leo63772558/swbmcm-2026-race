@@ -186,6 +186,7 @@ def generate(out, plotly_path, license_path):
         "https://github.com/plotly/plotly.js/blob/v2.35.2/dist/plotly-gl3d.min.js\n"
         f"Git blob SHA-1: {PLOTLY_SHA1}\n",
         encoding="utf-8",
+        newline="\n",
     )
     payload = confirmed_payload(out / "results")
     write_json(browser / "KEYFRAME_STATES.json", payload["keyframes"])

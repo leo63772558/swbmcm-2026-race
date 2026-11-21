@@ -6,6 +6,7 @@ import sys
 import zipfile
 from pathlib import Path
 
+import pytest
 from pypdf import PdfReader
 
 REPO = Path(__file__).resolve().parent.parent
@@ -136,3 +137,37 @@ def test_supporting_zip_size_contents_and_full_anonymity_scan():
                 pdf_text = "\n".join((p.extract_text() or "") for p in reader.pages)
                 for leak in FORBIDDEN_IDENTITY_TOKENS:
                     assert leak not in pdf_text, f"Anonymity leak ({leak}) in ZIP PDF {member}"
+
+
+def test_reproduction_manifest_requires_every_artifact(tmp_path, monkeypatch):
+    import reproduce_b_revision as reproduce
+
+    reference = tmp_path / "reference"
+    rerun = tmp_path / "rerun"
+    result = "results/observations.csv"
+    for root in (reference, rerun):
+        (root / "results").mkdir(parents=True)
+        (root / result).write_bytes(b"time\n2.5\n")
+    monkeypatch.setattr(reproduce, "BASE_ARTIFACTS", ())
+    monkeypatch.setattr(reproduce, "FROZEN_INPUTS", ())
+    monkeypatch.setattr(reproduce, "PDF_NAMES", ())
+    reproduce.build_manifest(reference)
+    manifest = reproduce.load_manifest(reference)
+    assert reproduce.compare(rerun, manifest) == ([result], [])
+
+    (rerun / result).write_bytes(b"time\r\n2.5\r\n")
+    with pytest.raises(ValueError, match="Reproduced SHA-256 differs"):
+        reproduce.compare(rerun, manifest)
+    (reference / result).unlink()
+    with pytest.raises(ValueError, match="No mandatory results"):
+        reproduce.load_manifest(reference)
+
+
+def test_reproduction_requires_tex_engine(monkeypatch):
+    from b_revision_paper import tex_engine
+
+    monkeypatch.setattr("b_revision_paper.which", lambda name: name if name == "tectonic" else None)
+    assert tex_engine(None) == ("tectonic", "tectonic")
+    monkeypatch.setattr("b_revision_paper.which", lambda name: None)
+    with pytest.raises(RuntimeError, match="Neither XeLaTeX nor Tectonic"):
+        tex_engine(None)

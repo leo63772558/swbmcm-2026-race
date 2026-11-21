@@ -25,39 +25,112 @@ from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
 
 
-def content_hash(path):
-    """Use the repository's LF convention for generated CSVs across checkouts."""
-    if path.suffix.lower() in (".csv", ".json", ".html", ".txt"):
-        return sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+MANIFEST_NAME = "REPRODUCIBILITY_MANIFEST.json"
+FIGURES = (
+    "framework", "p1_geometry", "p2_precision", "p2_paths", "p2_dispatch",
+    "p3_risk", "p4_resilience", "v5_timeline", "global_sensitivity", "pareto_3d",
+    "3d_dashboard",
+)
+KEYFRAMES = ("normal_coordination", "v5_fault_trigger", "v5_recovery_compare")
+CAPTURE_STEMS = (
+    "1_nominal_beam", "2_failure_V5_keep", "3_failure_V5_reschedule",
+    "4_failure_V5_keep_at_recovery",
+)
+FROZEN_INPUTS = tuple(
+    f"figures/replay_frames/browser_captures/{renderer}_{stem}.png"
+    for renderer in ("webgl", "canvas") for stem in CAPTURE_STEMS
+) + (
+    f"simulator/assets/{b_revision_replay.ASSET}",
+    "simulator/assets/PLOTLY_LICENSE.txt",
+)
+PDF_NAMES = ("paper/B_submission.pdf", "paper/P1_ERRATA.pdf")
+BASE_ARTIFACTS = (
+    "figures/FIGURE_SOURCES.csv",
+    "figures/P4_PANEL_INDEX.csv",
+    "figures/replay_frames/KEYFRAME_SOURCES.csv",
+    "paper/B_review_metrics.tex",
+    "paper/B_review_tables.tex",
+    "paper/NUMBER_PROVENANCE.csv",
+    "simulator/B_Simulator.html",
+    "simulator/KEYFRAME_STATES.json",
+    "simulator/assets/PLOTLY_SOURCE.txt",
+) + tuple(
+    f"figures/fig{number:02d}_{stem}.{suffix}"
+    for number, stem in enumerate(FIGURES, 1) for suffix in ("pdf", "png")
+) + tuple(
+    f"figures/replay_frames/{stem}.{suffix}"
+    for stem in KEYFRAMES for suffix in ("pdf", "png")
+)
+
+
+def required_hash(root, rel):
+    path = root / rel
+    if not path.is_file():
+        raise FileNotFoundError(f"Missing mandatory artifact: {path}")
     return file_hash(path)
 
 
-def compare(reference, rerun, tex):
-    matched = []
-    expected = [
-        *sorted((reference/"results").glob("*")),
-        *sorted((reference/"figures").glob("fig[0-9][0-9]_*")),
-        *sorted((reference/"figures"/"replay_frames").rglob("*")),
-        reference/"figures"/"FIGURE_SOURCES.csv",
-        reference/"figures"/"P4_PANEL_INDEX.csv",
-        reference/"simulator"/"B_Simulator.html",
-        reference/"simulator"/"KEYFRAME_STATES.json",
+def result_paths(root):
+    paths = sorted(path.relative_to(root).as_posix() for path in (root / "results").iterdir())
+    if not paths:
+        raise ValueError(f"No mandatory results in {root / 'results'}")
+    return paths
+
+
+def pdf_text_hashes(path):
+    return [
+        sha256((page.extract_text() or "").encode("utf-8")).hexdigest()
+        for page in PdfReader(path).pages
     ]
-    for old in expected:
-        if not old.is_file():
-            continue
-        rel = old.relative_to(reference)
-        new = rerun/rel
-        assert new.is_file() and content_hash(old)==content_hash(new), f"Reproduced file differs: {rel}"
-        matched.append(rel.as_posix())
-    text_matches=[]
-    if tex:
-        for name in ("B_submission.pdf","P1_ERRATA.pdf"):
-            old=PdfReader(reference/"paper"/name)
-            new=PdfReader(rerun/"paper"/name)
-            assert [p.extract_text() for p in old.pages] == [p.extract_text() for p in new.pages]
-            text_matches.append(name)
-    return matched,text_matches
+
+
+def build_manifest(root):
+    manifest = {
+        "artifacts_sha256": {
+            rel: required_hash(root, rel) for rel in [*result_paths(root), *BASE_ARTIFACTS]
+        },
+        "frozen_inputs_sha256": {rel: required_hash(root, rel) for rel in FROZEN_INPUTS},
+        "paper_files": {
+            rel: {"sha256": required_hash(root, rel), "page_text_sha256": pdf_text_hashes(root / rel)}
+            for rel in PDF_NAMES
+        },
+    }
+    write_json(root / MANIFEST_NAME, manifest)
+    return manifest
+
+
+def load_manifest(reference):
+    manifest = read_json(reference / MANIFEST_NAME)
+    expected_keys = {
+        "artifacts_sha256": set(result_paths(reference)) | set(BASE_ARTIFACTS),
+        "frozen_inputs_sha256": set(FROZEN_INPUTS),
+        "paper_files": set(PDF_NAMES),
+    }
+    for group, expected in expected_keys.items():
+        actual = set(manifest[group])
+        if actual != expected:
+            raise ValueError(f"{group}: missing {sorted(expected - actual)}; unexpected {sorted(actual - expected)}")
+        for rel, record in manifest[group].items():
+            expected_hash = record["sha256"] if group == "paper_files" else record
+            if required_hash(reference, rel) != expected_hash:
+                raise ValueError(f"Reference SHA-256 differs: {rel}")
+    return manifest
+
+
+def compare(rerun, manifest):
+    artifacts = manifest["artifacts_sha256"]
+    if set(result_paths(rerun)) != {rel for rel in artifacts if rel.startswith("results/")}:
+        raise ValueError("Reproduced result inventory differs from the manifest.")
+    for rel, expected_hash in artifacts.items():
+        if required_hash(rerun, rel) != expected_hash:
+            raise ValueError(f"Reproduced SHA-256 differs: {rel}")
+    for rel, record in manifest["paper_files"].items():
+        for index, (actual, expected) in enumerate(
+            zip(pdf_text_hashes(rerun / rel), record["page_text_sha256"], strict=True), start=1
+        ):
+            if actual != expected:
+                raise ValueError(f"Reproduced PDF text differs: {rel}, page {index}")
+    return sorted(artifacts), sorted(Path(rel).name for rel in manifest["paper_files"])
 
 
 def main(out, reference, bundle):
@@ -65,6 +138,11 @@ def main(out, reference, bundle):
     reference=reference.resolve()
     if out.exists() or out.is_relative_to(ROOT/"data") or out.is_relative_to(ROOT/"results"):
         raise ValueError("Choose a fresh directory outside the source data and baseline results.")
+    b_revision_paper.tex_engine(bundle)
+    node = which("node")
+    if not node:
+        raise RuntimeError("Node.js required for replay consistency check")
+    manifest = load_manifest(reference)
     out.mkdir(parents=True)
     results=out/"results"
     times={}
@@ -80,29 +158,22 @@ def main(out, reference, bundle):
     assets=reference/"simulator"/"assets"
     b_revision_replay.generate(out,assets/b_revision_replay.ASSET,assets/"PLOTLY_LICENSE.txt")
     captures_src = reference/"figures"/"replay_frames"/"browser_captures"
-    if captures_src.is_dir():
-        copytree(captures_src, out/"figures"/"replay_frames"/"browser_captures", dirs_exist_ok=True)
+    copytree(captures_src, out/"figures"/"replay_frames"/"browser_captures")
     b_revision_figures.generate(out)
-    node=which("node")
-    if not node:
-        raise RuntimeError("Node.js required for replay consistency check")
     subprocess.run([node,str(ROOT/"src"/"b_replay_check.cjs"),str(out/"simulator"/"B_Simulator.html")],check=True)
     times["4_visuals"]=round(perf_counter()-tick,3)
-    compile_pdf = bool(bundle) or bool(which("xelatex"))
-    if compile_pdf:
-        tick=perf_counter()
-        dest=out/"paper"
-        dest.mkdir()
-        for file in ("B_submission.tex","P1_ERRATA.tex"):
-            copyfile(reference/"paper"/file,dest/file)
-        team_src = reference/"paper"/"team"
-        if team_src.is_dir():
-            copytree(team_src, dest/"team", dirs_exist_ok=True)
-        b_revision_paper.generate(out,bundle)
-        b_hardcore_audit.main(out)
-        times["5_pdf"]=round(perf_counter()-tick,3)
-    matches,text_matches=compare(reference,out,compile_pdf)
+    tick=perf_counter()
+    dest=out/"paper"
+    dest.mkdir()
+    for file in ("B_submission.tex","P1_ERRATA.tex"):
+        copyfile(reference/"paper"/file,dest/file)
+    copytree(reference/"paper"/"team", dest/"team")
+    b_revision_paper.generate(out,bundle)
+    b_hardcore_audit.main(out)
+    times["5_pdf"]=round(perf_counter()-tick,3)
+    matches,text_matches=compare(out,manifest)
     qa={"byte_matches":len(matches),"matched_artifacts":matches,"pdf_text_matches":text_matches,
+        "verified_frozen_inputs":sorted(manifest["frozen_inputs_sha256"]),
         "wall_seconds":times,"plan_id":read_json(results/"priority_3.json")["nominal_plan_id"]}
     write_json(out/"REPRODUCTION_CHECK.json",qa)
     print("Review archive reproduced:",len(matches),"byte matches and",len(text_matches),"PDF content matches.")

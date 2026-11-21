@@ -89,10 +89,43 @@
           "T1": 3.092627,
           "T2": 8.889889,
           "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": {
+            "V3": [
+              12,
+              92
+            ],
+            "V5": [
+              52,
+              92
+            ]
+          },
+          "T2": {
+            "V1": [
+              12,
+              12
+            ],
+            "V4": [
+              84,
+              76
+            ]
+          },
+          "T3": {
+            "V2": [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            "V3": [
+              12,
+              92
+            ]
+          }
         }
-      }
+      },
+      "witness_replay_passed": true
     },
-    "gap_vs_exact_k8_s": -0.0,
+    "gap_vs_exact_k8_s": 0.0,
     "exact_full_discrete_pool_bnb": {
       "shortlist_k": "FULL_DISCRETE_POOL",
       "discrete_station_pool_size": 585,
@@ -148,10 +181,225 @@
           "T1": 3.092627,
           "T2": 8.889889,
           "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": {
+            "V3": [
+              12,
+              92
+            ],
+            "V5": [
+              52,
+              92
+            ]
+          },
+          "T2": {
+            "V1": [
+              12,
+              12
+            ],
+            "V4": [
+              84,
+              76
+            ]
+          },
+          "T3": {
+            "V2": [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            "V3": [
+              12,
+              92
+            ]
+          }
         }
-      }
+      },
+      "witness_replay_passed": true
     },
-    "gap_vs_full_discrete_pool_s": -0.0
+    "gap_vs_full_discrete_pool_s": 0.0,
+    "unseeded_k8_bnb": {
+      "shortlist_k": 8,
+      "discrete_station_pool_size": 585,
+      "legal_pairings_total": 1000,
+      "acyclic_ordered_topologies_total": 4200,
+      "multiplicity_pattern_counts": {
+        "(2, 1, 1, 1, 1)": 180,
+        "(2, 2, 1, 1, 0)": 450,
+        "(2, 2, 2, 0, 0)": 60,
+        "(3, 1, 1, 1, 0)": 120,
+        "(3, 2, 1, 0, 0)": 180,
+        "(3, 3, 0, 0, 0)": 10
+      },
+      "initial_upper_bound_s": null,
+      "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
+      "pruned_layer0_topologies": 3693,
+      "pruned_inner_branches": 56581,
+      "exact_discrete_optimum_s": 11.034062,
+      "witness": {
+        "pairing": {
+          "T1": [
+            3,
+            5
+          ],
+          "T2": [
+            1,
+            4
+          ],
+          "T3": [
+            2,
+            3
+          ]
+        },
+        "pattern": [
+          2,
+          1,
+          1,
+          1,
+          1
+        ],
+        "topo_order": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "reused_orders": {
+          "V3": [
+            "T1",
+            "T3"
+          ]
+        },
+        "starts_s": {
+          "T1": 3.092627,
+          "T2": 8.889889,
+          "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": {
+            "V3": [
+              12,
+              92
+            ],
+            "V5": [
+              52,
+              92
+            ]
+          },
+          "T2": {
+            "V1": [
+              12,
+              12
+            ],
+            "V4": [
+              84,
+              76
+            ]
+          },
+          "T3": {
+            "V2": [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            "V3": [
+              12,
+              92
+            ]
+          }
+        }
+      },
+      "witness_replay_passed": true
+    },
+    "unseeded_full_discrete_pool_bnb": {
+      "shortlist_k": "FULL_DISCRETE_POOL",
+      "discrete_station_pool_size": 585,
+      "legal_pairings_total": 1000,
+      "acyclic_ordered_topologies_total": 4200,
+      "multiplicity_pattern_counts": {
+        "(2, 1, 1, 1, 1)": 180,
+        "(2, 2, 1, 1, 0)": 450,
+        "(2, 2, 2, 0, 0)": 60,
+        "(3, 1, 1, 1, 0)": 120,
+        "(3, 2, 1, 0, 0)": 180,
+        "(3, 3, 0, 0, 0)": 10
+      },
+      "initial_upper_bound_s": null,
+      "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
+      "pruned_layer0_topologies": 3693,
+      "pruned_inner_branches": 4479089,
+      "exact_discrete_optimum_s": 11.034062,
+      "witness": {
+        "pairing": {
+          "T1": [
+            3,
+            5
+          ],
+          "T2": [
+            1,
+            4
+          ],
+          "T3": [
+            2,
+            3
+          ]
+        },
+        "pattern": [
+          2,
+          1,
+          1,
+          1,
+          1
+        ],
+        "topo_order": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "reused_orders": {
+          "V3": [
+            "T1",
+            "T3"
+          ]
+        },
+        "starts_s": {
+          "T1": 3.092627,
+          "T2": 8.889889,
+          "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": {
+            "V3": [
+              12,
+              92
+            ],
+            "V5": [
+              52,
+              92
+            ]
+          },
+          "T2": {
+            "V1": [
+              12,
+              12
+            ],
+            "V4": [
+              84,
+              76
+            ]
+          },
+          "T3": {
+            "V2": [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            "V3": [
+              12,
+              92
+            ]
+          }
+        }
+      },
+      "witness_replay_passed": true
+    }
   },
   "audit_5_sensitivity_pareto": {
     "passed": true,

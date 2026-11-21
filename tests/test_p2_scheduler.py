@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 
+from b_hardcore_audit import _p2_replay_witness
 import problem_b_geometry as g
 import solve_problem_b as s
 
@@ -54,6 +55,27 @@ def test_shortlist_ranking_reversal_and_exact_1000_pair_bnb():
     assert "(3, 3, 0, 0, 0)" in full["multiplicity_pattern_counts"]
     assert abs(bnb["gap_vs_full_discrete_pool_s"]) < 1e-9
     assert math.isclose(full["exact_discrete_optimum_s"], 11.034062, abs_tol=1e-5)
+
+
+def test_unseeded_exact_audit_replays_feasible_station_witness():
+    audit = json.loads((REVIEW_DIR / "results" / "HARDCORE_AUDIT_REPORT.json").read_text(encoding="utf-8"))
+    bnb = audit["audit_4_p2_exact_bnb"]
+    expected = bnb["beam_k8_incumbent_s"]
+    for key, pool, inner_prunes in (
+        ("unseeded_k8_bnb", 8, 56581),
+        ("unseeded_full_discrete_pool_bnb", "FULL_DISCRETE_POOL", 4479089),
+    ):
+        run = bnb[key]
+        assert run["initial_upper_bound_s"] is None
+        assert run["shortlist_k"] == pool
+        assert run["discrete_station_pool_size"] == 585
+        assert run["legal_pairings_total"] == 1000
+        assert run["acyclic_ordered_topologies_total"] == 4200
+        assert run["pruned_layer0_topologies"] == 3693
+        assert run["pruned_inner_branches"] == inner_prunes
+        assert run["exact_discrete_optimum_s"] == expected
+        assert run["witness_replay_passed"]
+        assert _p2_replay_witness(run)
 
 
 def test_nominal_k8_schedule_satisfies_constraints():

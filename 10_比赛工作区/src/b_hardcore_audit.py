@@ -9,6 +9,8 @@ Checks:
 6. Three-way 100% numeric consistency across solver outputs, CSVs, 72 LaTeX macros, and figures.
 
 AI assistance: Antigravity (Gemini), 2026-11-21. Audit & verification only.
+Audit entry and witness checks assisted by ChatGPT (Codex, GPT-6 series), OpenAI,
+2026-11-21; public model release date unverified.
 """
 from argparse import ArgumentParser
 from collections import Counter
@@ -343,7 +345,14 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                                 "pattern": list(pattern),
                                 "topo_order": [alerts[i] for i in topo],
                                 "reused_orders": {f"V{v+1}": [alerts[i] for i in seq] for v, seq in veh_order.items()},
-                                "starts_s": {alerts[a_i]: round(t_st, 6) for a_i, t_st, _, _ in chosen},
+                                "starts_s": {alerts[a_i]: round(t_st, 6) for a_i, t_st, *_ in chosen},
+                                "stations_m": {
+                                    alerts[a_i]: {
+                                        f"V{u + 1}": su,
+                                        f"V{w + 1}": sw,
+                                    }
+                                    for a_i, _, u, w, su, sw in chosen
+                                },
                             }
                         return
 
@@ -361,7 +370,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                         if t_st >= best_makespan - 1e-12:
                             pruned_inner += 1
                             return
-                        dfs(step_idx + 1, veh_state, max(cur_max, t_st), chosen + ((a_i, t_st, st_pair[0], st_pair[1]),))
+                        dfs(step_idx + 1, veh_state, max(cur_max, t_st), chosen + ((a_i, t_st, u, w, *st_pair),))
                         return
 
                     opts_u = init_ready_sorted[(u, a_i)] if avail_u == 0.0 else get_leg_opts(pos_u, a_i)
@@ -415,7 +424,7 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                                     continue
                                 next_state[w] = (sw, t_free_w)
 
-                            dfs(step_idx + 1, next_state, max(cur_max, t_st), chosen + ((a_i, t_st, su, sw),))
+                            dfs(step_idx + 1, next_state, max(cur_max, t_st), chosen + ((a_i, t_st, u, w, su, sw),))
 
                             # If w is NOT reused later, the first compatible w (sorted by ready time)
                             # strictly dominates all later w for this fixed su!
@@ -441,33 +450,91 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
             ),
             "pruned_layer0_topologies": pruned_layer0,
             "pruned_inner_branches": pruned_inner,
-            "exact_discrete_optimum_s": round(best_makespan, 6),
+            "exact_discrete_optimum_s": round(best_makespan, 6) if best_witness is not None else None,
             "witness": best_witness,
         }
 
 
+def _p2_replay_witness(run):
+    """Check the logged P2 witness through the nominal travel and reset clocks."""
+    witness = run["witness"]
+    if witness is None:
+        return False
+    states = {f"V{i + 1}": (point, 0.0) for i, point in enumerate(model.VEHICLES)}
+    order = witness["topo_order"]
+    if len(order) != len(model.TARGETS) or set(order) != set(model.TARGETS):
+        return False
+    replayed = {}
+    service_orders = {vehicle: [] for vehicle in states}
+    for alert in order:
+        goal = model.TARGETS[alert]
+        stations = {vehicle: tuple(point) for vehicle, point in witness["stations_m"][alert].items()}
+        if set(stations) != {f"V{i}" for i in witness["pairing"][alert]} or len(stations) != 2:
+            return False
+        first, second = stations.values()
+        _, gamma = solver.accuracy(first, second, goal)
+        if first == second or not 1e-6 < gamma < 180.0 - 1e-6:
+            return False
+        candidates = set(rounded.stations(goal))
+        legs = []
+        for vehicle, station in stations.items():
+            if station not in candidates:
+                return False
+            origin, available = states[vehicle]
+            distance, _ = rounded.route(origin, station)
+            slew = model.slew_time(station, goal)
+            legs.append((vehicle, station, slew, available + distance / model.SPEED + slew))
+        start = max(leg[3] for leg in legs)
+        replayed[alert] = round(start, 6)
+        for vehicle, station, slew, _ in legs:
+            states[vehicle] = station, start + model.OBSERVE + slew
+            service_orders[vehicle].append(alert)
+    reused_orders = {vehicle: alerts for vehicle, alerts in service_orders.items() if len(alerts) > 1}
+    return (
+        replayed == witness["starts_s"]
+        and reused_orders == witness["reused_orders"]
+        and max(replayed.values()) == run["exact_discrete_optimum_s"]
+    )
+
+
 def audit_4_p2_exact_bnb(review_dir):
-    """Run independent exact Branch-and-Bound over ALL 1,000 legal pairings on k=8 AND full 585-station pool."""
+    """Run seeded and unseeded audits on both the k=8 and full station pools."""
     trials = read_csv(review_dir / "results" / "P2_trials.csv")
     beam_k8 = float(next(
         r["latest_start_s"] for r in trials
         if r["routing"] == "rounded" and r["k"] == "8" and r["beam_width"] == "20" and r["policy"] == "beam"
     ))
-    exact_k8 = _exact_p2_bnb(shortlist_k=8, initial_ub=beam_k8 + 1e-4)
-    exact_full = _exact_p2_bnb(shortlist_k=None, initial_ub=beam_k8 + 1e-4)
-    gap_k8 = beam_k8 - exact_k8["exact_discrete_optimum_s"]
-    gap_full = beam_k8 - exact_full["exact_discrete_optimum_s"]
-    gap_k8 = 0.0 if abs(gap_k8) < 1e-12 else round(gap_k8, 6)
-    gap_full = 0.0 if abs(gap_full) < 1e-12 else round(gap_full, 6)
+    seeded_upper_bound = beam_k8 + 1e-4
+    exact_k8 = _exact_p2_bnb(shortlist_k=8, initial_ub=seeded_upper_bound)
+    exact_full = _exact_p2_bnb(shortlist_k=None, initial_ub=seeded_upper_bound)
+    unseeded_k8 = _exact_p2_bnb(shortlist_k=8)
+    unseeded_full = _exact_p2_bnb(shortlist_k=None)
+    runs = (exact_k8, exact_full, unseeded_k8, unseeded_full)
+    for run in runs:
+        run["witness_replay_passed"] = _p2_replay_witness(run)
+    incumbent = round(beam_k8, 6)
+
+    def gap(run):
+        optimum = run["exact_discrete_optimum_s"]
+        return None if optimum is None else round(incumbent - optimum, 6)
+
     return {
-        "passed": exact_k8["legal_pairings_total"] == 1000 and exact_full["legal_pairings_total"] == 1000
-                  and exact_k8["exact_discrete_optimum_s"] <= beam_k8 + 1e-6
-                  and exact_full["exact_discrete_optimum_s"] <= beam_k8 + 1e-6,
-        "beam_k8_incumbent_s": round(beam_k8, 6),
+        "passed": all(
+            run["legal_pairings_total"] == 1000
+            and run["acyclic_ordered_topologies_total"] == 4200
+            and run["discrete_station_pool_size"] == 585
+            and sum(run["multiplicity_pattern_counts"].values()) == 1000
+            and run["witness_replay_passed"]
+            and gap(run) == 0
+            for run in runs
+        ),
+        "beam_k8_incumbent_s": incumbent,
         "exact_k8_bnb": exact_k8,
-        "gap_vs_exact_k8_s": gap_k8,
+        "gap_vs_exact_k8_s": gap(exact_k8),
         "exact_full_discrete_pool_bnb": exact_full,
-        "gap_vs_full_discrete_pool_s": gap_full,
+        "gap_vs_full_discrete_pool_s": gap(exact_full),
+        "unseeded_k8_bnb": unseeded_k8,
+        "unseeded_full_discrete_pool_bnb": unseeded_full,
     }
 
 
@@ -564,6 +631,14 @@ def main(review_dir):
     print(f"  P2(2) Exact FULL discrete pool B&B: {a4['exact_full_discrete_pool_bnb']['exact_discrete_optimum_s']} s (gap {a4['gap_vs_full_discrete_pool_s']} s)")
     print(f"  Full witness: {a4['exact_full_discrete_pool_bnb']['witness']}")
     print(f"  k=8 witness:  {a4['exact_k8_bnb']['witness']}")
+    for label, key in (("k=8", "unseeded_k8_bnb"), ("full pool", "unseeded_full_discrete_pool_bnb")):
+        run = a4[key]
+        print(f"  Unseeded {label} B&B (+inf): {run['exact_discrete_optimum_s']} s | "
+              f"{run['legal_pairings_total']} pairings / {run['acyclic_ordered_topologies_total']} orders | "
+              f"witness replay passed={run['witness_replay_passed']}")
+    failed = [name for name, result in report.items() if not result["passed"]]
+    if failed:
+        raise RuntimeError(f"Hardcore audit failed: {', '.join(failed)}")
 
 
 if __name__ == "__main__":

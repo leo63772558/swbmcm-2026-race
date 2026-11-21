@@ -131,7 +131,35 @@ def p2_precision_checks(out):
            "rounded_travel_1_s": travel[0], "rounded_travel_2_s": travel[1]}
     write_csv(out / "P2_precision.csv", [row])
     write_json(out / "P2_precision_routes.json", paths)
-    print(f"P2(1) finite difference RMS {rms:.9f} m; equality check and both 30 s limits passed")
+    pitch_rows = []
+    travel_limit = model.number("p2_1", "vehicle", "travel_time_max")
+    for cap in (model.PITCH_MAX, model.PITCH_MAX - 1):
+        cap_range = (target[2] - model.HEIGHT) / tan(radians(cap))
+        cap_stations = [
+            tuple(t + (p - t) * (cap_range / r) for p, t in zip(station, target[:2]))
+            for station in stations
+        ]
+        cap_rms, cap_angle = accuracy(*cap_stations, target)
+        assert isclose(cap_angle, 90.0, abs_tol=1e-8)
+        assert isclose(cap_rms, sqrt(2) * cap_range * sigma, abs_tol=1e-10)
+        pitch_row = {
+            "elevation_ceiling_deg": cap,
+            "minimum_radius_m": cap_range,
+            "crossing_deg": cap_angle,
+            "horizontal_rms_m": cap_rms,
+            "rms_increase_pct": 100 * (cap_rms / value - 1),
+        }
+        for i, station in enumerate(cap_stations, 1):
+            vehicle = int(archived[f"vehicle_{i}"])
+            length, path = rounded.route(model.VEHICLES[vehicle - 1], station)
+            assert model.visible(station, target) and path
+            assert isclose(model.angles(station, target)[1], cap, abs_tol=1e-9)
+            assert length / model.SPEED <= travel_limit
+            pitch_row.update({f"vehicle_{i}": vehicle, f"x_{i}_m": station[0], f"y_{i}_m": station[1],
+                              f"travel_{i}_s": length / model.SPEED})
+        pitch_rows.append(pitch_row)
+    write_csv(out / "P2_precision_pitch_checks.csv", pitch_rows)
+    print(f"P2(1) finite difference RMS {rms:.9f} m; both pitch witnesses meet the 30 s limit")
 
 
 def verify_clocks(out):

@@ -19,6 +19,7 @@ from pypdf import PdfReader
 
 from b_revision_data import DEFAULT_OUTPUT, file_hash, read_json, write_json
 from problem_b_geometry import ROOT
+from reproduce_b_revision import MANIFEST_NAME, build_manifest
 
 
 BASELINE = "9c2fef86ae38a5b6b472c7750d2451faf9df5d27"
@@ -72,6 +73,7 @@ def support_entries(review):
         **{f"src/{path.name}": path for pattern in ("b_revision_*.py", "b_replay*")
            for path in (ROOT / "src").glob(pattern) if path.is_file()},
         **{name: review / name for name in DOCUMENTS},
+        f"artifacts/{MANIFEST_NAME}": review / MANIFEST_NAME,
     }
     figure_dir = review / "figures"
     paper_dir = review / "paper"
@@ -128,6 +130,7 @@ def build(review, bundle=None):
     paper = review / "paper" / "B_submission.pdf"
     paper_info = inspect_paper(paper)
     inspect_replay(review)
+    build_manifest(review)
     dependencies = ("matplotlib", "numpy", "pypdf", "Pillow")
     (review / "requirements-review.txt").write_text(
         "\n".join(f"{name}=={version(name)}" for name in dependencies) + "\n", encoding="utf-8"

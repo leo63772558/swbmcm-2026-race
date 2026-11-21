@@ -1,6 +1,10 @@
 """Reproduce Problem B results.
 
-Implementation and performance refactoring assisted by OpenAI Codex (GPT-6 series).
+AI Assistance Disclosure (Article 7):
+- Tool: OpenAI Codex / ChatGPT (GPT-5.4), Google Antigravity (Gemini 3.1 Pro)
+- Scope: Core geometry/dispatch solver scaffolding, performance refactoring, and reset-phase edge-case fix
+- Date: 2026-11-20 to 2026-11-21
+- Team Verification: Mathematical models, kinematic parameters, and solver outputs verified by Team#SWBMCM2613050.
 """
 
 import csv
@@ -258,6 +262,9 @@ def scenario_state(plan, t, failed, disturbance):
             partner_failed = any(v.alert == visit.alert and v.vehicle == failed for v in plan)
             valid_start = not partner_failed or visit.start < disturbance
             if visit.start < t and valid_start:
+                release = visit.reset
+            elif t >= visit.end:
+                # Already resetting from an invalidated pair; finish remaining return to park.
                 release = visit.reset
             else:
                 # Cancel a not-yet-started observation, returning the head to park.

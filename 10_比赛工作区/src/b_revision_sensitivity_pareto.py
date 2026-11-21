@@ -1,6 +1,7 @@
 """Parameter perturbation, pairwise interaction, weight-stability, and 3D Pareto analysis.
 
-AI assistance: Antigravity (Gemini), 2026-11-21.
+AI assistance:
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
 All P1, P2 (both fixed-plan and re-optimized with decoupled pan/tilt axes), P3, and P4
 metrics are evaluated directly through the verified physics and discrete-event solvers;
 no linear proxy formulas are used and existing P1-P4 baseline CSVs are never modified.
@@ -33,7 +34,7 @@ def _p1_quality(pitch_deg):
     return 1.0 / r_min
 
 
-def _p3_crossing(a_val, b_val, n=48):
+def _p3_crossing(a_val, b_val, n=96):
     """Exact bisection for 95% coverage distance using b_revision_probability.coverage."""
     if a_val < 0 or b_val < 0:
         raise ValueError("Position error parameters a and b must be non-negative")
@@ -430,6 +431,7 @@ def compute_pareto_tradeoff_3d(results_dir):
             max_veh_dist_m = max(by_v_dist.values())
             rows.append({
                 "policy": policy, "k": k, "beam_width": bw,
+                "_raw_t": t_last, "_raw_d": total_travel_m, "_raw_q": mean_quality,
                 "latest_start_s": round(t_last, 6),
                 "total_travel_m": round(total_travel_m, 4),
                 "max_vehicle_travel_m": round(max_veh_dist_m, 4),
@@ -439,7 +441,7 @@ def compute_pareto_tradeoff_3d(results_dir):
                        else ("nearest_baseline" if (policy == "nearest" and k == 8) else "sweep"),
             })
 
-    # 2D Pareto (for transparent historical comparison) AND 3D Pareto (true primary frontier)
+    # 2D Pareto (for transparent historical comparison) AND 3D Pareto (true primary frontier on raw floats)
     for i, r in enumerate(rows):
         dom_2d = False
         dom_3d = False
@@ -447,22 +449,26 @@ def compute_pareto_tradeoff_3d(results_dir):
             if i == j:
                 continue
             # 2D: min (latest_start_s, total_travel_m)
-            if (o["latest_start_s"] <= r["latest_start_s"] + 1e-9
-                and o["total_travel_m"] <= r["total_travel_m"] + 1e-6
-                and (o["latest_start_s"] < r["latest_start_s"] - 1e-9
-                     or o["total_travel_m"] < r["total_travel_m"] - 1e-6)):
+            if (o["_raw_t"] <= r["_raw_t"] + 1e-9
+                and o["_raw_d"] <= r["_raw_d"] + 1e-6
+                and (o["_raw_t"] < r["_raw_t"] - 1e-9
+                     or o["_raw_d"] < r["_raw_d"] - 1e-6)):
                 dom_2d = True
             # 3D: min latest_start_s, min total_travel_m, max mean_quality_m_inv
-            if (o["latest_start_s"] <= r["latest_start_s"] + 1e-9
-                and o["total_travel_m"] <= r["total_travel_m"] + 1e-6
-                and o["mean_quality_m_inv"] >= r["mean_quality_m_inv"] - 1e-9
-                and (o["latest_start_s"] < r["latest_start_s"] - 1e-9
-                     or o["total_travel_m"] < r["total_travel_m"] - 1e-6
-                     or o["mean_quality_m_inv"] > r["mean_quality_m_inv"] + 1e-9)):
+            if (o["_raw_t"] <= r["_raw_t"] + 1e-9
+                and o["_raw_d"] <= r["_raw_d"] + 1e-6
+                and o["_raw_q"] >= r["_raw_q"] - 1e-9
+                and (o["_raw_t"] < r["_raw_t"] - 1e-9
+                     or o["_raw_d"] < r["_raw_d"] - 1e-6
+                     or o["_raw_q"] > r["_raw_q"] + 1e-9)):
                 dom_3d = True
         r["is_pareto_2d"] = not dom_2d
         r["is_pareto_3d"] = not dom_3d
         r["is_pareto"] = not dom_3d  # Primary Pareto flag is now exact 3D non-dominated status
+    for r in rows:
+        r.pop("_raw_t", None)
+        r.pop("_raw_d", None)
+        r.pop("_raw_q", None)
 
     rows.sort(key=lambda r: (r["latest_start_s"], r["total_travel_m"], -r["mean_quality_m_inv"]))
     write_csv(results_dir / "Pareto_tradeoff.csv", rows)
@@ -476,6 +482,10 @@ def main(results_dir=None):
     pareto = compute_pareto_tradeoff_3d(results_dir)
     n_front_3d = sum(1 for r in pareto if r["is_pareto_3d"])
     n_front_2d = sum(1 for r in pareto if r["is_pareto_2d"])
+    distinct_3d = len({
+        (r["latest_start_s"], r["total_travel_m"], r["mean_quality_m_inv"])
+        for r in pareto if r["is_pareto_3d"]
+    })
     write_json(results_dir / "Global_sensitivity_summary.json", {
         "method": "Parameter Perturbation and Pairwise Interaction Analysis (real P1-P4 solver evaluations)",
         "top_parameter": oat[0]["parameter"],
@@ -484,6 +494,7 @@ def main(results_dir=None):
         "pareto_front_count": n_front_3d,
         "pareto_front_2d_count": n_front_2d,
         "pareto_front_3d_count": n_front_3d,
+        "pareto_front_distinct_vectors": distinct_3d,
         "weight_schemes_tested": len(WEIGHT_SCHEMES),
     })
     print(

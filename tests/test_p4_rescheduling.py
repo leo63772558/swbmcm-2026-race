@@ -1,3 +1,8 @@
+# AI Assistance Disclosure (Article 7):
+# - Tool: OpenAI ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol); Google Antigravity (Gemini 3.1 Pro)
+# - Scope: Implementation scaffolding, numerical verification, and automated test engineering
+# - Date: 2026-11-20 to 2026-11-21
+# - Team Verification: Mathematical models and outputs verified by Team#SWBMCM2613050.
 from __future__ import annotations
 
 import csv
@@ -75,3 +80,38 @@ def test_real_solver_sensitivity_weight_check_and_3d_pareto():
     assert k8["is_pareto_3d"] == "True"
     assert float(k5["total_travel_m"]) < float(k8["total_travel_m"])
     assert float(k8["mean_quality_m_inv"]) > float(k5["mean_quality_m_inv"])
+
+
+def test_live_hysteresis_sweep_and_case_deduplication():
+    """Directly invoke b_revision_p4_extended helpers and verify positive-threshold hysteresis sweep."""
+    import b_revision_p4_extended as p4ext
+
+    # Verify live deduplication builder produces exact 62 baseline + 53 expanded = 115 unique cases
+    dedup_base, expanded, dup_cnt = p4ext.build_dedup_and_expanded_specs()
+    assert len(dedup_base) == 62
+    assert len(expanded) == 53
+    assert dup_cnt == 11
+    all_sigs = {p4ext._case_signature(a, f, r) for _, _, a, f, r in (*dedup_base, *expanded)}
+    assert len(all_sigs) == 115
+
+    # Verify persisted positive-threshold hysteresis sweep across delta in {0, 0.25, 0.5, 1.0, 2.0} s
+    sweep_path = REVIEW_DIR / "results" / "P4_hysteresis_sweep.csv"
+    assert sweep_path.is_file(), "Missing P4_hysteresis_sweep.csv"
+    with sweep_path.open("r", encoding="utf-8") as fh:
+        srows = list(csv.DictReader(fh))
+    assert [float(r["hyst_delta_s"]) for r in srows] == [0.0, 0.25, 0.5, 1.0, 2.0]
+    for r in srows:
+        assert float(r["mean_hyst_eta"]) == 1.0
+        assert int(r["hyst_losses"]) == 0
+        assert int(r["hyst_wins"]) == 110
+        assert int(r["hyst_ties"]) == 5
+
+    # Live single-case suite invocation testing both delta=0.0 and delta=1.0 on failure_V5
+    nominal_visits = p4ext._load_nominal_visits(REVIEW_DIR / "results")
+    v5_spec = [("baseline_unique", "failure_V5", None, 4, 5.0)]
+    r0 = p4ext._run_suite(nominal_visits, v5_spec, stations=2, beam_width=3, hyst_delta=0.0)[0]
+    r1 = p4ext._run_suite(nominal_visits, v5_spec, stations=2, beam_width=3, hyst_delta=1.0)[0]
+    assert r0["winner"] == "keep" and r0["hyst_winner"] == "tie"
+    assert r1["hyst_winner"] == "tie"
+    assert math.isclose(r0["hyst_latest_s"], 11.034062, abs_tol=1e-5)
+    assert math.isclose(r1["hyst_latest_s"], 11.034062, abs_tol=1e-5)

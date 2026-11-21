@@ -1,7 +1,9 @@
 """Build self-contained dark-theme offline WebGL/Canvas digital twin replay from verified intervals.
 
-AI assistance: Antigravity (Gemini) & ChatGPT (Codex), 2026-11-21.
-Assistance: replay UI/rendering and graphics; all underlying numerical trajectories are unchanged.
+AI assistance:
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+  - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
+Scope: replay UI/rendering and graphics; all underlying numerical trajectories are unchanged.
 """
 from argparse import ArgumentParser
 from hashlib import sha1
@@ -100,6 +102,7 @@ def build_p1_overlay(results):
                         round(t1[1] + r_opt * math.sin(rad), 3)])
     return {
         "feasible_xy": feasible_xy,
+        "infeasible_xy": occluded_xy,
         "occluded_xy": occluded_xy,
         "optimal_arc": arc_pts,
         "optimal_station": [round(float(p1_rows["ready"]["x_m"]), 3),

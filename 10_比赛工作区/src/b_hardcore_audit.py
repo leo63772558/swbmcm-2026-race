@@ -8,7 +8,9 @@ Checks:
 5. Global sensitivity & Pareto deterministic reproducibility and dimensional consistency check.
 6. Three-way 100% numeric consistency across solver outputs, CSVs, 72 LaTeX macros, and figures.
 
-AI assistance: Antigravity (Gemini), 2026-11-21. Audit & verification only.
+AI assistance:
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+Scope: automated mathematical, geometric, B&B, sensitivity, and three-way numeric audit.
 """
 from argparse import ArgumentParser
 from collections import Counter
@@ -41,6 +43,13 @@ def audit_1_field_inset(review_dir):
             violations.append(("waypoint", i, wp))
     timeline = read_json(review_dir / "results" / "Executed_timeline.json")
     checked_traj_pts = 0
+    for pol, rows in timeline.get("nominal_policies", {}).items():
+        for row in rows:
+            pts = row.get("path") or ([row["position"]] if row.get("position") else [])
+            for pt in pts:
+                checked_traj_pts += 1
+                if not (lo - tol <= pt[0] <= hi + tol and lo_y - tol <= pt[1] <= hi_y + tol):
+                    violations.append(("traj", "nominal", pol, pt))
     for case_name, case in timeline["cases"].items():
         for pol, rows in case["policies"].items():
             for row in rows:
@@ -80,24 +89,30 @@ def audit_2_minkowski_clearance(review_dir):
             d = dist(pair[0]["station"], pair[1]["station"])
             min_pair_sep = min(min_pair_sep, d)
 
+    def _check_rows(case_name, pol, rows):
+        nonlocal seg_count, pt_count, min_seg_margin, min_pt_margin
+        for row in rows:
+            if row["phase"] == "travel" and row.get("path"):
+                path = row["path"]
+                for a, b in zip(path[:-1], path[1:]):
+                    m = rounded.clearance(tuple(a), tuple(b))
+                    seg_count += 1
+                    min_seg_margin = min(min_seg_margin, m)
+                    if m < -tol:
+                        violations.append(("segment", case_name, pol, a, b, m))
+            elif row.get("position"):
+                pt = tuple(row["position"])
+                m = rounded.clearance(pt, pt)
+                pt_count += 1
+                min_pt_margin = min(min_pt_margin, m)
+                if m < -tol:
+                    violations.append(("point", case_name, pol, pt, m))
+
+    for pol, rows in timeline.get("nominal_policies", {}).items():
+        _check_rows("nominal", pol, rows)
     for case_name, case in timeline["cases"].items():
         for pol, rows in case["policies"].items():
-            for row in rows:
-                if row["phase"] == "travel" and row.get("path"):
-                    path = row["path"]
-                    for a, b in zip(path[:-1], path[1:]):
-                        m = rounded.clearance(tuple(a), tuple(b))
-                        seg_count += 1
-                        min_seg_margin = min(min_seg_margin, m)
-                        if m < -tol:
-                            violations.append(("segment", case_name, pol, a, b, m))
-                elif row.get("position"):
-                    pt = tuple(row["position"])
-                    m = rounded.clearance(pt, pt)
-                    pt_count += 1
-                    min_pt_margin = min(min_pt_margin, m)
-                    if m < -tol:
-                        violations.append(("point", case_name, pol, pt, m))
+            _check_rows(case_name, pol, rows)
     route_summary = read_json(review_dir / "results" / "Route_summary.json")
     return {
         "passed": len(violations) == 0 and min_pair_sep >= 2 * model.RADIUS - tol,
@@ -344,6 +359,9 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
                                 "topo_order": [alerts[i] for i in topo],
                                 "reused_orders": {f"V{v+1}": [alerts[i] for i in seq] for v, seq in veh_order.items()},
                                 "starts_s": {alerts[a_i]: round(t_st, 6) for a_i, t_st, _, _ in chosen},
+                                "stations_m": {
+                                    alerts[a_i]: [list(su), list(sw)] for a_i, _, su, sw in chosen
+                                },
                             }
                         return
 
@@ -441,13 +459,15 @@ def _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf")):
             ),
             "pruned_layer0_topologies": pruned_layer0,
             "pruned_inner_branches": pruned_inner,
+            "exact_discrete_optimum_raw_s": best_makespan,
             "exact_discrete_optimum_s": round(best_makespan, 6),
             "witness": best_witness,
         }
 
 
 def audit_4_p2_exact_bnb(review_dir):
-    """Run independent exact Branch-and-Bound over ALL 1,000 legal pairings on k=8 AND full 585-station pool."""
+    """Run independent exact Branch-and-Bound over ALL 1,000 legal pairings on k=8 AND full 585-station pool
+    (both seeded with beam_k8 + 1e-4 and completely unseeded from +inf)."""
     trials = read_csv(review_dir / "results" / "P2_trials.csv")
     beam_k8 = float(next(
         r["latest_start_s"] for r in trials
@@ -455,19 +475,29 @@ def audit_4_p2_exact_bnb(review_dir):
     ))
     exact_k8 = _exact_p2_bnb(shortlist_k=8, initial_ub=beam_k8 + 1e-4)
     exact_full = _exact_p2_bnb(shortlist_k=None, initial_ub=beam_k8 + 1e-4)
-    gap_k8 = beam_k8 - exact_k8["exact_discrete_optimum_s"]
-    gap_full = beam_k8 - exact_full["exact_discrete_optimum_s"]
-    gap_k8 = 0.0 if abs(gap_k8) < 1e-12 else round(gap_k8, 6)
-    gap_full = 0.0 if abs(gap_full) < 1e-12 else round(gap_full, 6)
+    exact_full_unseeded = _exact_p2_bnb(shortlist_k=None, initial_ub=float("inf"))
+    raw_gap_k8 = max(0.0, beam_k8 - exact_k8["exact_discrete_optimum_raw_s"])
+    raw_gap_full = max(0.0, beam_k8 - exact_full["exact_discrete_optimum_raw_s"])
+    raw_gap_unseeded = max(0.0, beam_k8 - exact_full_unseeded["exact_discrete_optimum_raw_s"])
+    gap_k8 = 0.0 if raw_gap_k8 < 1e-9 else round(raw_gap_k8, 6)
+    gap_full = 0.0 if raw_gap_full < 1e-9 else round(raw_gap_full, 6)
+    gap_unseeded = 0.0 if raw_gap_unseeded < 1e-9 else round(raw_gap_unseeded, 6)
     return {
-        "passed": exact_k8["legal_pairings_total"] == 1000 and exact_full["legal_pairings_total"] == 1000
-                  and exact_k8["exact_discrete_optimum_s"] <= beam_k8 + 1e-6
-                  and exact_full["exact_discrete_optimum_s"] <= beam_k8 + 1e-6,
+        "passed": (
+            exact_k8["legal_pairings_total"] == 1000
+            and exact_full["legal_pairings_total"] == 1000
+            and exact_full_unseeded["legal_pairings_total"] == 1000
+            and abs(exact_full["exact_discrete_optimum_raw_s"] - exact_full_unseeded["exact_discrete_optimum_raw_s"]) < 1e-9
+            and exact_k8["exact_discrete_optimum_s"] <= beam_k8 + 1e-6
+            and exact_full["exact_discrete_optimum_s"] <= beam_k8 + 1e-6
+        ),
         "beam_k8_incumbent_s": round(beam_k8, 6),
         "exact_k8_bnb": exact_k8,
         "gap_vs_exact_k8_s": gap_k8,
         "exact_full_discrete_pool_bnb": exact_full,
         "gap_vs_full_discrete_pool_s": gap_full,
+        "exact_full_discrete_pool_unseeded_bnb": exact_full_unseeded,
+        "gap_vs_full_discrete_pool_unseeded_s": gap_unseeded,
     }
 
 
@@ -526,27 +556,35 @@ def audit_6_three_way_consistency(review_dir):
         target_txt = errata_txt if m.startswith(("From", "To", "At", "Branch")) else paper_txt
         if val not in target_txt:
             missing_in_pdf.append((m, val))
-    # Also check citation coverage of all bibitems in B_submission.tex + team/*.tex
-    tex_all = (review_dir / "paper" / "B_submission.tex").read_text(encoding="utf-8")
-    for tf in sorted((review_dir / "paper" / "team").glob("*.tex")):
-        tex_all += "\n" + tf.read_text(encoding="utf-8")
-    bibkeys = re.findall(r"\\bibitem\{([^}]+)\}", tex_all)
-    cited = set()
-    for grp in re.findall(r"\\cite\{([^}]+)\}", tex_all):
+    # Also check citation coverage and strict first-citation order across expanded document
+    main_tex = (review_dir / "paper" / "B_submission.tex").read_text(encoding="utf-8")
+    def _expand_team(match):
+        p = review_dir / "paper" / "team" / f"{match.group(1)}.tex"
+        return p.read_text(encoding="utf-8") if p.is_file() else ""
+    expanded = re.sub(r"\\TeamText\{([^}]+)\}\{[^}]*\}", _expand_team, main_tex)
+    expanded_nc = re.sub(r"(?<!\\)%.*", "", expanded)
+    body = expanded_nc.split(r"\begin{document}")[-1]
+    bibkeys = re.findall(r"\\bibitem\{([^}]+)\}", body)
+    first_cite_order = []
+    for grp in re.findall(r"\\cite(?:\[[^\]]*\])?\{([^}]+)\}", body):
         for k in grp.split(","):
-            cited.add(k.strip())
-    uncited = [k for k in bibkeys if k not in cited]
+            k = k.strip()
+            if k and k not in first_cite_order:
+                first_cite_order.append(k)
+    uncited = [k for k in bibkeys if k not in first_cite_order]
+    order_exact = (bibkeys == first_cite_order)
     return {
-        "passed": not missing_macros and not missing_in_pdf and not uncited,
+        "passed": not missing_macros and not missing_in_pdf and not uncited and order_exact,
         "bound_macros": len(prov),
         "missing_macros": missing_macros,
         "missing_in_pdf": missing_in_pdf,
         "bibitems_total": len(bibkeys),
         "uncited_bibitems": uncited,
+        "citation_order_exact": order_exact,
     }
 
 
-def main(review_dir):
+def main(review_dir, check_pdf=True):
     review_dir = Path(review_dir).resolve()
     report = {
         "audit_1_field_inset": audit_1_field_inset(review_dir),
@@ -554,8 +592,9 @@ def main(review_dir):
         "audit_3_tie_break_uniqueness": audit_3_tie_break_uniqueness(review_dir),
         "audit_4_p2_exact_bnb": audit_4_p2_exact_bnb(review_dir),
         "audit_5_sensitivity_pareto": audit_5_sensitivity_pareto(review_dir),
-        "audit_6_three_way_consistency": audit_6_three_way_consistency(review_dir),
     }
+    if check_pdf:
+        report["audit_6_three_way_consistency"] = audit_6_three_way_consistency(review_dir)
     write_json(review_dir / "results" / "HARDCORE_AUDIT_REPORT.json", report)
     for k, v in report.items():
         print(f"{k}: passed={v['passed']}")

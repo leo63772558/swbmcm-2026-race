@@ -1,8 +1,10 @@
 """P4 scenario deduplication, multi-azimuth/range/shadow-edge expansion, and search-budget stability.
 
-AI assistance: Antigravity (Gemini), 2026-11-21.
+AI assistance:
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
 Does not alter frozen nominal schedules or archived P4_cases.csv; produces independent
-deduplicated category statistics, expanded spatial stress results, and k=3/5/8 stability tables.
+deduplicated category statistics, expanded spatial stress results, k=2/3/5/8 budget stability,
+and positive-threshold hysteresis sweeps.
 """
 from argparse import ArgumentParser
 from collections import defaultdict
@@ -202,9 +204,12 @@ def _summarize_categories(rows):
             "mean_replan_eta": round(sum(r["replan_eta"] for r in grp) / n, 4),
             "mean_hyst_eta": round(sum(r["hyst_eta"] for r in grp) / n, 4),
             "mean_replan_tlast_s": round(sum(r["replan_latest_s"] for r in grp) / n, 3),
+            "mean_hyst_tlast_s": round(sum(r["hyst_latest_s"] for r in grp) / n, 3),
             "replan_wins": sum(1 for r in grp if r["winner"] == "reschedule"),
             "keep_wins": sum(1 for r in grp if r["winner"] == "keep"),
             "ties": sum(1 for r in grp if r["winner"] == "tie"),
+            "hyst_wins": sum(1 for r in grp if r["hyst_winner"] == "hyst_replan"),
+            "hyst_ties": sum(1 for r in grp if r["hyst_winner"] == "tie"),
             "hyst_losses": sum(1 for r in grp if r["hyst_winner"] == "keep"),
         })
     n_tot = len(rows)
@@ -215,9 +220,12 @@ def _summarize_categories(rows):
         "mean_replan_eta": round(sum(r["replan_eta"] for r in rows) / n_tot, 4),
         "mean_hyst_eta": round(sum(r["hyst_eta"] for r in rows) / n_tot, 4),
         "mean_replan_tlast_s": round(sum(r["replan_latest_s"] for r in rows) / n_tot, 3),
+        "mean_hyst_tlast_s": round(sum(r["hyst_latest_s"] for r in rows) / n_tot, 3),
         "replan_wins": sum(1 for r in rows if r["winner"] == "reschedule"),
         "keep_wins": sum(1 for r in rows if r["winner"] == "keep"),
         "ties": sum(1 for r in rows if r["winner"] == "tie"),
+        "hyst_wins": sum(1 for r in rows if r["hyst_winner"] == "hyst_replan"),
+        "hyst_ties": sum(1 for r in rows if r["hyst_winner"] == "tie"),
         "hyst_losses": sum(1 for r in rows if r["hyst_winner"] == "keep"),
     })
     return summary
@@ -262,10 +270,44 @@ def main(results_dir=None):
             "v5_delta_vs_keep_s": v5_row["delta_replan_minus_keep_s"],
         })
 
+    # 3. Positive-threshold hysteresis sweep on all 115 unique cases (evaluating delta_hyst >= 0)
+    hyst_sweep_rows = []
+    for delta in (0.0, 0.25, 0.5, 1.0, 2.0):
+        wins = ties = losses = 0
+        tlast_sum = 0.0
+        eta_sum = 0.0
+        for r in full_rows:
+            k_eta, r_eta = r["keep_eta"], r["replan_eta"]
+            k_last, r_last = r["keep_latest_s"], r["replan_latest_s"]
+            trig = (r_eta > k_eta + 1e-12) or (
+                abs(r_eta - k_eta) <= 1e-12 and (k_last - r_last) > delta + 1e-9
+            )
+            h_eta, h_last = (r_eta, r_last) if trig else (k_eta, k_last)
+            eta_sum += h_eta
+            tlast_sum += h_last
+            sk = (round(k_eta * r["alerts"]), -k_last)
+            sh = (round(h_eta * r["alerts"]), -h_last)
+            if sh > sk:
+                wins += 1
+            elif sk > sh:
+                losses += 1
+            else:
+                ties += 1
+        hyst_sweep_rows.append({
+            "hyst_delta_s": delta,
+            "unique_cases": len(full_rows),
+            "mean_hyst_eta": round(eta_sum / len(full_rows), 6),
+            "mean_hyst_tlast_s": round(tlast_sum / len(full_rows), 4),
+            "hyst_wins": wins,
+            "hyst_ties": ties,
+            "hyst_losses": losses,
+        })
+
     write_csv(results_dir / "P4_dedup_expanded_cases.csv", full_rows)
     write_csv(results_dir / "P4_category_summary_expanded.csv", cat_summary_all)
     write_csv(results_dir / "P4_category_summary_dedup62.csv", cat_summary_dedup)
     write_csv(results_dir / "P4_budget_stability.csv", budget_rows)
+    write_csv(results_dir / "P4_hysteresis_sweep.csv", hyst_sweep_rows)
     write_json(results_dir / "P4_extended_summary.json", {
         "raw_archived_case_count": len(dedup_base) + dup_count,
         "duplicates_removed": dup_count,
@@ -275,6 +317,7 @@ def main(results_dir=None):
         "dedup_total_row": cat_summary_dedup[-1],
         "expanded_total_row": cat_summary_all[-1],
         "budget_stability": budget_rows,
+        "hysteresis_sweep": hyst_sweep_rows,
     })
     print(
         f"P4 extended audit: {len(dedup_base)+dup_count} raw -> {len(dedup_base)} unique baseline "

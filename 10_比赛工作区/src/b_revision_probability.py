@@ -1,12 +1,15 @@
 """Independent numerical checks of the existing Problem 3 uncertainty model.
 
-AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
-Public model release date was not verified. This is numerical review evidence.
+AI assistance:
+  - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+Scope: independent numerical quadrature and Monte Carlo verification.
 """
 from functools import cache
-from math import atan2, degrees, erf, erfc, exp, pi, radians, sqrt, tan
-from random import Random
+from math import degrees, erf, erfc, exp, pi, radians, sqrt, tan
 from statistics import NormalDist
+
+import numpy as np
 
 from problem_b_geometry import number, read_values
 from b_revision_data import SOURCE_RESULTS, read_csv, write_csv, write_json
@@ -73,19 +76,27 @@ def wilson(k, n, z):
 
 
 def monte_carlo(probes):
-    rng = Random(SEED)
-    counts = [0] * len(probes)
-    sigma = [(A+B*s) for s in probes]
-    gauss = rng.gauss
-    for _ in range(SAMPLES):
-        zx, zy = gauss(0, 1), gauss(0, 1)
-        error = gauss(0, OFFSET) + gauss(0, CONTROL)
-        for i, spread in enumerate(sigma):
-            angle = degrees(atan2(spread*zy, DISTANCE+spread*zx))
-            if abs((angle+error+180) % 360 - 180) <= MARGIN:
-                counts[i] += 1
-    z = NormalDist().inv_cdf(1-.05 / (2*len(probes)))
-    return [{"distance_m": s, "samples": SAMPLES, "hits": k, "estimate": k/SAMPLES,
+    """Run genuinely independent fixed-seed Monte Carlo streams (SAMPLES trials per probe)."""
+    rng = np.random.default_rng(SEED)
+    counts = []
+    for s in probes:
+        spread = A + B * s
+        # Process in chunks to keep peak RAM modest while preserving exact independent draws
+        hits = 0
+        chunk = 500_000
+        remaining = SAMPLES
+        while remaining > 0:
+            m = min(chunk, remaining)
+            zx = rng.standard_normal(m)
+            zy = rng.standard_normal(m)
+            err = rng.normal(0.0, OFFSET, m) + rng.normal(0.0, CONTROL, m)
+            angle = np.degrees(np.arctan2(spread * zy, DISTANCE + spread * zx))
+            wrapped = (angle + err + 180.0) % 360.0 - 180.0
+            hits += int(np.count_nonzero(np.abs(wrapped) <= MARGIN))
+            remaining -= m
+        counts.append(hits)
+    z = NormalDist().inv_cdf(1 - 0.05 / (2 * len(probes)))
+    return [{"distance_m": s, "samples": SAMPLES, "hits": k, "estimate": k / SAMPLES,
              "simultaneous_95_lower": lo, "simultaneous_95_upper": hi,
              "required": REQUIRED, "seed": SEED,
              "assessment": "above" if lo > REQUIRED else "below" if hi < REQUIRED else "indeterminate"}

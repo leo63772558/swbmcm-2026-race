@@ -9,13 +9,13 @@
     ],
     "checked_stations": 585,
     "checked_waypoints": 20,
-    "checked_trajectory_points": 6215,
+    "checked_trajectory_points": 6287,
     "violations": []
   },
   "audit_2_minkowski_clearance": {
     "passed": true,
-    "segments_checked": 882,
-    "stationary_points_checked": 4451,
+    "segments_checked": 892,
+    "stationary_points_checked": 4503,
     "min_continuous_segment_margin_m": 1.122153612,
     "min_stationary_point_margin_m": 1.122153612,
     "min_nominal_pair_separation_m": 38.425493,
@@ -51,6 +51,7 @@
       "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
       "pruned_layer0_topologies": 4133,
       "pruned_inner_branches": 2062,
+      "exact_discrete_optimum_raw_s": 11.034061764620652,
       "exact_discrete_optimum_s": 11.034062,
       "witness": {
         "pairing": {
@@ -89,10 +90,42 @@
           "T1": 3.092627,
           "T2": 8.889889,
           "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": [
+            [
+              12,
+              92
+            ],
+            [
+              52,
+              92
+            ]
+          ],
+          "T2": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              76
+            ]
+          ],
+          "T3": [
+            [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            [
+              12,
+              92
+            ]
+          ]
         }
       }
     },
-    "gap_vs_exact_k8_s": -0.0,
+    "gap_vs_exact_k8_s": 0.0,
     "exact_full_discrete_pool_bnb": {
       "shortlist_k": "FULL_DISCRETE_POOL",
       "discrete_station_pool_size": 585,
@@ -110,6 +143,7 @@
       "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
       "pruned_layer0_topologies": 4133,
       "pruned_inner_branches": 5784,
+      "exact_discrete_optimum_raw_s": 11.034061764620652,
       "exact_discrete_optimum_s": 11.034062,
       "witness": {
         "pairing": {
@@ -148,10 +182,134 @@
           "T1": 3.092627,
           "T2": 8.889889,
           "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": [
+            [
+              12,
+              92
+            ],
+            [
+              52,
+              92
+            ]
+          ],
+          "T2": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              76
+            ]
+          ],
+          "T3": [
+            [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            [
+              12,
+              92
+            ]
+          ]
         }
       }
     },
-    "gap_vs_full_discrete_pool_s": -0.0
+    "gap_vs_full_discrete_pool_s": 0.0,
+    "exact_full_discrete_pool_unseeded_bnb": {
+      "shortlist_k": "FULL_DISCRETE_POOL",
+      "discrete_station_pool_size": 585,
+      "legal_pairings_total": 1000,
+      "acyclic_ordered_topologies_total": 4200,
+      "multiplicity_pattern_counts": {
+        "(2, 1, 1, 1, 1)": 180,
+        "(2, 2, 1, 1, 0)": 450,
+        "(2, 2, 2, 0, 0)": 60,
+        "(3, 1, 1, 1, 0)": 120,
+        "(3, 2, 1, 0, 0)": 180,
+        "(3, 3, 0, 0, 0)": 10
+      },
+      "initial_upper_bound_s": null,
+      "lower_bound_formula": "Layer-0: max(fresh_pair_min, r0_min[u,a], r0_min[w,a], chain_lb(r0_min + m*OBSERVE + sum_min_slew)); Layer-1/2: max(cur_max, ready_u, ready_w, t_start + OBSERVE + reset_slew for any reused vehicle).",
+      "pruned_layer0_topologies": 3693,
+      "pruned_inner_branches": 4479089,
+      "exact_discrete_optimum_raw_s": 11.034061764620652,
+      "exact_discrete_optimum_s": 11.034062,
+      "witness": {
+        "pairing": {
+          "T1": [
+            3,
+            5
+          ],
+          "T2": [
+            1,
+            4
+          ],
+          "T3": [
+            2,
+            3
+          ]
+        },
+        "pattern": [
+          2,
+          1,
+          1,
+          1,
+          1
+        ],
+        "topo_order": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "reused_orders": {
+          "V3": [
+            "T1",
+            "T3"
+          ]
+        },
+        "starts_s": {
+          "T1": 3.092627,
+          "T2": 8.889889,
+          "T3": 11.034062
+        },
+        "stations_m": {
+          "T1": [
+            [
+              12,
+              92
+            ],
+            [
+              52,
+              92
+            ]
+          ],
+          "T2": [
+            [
+              12,
+              12
+            ],
+            [
+              84,
+              76
+            ]
+          ],
+          "T3": [
+            [
+              88.18053582018482,
+              5.699688318007885
+            ],
+            [
+              12,
+              92
+            ]
+          ]
+        }
+      }
+    },
+    "gap_vs_full_discrete_pool_unseeded_s": 0.0
   },
   "audit_5_sensitivity_pareto": {
     "passed": true,
@@ -172,6 +330,7 @@
     "missing_macros": [],
     "missing_in_pdf": [],
     "bibitems_total": 15,
-    "uncited_bibitems": []
+    "uncited_bibitems": [],
+    "citation_order_exact": true
   }
 }

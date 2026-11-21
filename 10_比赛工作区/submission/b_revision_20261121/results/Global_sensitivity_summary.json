@@ -6,5 +6,6 @@
   "pareto_front_count": 8,
   "pareto_front_2d_count": 6,
   "pareto_front_3d_count": 8,
+  "pareto_front_distinct_vectors": 5,
   "weight_schemes_tested": 5
 }

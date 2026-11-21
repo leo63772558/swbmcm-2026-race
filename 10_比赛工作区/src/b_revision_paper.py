@@ -1,7 +1,9 @@
 """Generate evidence macros, compile the English team review and verify its PDF.
 
-AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
-Public model release date was not verified. Assistance: data binding and typesetting.
+AI assistance:
+  - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+Scope: deterministic metric macro binding, LaTeX compilation, and PDF verification.
 """
 from argparse import ArgumentParser
 from os.path import relpath
@@ -24,7 +26,12 @@ def metrics(root):
     paper = root/"paper"
     source = []
     def add(name, value, from_file, key, field, digits=None):
-        rendered = str(value) if digits is None else f"{float(value):.{digits}f}"
+        if digits == "comma":
+            rendered = f"{int(value):,}"
+        elif digits is None:
+            rendered = str(value)
+        else:
+            rendered = f"{float(value):.{digits}f}"
         source.append({"macro":name,"rendered":rendered,"source_file":"results/"+from_file,
                        "record":key,"field":field,"raw":value})
     p1 = {x["tie"]:x for x in read_csv(results/"P1_station.csv")}
@@ -72,7 +79,7 @@ def metrics(root):
     assert len(probes) == 3
     fields = [
         ("Distance", "distance_m", 6),
-        ("Samples", "samples", None),
+        ("Samples", "samples", "comma"),
         ("Estimate", "estimate", 6),
         ("Low", "simultaneous_95_lower", 6),
         ("High", "simultaneous_95_upper", 6),
@@ -91,7 +98,7 @@ def metrics(root):
         add(name,run["V5_scores"][policy]["latest_start_s"],"priority_3.json",
             f"V5_scores.{policy}","latest_start_s",3)
     routing = read_json(results/"Route_summary.json")
-    for name, field, places in (("RouteCount","compared_routes",None),("ShortenedCount","shorter_paths",None),
+    for name, field, places in (("RouteCount","compared_routes","comma"),("ShortenedCount","shorter_paths",None),
                                 ("RestoredCount","restored_endpoints",None),
                                 ("SavingsMax","maximum_saving_m",5)):
         add(name,routing[field],"Route_summary.json","root",field,places)
@@ -264,7 +271,7 @@ def compile_tex(path, bundle):
     if not xe:
         raise RuntimeError("Neither tectonic nor xelatex is available on PATH.")
     logs = []
-    for _pass in range(2):
+    for _pass in range(3):
         proc = subprocess.run([xe, "-interaction=nonstopmode", "-halt-on-error", path.name],
                               cwd=path.parent, check=False, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=120)
@@ -278,8 +285,22 @@ def compile_tex(path, bundle):
 
 def inspect_pdf(path, qa, *, paper=True):
     reader = PdfReader(path)
-    assert 0<len(reader.pages)<=25 and not reader.attachments
+    total_pages = len(reader.pages)
+    assert total_pages > 0 and not reader.attachments
     assert not (reader.metadata.author if reader.metadata else None)
+    # Determine main-body page count (official rule: main text <= 25 pages; Appendices & AI Report excluded)
+    appendix_start = None
+    if paper:
+        for idx, pg in enumerate(reader.pages, start=1):
+            t = pg.extract_text() or ""
+            if idx > 2 and re.search(r"(?:^|\n)\s*Appendix\s+[A-Z]:", t):
+                appendix_start = idx
+                break
+        main_pages = (appendix_start - 1) if appendix_start is not None else total_pages
+        assert 2 < main_pages <= 25, f"Main paper pages {main_pages} exceeds 25-page official limit"
+    else:
+        main_pages = total_pages
+        assert total_pages <= 25
     qa.mkdir(parents=True,exist_ok=True)
     for prior_render in qa.glob(path.stem+"-*.png"):
         if re.fullmatch(re.escape(path.stem) + r"-\d+\.png", prior_render.name):
@@ -324,7 +345,8 @@ def inspect_pdf(path, qa, *, paper=True):
     texlog=path.with_suffix(".log").read_text(encoding="utf-8",errors="replace")
     assert not re.search(r"Overfull \\[hv]box|Missing character:|LaTeX Warning: (?:Reference|Citation).*undefined",
                          texlog), f"Formatting report requires attention for {path.name}"
-    return {"file":path.name,"page_count":len(reader.pages),"pages":logs}
+    return {"file": path.name, "page_count": len(reader.pages), "main_body_pages": main_pages,
+            "appendix_pages": len(reader.pages) - main_pages, "pages": logs}
 
 
 def generate(root,bundle):

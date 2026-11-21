@@ -171,6 +171,7 @@ function makeTimelines() {
       cursor.dataset.range = end;
       track.append(cursor);
       track.addEventListener("pointerdown", e => {
+        stopAutoTour(true);
         const rect = track.getBoundingClientRect();
         setTime(Math.max(0, Math.min(end, ((e.clientX - rect.left) / rect.width) * end)));
       });
@@ -367,6 +368,7 @@ async function startAutoTour() {
   if ($("los")) $("los").checked = true;
   if ($("bldgTrans")) $("bldgTrans").checked = true;
   const v5Case = data.cases.failure_V5;
+  const tT1 = v5Case.scores.keep.starts.T1;
   const tFault = v5Case.disturbance_s;
   const tKeep = v5Case.scores.keep.latest_start_s;
   const tReplan = v5Case.scores.reschedule.latest_start_s;
@@ -377,10 +379,10 @@ async function startAutoTour() {
   await setCase("failure_V5", "reschedule", 0);
   if (!autoTourActive) return;
   autoTourStage = "approach";
-  setTourCaption("Phase 1/3 · Nominal approach (45° urban view): T1 paired observation locks at 3.093 s.");
+  setTourCaption("Phase 1/3 · Nominal approach (45° urban view): T1 paired observation locks at " + fmt(tT1, 3) + " s.");
 
-  const stepMs = 110;
-  const simStep = 0.45;
+  const stepMs = 80;
+  const simStep = 0.55;
   const advance = async () => {
     if (!autoTourActive) return;
     if (autoTourStage === "approach") {
@@ -391,7 +393,7 @@ async function startAutoTour() {
         autoTourStage = "fault_pause";
         tourFaultPulse = true;
         $("field").dataset.autotour = "fault_highlight";
-        setTourCaption("Phase 2/3 · V5 FAULT @ t = 5.000 s! Red pulse alert & diverging dashed trajectories (Keep vs. Reschedule).");
+        setTourCaption("Phase 2/3 · V5 FAULT @ t = " + fmt(tFault, 3) + " s! Red pulse alert & dual-policy divergence (Keep vs. Reschedule).");
         await draw();
         if (!autoTourActive) return;
         autoTourTimer = setTimeout(() => {
@@ -401,7 +403,7 @@ async function startAutoTour() {
           setTourCaption("Phase 3/3 · Dual-strategy divergence: Keep finishes T3 @ " + fmt(tKeep, 3) +
             " s vs. Reschedule T2 @ " + fmt(tReplan, 3) + " s (+" + fmt(tReplan - tKeep, 3) + " s cancel-reset penalty).");
           autoTourTimer = setTimeout(advance, stepMs);
-        }, 1600);
+        }, 900);
         return;
       }
       autoTourTimer = setTimeout(advance, stepMs);
@@ -411,15 +413,18 @@ async function startAutoTour() {
       if (!autoTourActive) return;
       if (nextT >= tReplan - 1e-6) {
         autoTourStage = "complete";
+        tourFaultPulse = false;
+        if ($("faultBanner")) $("faultBanner").dataset.pulse = "false";
         $("field").dataset.autotour = "complete";
         setTourCaption("Demo complete · Keep " + fmt(tKeep, 3) + " s vs. Reschedule " + fmt(tReplan, 3) +
-          " s (+" + fmt(tReplan - tKeep, 3) + " s). Dashed slate tracks show Keep alternative.");
+          " s (+" + fmt(tReplan - tKeep, 3) + " s). Dashed slate connectors mark Keep baseline station offset.");
         autoTourActive = false;
         if (btn) {
           btn.dataset.active = "false";
           btn.setAttribute("aria-pressed", "false");
           btn.textContent = "▶ Auto-Tour: V5 Fault & Dual-Strategy Demo";
         }
+        await draw();
         return;
       }
       autoTourTimer = setTimeout(advance, stepMs);
@@ -447,6 +452,7 @@ $("play").addEventListener("click", () => {
   if (playing) requestAnimationFrame(playStep);
 });
 $("event").addEventListener("click", () => {
+  stopAutoTour(true);
   const c = data.cases[selected];
   const bounds = Object.values(c.policies).flat().flatMap(e => [e.start_s, e.end_s]);
   bounds.push(c.disturbance_s, c.absolute_recovery_s);

@@ -1,17 +1,12 @@
-# 数维杯 2026 秋季赛 B 题 · 依赖清单
+# 数维杯 2026 秋季赛 B 题 · 核心复现依赖清单
 # 安装：python -m pip install -r requirements.txt
+# 外部 CLI 工具（按需）：Node.js（回放状态断言）、XeLaTeX / Tectonic + pdftoppm（PDF 编译与质检）
 
 numpy==2.3.4
-scipy==1.16.2
-pandas==2.3.3
 matplotlib==3.10.7
 pypdf==6.21.4
 Pillow==13.0.0
-
-# 优化与几何（备用/扩展）
-pulp==3.2.2
-shapely==2.1.2
-
-# PDF 检查与测试
-pymupdf==1.28.2
 pytest>=8.4.2
+
+# 可选浏览器离线动态复验（仅运行 b_replay_browser_check.py 时需要）
+# playwright>=1.50.0

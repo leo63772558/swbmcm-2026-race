@@ -11,9 +11,12 @@
     "mean_replan_eta": 1.0,
     "mean_hyst_eta": 1.0,
     "mean_replan_tlast_s": 29.154,
+    "mean_hyst_tlast_s": 29.123,
     "replan_wins": 57,
     "keep_wins": 1,
     "ties": 4,
+    "hyst_wins": 57,
+    "hyst_ties": 5,
     "hyst_losses": 0
   },
   "expanded_total_row": {
@@ -23,9 +26,12 @@
     "mean_replan_eta": 1.0,
     "mean_hyst_eta": 1.0,
     "mean_replan_tlast_s": 27.064,
+    "mean_hyst_tlast_s": 27.047,
     "replan_wins": 110,
     "keep_wins": 1,
     "ties": 4,
+    "hyst_wins": 110,
+    "hyst_ties": 5,
     "hyst_losses": 0
   },
   "budget_stability": [
@@ -88,6 +94,53 @@
       "hyst_losses": 0,
       "v5_replan_tlast_s": 12.927041,
       "v5_delta_vs_keep_s": 1.89298
+    }
+  ],
+  "hysteresis_sweep": [
+    {
+      "hyst_delta_s": 0.0,
+      "unique_cases": 115,
+      "mean_hyst_eta": 1.0,
+      "mean_hyst_tlast_s": 27.0474,
+      "hyst_wins": 110,
+      "hyst_ties": 5,
+      "hyst_losses": 0
+    },
+    {
+      "hyst_delta_s": 0.25,
+      "unique_cases": 115,
+      "mean_hyst_eta": 1.0,
+      "mean_hyst_tlast_s": 27.0474,
+      "hyst_wins": 110,
+      "hyst_ties": 5,
+      "hyst_losses": 0
+    },
+    {
+      "hyst_delta_s": 0.5,
+      "unique_cases": 115,
+      "mean_hyst_eta": 1.0,
+      "mean_hyst_tlast_s": 27.0474,
+      "hyst_wins": 110,
+      "hyst_ties": 5,
+      "hyst_losses": 0
+    },
+    {
+      "hyst_delta_s": 1.0,
+      "unique_cases": 115,
+      "mean_hyst_eta": 1.0,
+      "mean_hyst_tlast_s": 27.0474,
+      "hyst_wins": 110,
+      "hyst_ties": 5,
+      "hyst_losses": 0
+    },
+    {
+      "hyst_delta_s": 2.0,
+      "unique_cases": 115,
+      "mean_hyst_eta": 1.0,
+      "mean_hyst_tlast_s": 27.0474,
+      "hyst_wins": 110,
+      "hyst_ties": 5,
+      "hyst_losses": 0
     }
   ]
 }

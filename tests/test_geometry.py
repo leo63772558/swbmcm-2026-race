@@ -1,3 +1,8 @@
+# AI Assistance Disclosure (Article 7):
+# - Tool: OpenAI ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol); Google Antigravity (Gemini 3.1 Pro)
+# - Scope: Implementation scaffolding, numerical verification, and automated test engineering
+# - Date: 2026-11-20 to 2026-11-21
+# - Team Verification: Mathematical models and outputs verified by Team#SWBMCM2613050.
 from __future__ import annotations
 
 import math
@@ -54,3 +59,20 @@ def test_all_five_vehicles_and_buildings_valid():
     for vid, pos in enumerate(g.VEHICLES, start=1):
         assert g.in_field(pos), f"V{vid} outside inset field"
         assert rg.clearance(pos, pos) >= -1e-9, f"V{vid} violates Minkowski clearance"
+
+
+def test_continuous_segment_minkowski_clearance_and_grazing():
+    """Continuous segment distance & road_clear enforce r >= 1.5 m along the entire segment."""
+    b = g.BUILDINGS[0]
+    x0, x1, y0, y1, _ = b
+    # Segment cutting right across a corner inside the 1.5 m fillet must fail
+    a_bad = (x0 - 1.5, y0 + 2.0)
+    b_bad = (x0 + 2.0, y0 - 1.5)
+    assert rg.segment_rect_distance(a_bad, b_bad, b) < g.RADIUS
+    assert not rg.road_clear(a_bad, b_bad)
+
+    # Segment running parallel at exact 1.5 m tangent clearance must pass
+    a_ok = (x0 - g.RADIUS, y0)
+    b_ok = (x0 - g.RADIUS, y1)
+    assert math.isclose(rg.segment_rect_distance(a_ok, b_ok, b), g.RADIUS, abs_tol=1e-12)
+    assert rg.road_clear(a_ok, b_ok)

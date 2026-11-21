@@ -1,5 +1,5 @@
 {
-  "byte_matches": 87,
+  "byte_matches": 88,
   "matched_artifacts": [
     "results/Executed_timeline.json",
     "results/Global_sensitivity_fixed_vs_reopt.csv",
@@ -37,6 +37,7 @@
     "results/P4_clock_checks.json",
     "results/P4_dedup_expanded_cases.csv",
     "results/P4_extended_summary.json",
+    "results/P4_hysteresis_sweep.csv",
     "results/P4_instruction_sensitivity.csv",
     "results/P4_V5_event_comparison.csv",
     "results/Pareto_tradeoff.csv",
@@ -94,13 +95,13 @@
     "P1_ERRATA.pdf"
   ],
   "wall_seconds": {
-    "1_correctness": 0.509,
-    "2_validation": 14.996,
-    "3_experiments": 8.4,
-    "3b_sensitivity_pareto": 259.364,
-    "3c_p4_extended": 22.203,
-    "4_visuals": 32.448,
-    "5_pdf": 27.859
+    "1_correctness": 0.491,
+    "2_validation": 6.05,
+    "3_experiments": 4.327,
+    "3b_sensitivity_pareto": 125.248,
+    "3c_p4_extended": 15.643,
+    "4_visuals": 12.352,
+    "5_pdf": 26.116
   },
   "plan_id": "64ac2233279ee4f440ed8febb4eb08c5207e7ca27bffa8c07b5e98eb84ddbbab"
 }

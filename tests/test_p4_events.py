@@ -1,3 +1,8 @@
+# AI Assistance Disclosure (Article 7):
+# - Tool: OpenAI ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol); Google Antigravity (Gemini 3.1 Pro)
+# - Scope: Implementation scaffolding, numerical verification, and automated test engineering
+# - Date: 2026-11-20 to 2026-11-21
+# - Team Verification: Mathematical models and outputs verified by Team#SWBMCM2613050.
 from __future__ import annotations
 
 import csv
@@ -47,3 +52,36 @@ def test_cached_vs_ongoing_only_outage_semantics():
     t30 = lookup[("all_V2", 30.0, "cached")]
     t35 = lookup[("all_duration_sensitivity", 35.0, "cached")]
     assert math.isclose(t35 - t30, 5.0, abs_tol=1e-4)
+
+
+def test_live_event_engine_and_strict_locking_clock():
+    """Directly invoke b_revision_events and solve_problem_b.scenario_state / observation_starts."""
+    import b_revision_events as ev
+    import solve_problem_b as s
+
+    plans = json.loads((REVIEW_DIR / "results" / "P2_main_plans.json").read_text(encoding="utf-8"))
+    visits = tuple(
+        s.Visit(
+            vehicle=int(v["vehicle"]), alert=v["alert"], station=tuple(v["station"]),
+            path=tuple(tuple(p) for p in v["path"]), depart=float(v["depart"]),
+            arrival=float(v["arrival"]), ready=float(v["ready"]),
+            start=float(v["start"]), end=float(v["end"]), reset=float(v["reset"]),
+        )
+        for v in plans["beam"]
+    )
+    # V5 fails at t_d = 5.0 s: T1 started at 3.093 s < 5.0 s, so T1 remains preserved & locked!
+    preserved = s.observation_starts(visits, failed=4, disturbance=5.0)
+    assert "T1" in preserved and preserved["T1"] < 5.0
+    assert set(preserved.keys()) == {"T1", "T2", "T3"}
+
+    # Live scenario_state on fleet at t = 5.0 s (V5 failed, V3 during T1 observation)
+    fleet_state = s.scenario_state(visits, 5.0, failed=4, disturbance=5.0)
+    assert fleet_state[4] is None
+    v3_pos, v3_rel = fleet_state[2]
+    assert v3_pos == (12, 92)
+    assert math.isclose(v3_rel, visits[0].reset, abs_tol=1e-9)
+
+    # Live b_revision_events.nominal_events round-trip
+    nom_ev = ev.nominal_events(visits, preserved)
+    assert len(nom_ev) > 0
+    assert all(e["end_s"] >= e["start_s"] - 1e-9 for e in nom_ev)

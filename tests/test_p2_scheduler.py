@@ -1,3 +1,8 @@
+# AI Assistance Disclosure (Article 7):
+# - Tool: OpenAI ChatGPT (Codex, GPT-5.4 / GPT-6.2 Sol); Google Antigravity (Gemini 3.1 Pro)
+# - Scope: Implementation scaffolding, numerical verification, and automated test engineering
+# - Date: 2026-11-20 to 2026-11-21
+# - Team Verification: Mathematical models and outputs verified by Team#SWBMCM2613050.
 from __future__ import annotations
 
 import csv
@@ -80,3 +85,28 @@ def test_nominal_k8_schedule_satisfies_constraints():
         vlist.sort(key=lambda x: x["depart"])
         for a, b in zip(vlist, vlist[1:]):
             assert b["depart"] >= a["reset"] - 1e-6
+
+
+def test_live_scheduler_and_exact_bnb_invocation():
+    """Directly invoke live solver.solve_schedule(), validate_visits(), and exact B&B topological helpers."""
+    import b_hardcore_audit as audit
+    import b_revision_geometry as rg
+    from unittest.mock import patch
+
+    with patch.object(s, "road_clear", rg.road_clear), patch.object(s, "route", rg.route):
+        init_state = [(pos, 0.0) for pos in g.VEHICLES]
+        live_visits = s.solve_schedule(init_state, g.TARGETS, 60.0, beam_width=20, stations=8)
+        assert len(live_visits) == 6
+        s.validate_visits(live_visits, g.TARGETS)
+        t_last = max(v.start for v in live_visits)
+        assert math.isclose(t_last, 11.034062, abs_tol=1e-5)
+
+        # Verify topological order enumeration helper for a sample single-reuse pairing
+        sample_orders = audit._topological_orders_for_pairing(((2, 4), (0, 3), (1, 2)), ("T1", "T2", "T3"))
+        assert len(sample_orders) == 2
+
+        # Verify live unseeded B&B certification on k=8 shortlist matches 11.034062 s
+        res_k8 = audit._exact_p2_bnb(shortlist_k=8, initial_ub=float("inf"))
+        assert res_k8["legal_pairings_total"] == 1000
+        assert res_k8["acyclic_ordered_topologies_total"] == 4200
+        assert math.isclose(res_k8["exact_discrete_optimum_raw_s"], 11.034062, abs_tol=1e-5)

@@ -111,7 +111,6 @@ def p1_area(out):
                  "ci_lo_m2": interval[0]*area, "ci_hi_m2": interval[1]*area, "seed": seed})
     write_csv(out / "P1_area.csv", rows)
 
-    duration = 0.0
     sensitivity = []
     for variable, baseline in (("height_m", goal[2]), ("radius_m", model.RADIUS),
                                ("pitch_cap_deg", model.PITCH_MAX)):

@@ -1,3 +1,4 @@
+// AI Assistance Disclosure (Article 7): Tool: ChatGPT (Codex) & Antigravity (Gemini 3.1 Pro); Scope: Node.js offline replay state assertion suite; Date: 2026-11-21; Verified by Team#SWBMCM2613050.
 /* AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
  * Public model release date not verified. Fixture compares browser-state math to Python. */
 const assert = require("node:assert/strict");

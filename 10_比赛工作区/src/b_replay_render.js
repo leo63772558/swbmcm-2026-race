@@ -1,5 +1,7 @@
 /* Dark sci-fi 3D WebGL & 2.5D isometric Canvas renderer.
- * AI assistance: Antigravity (Gemini) & ChatGPT (Codex), 2026-11-21.
+ * AI assistance:
+ *   - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+ *   - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
  * Display geometry only; all trajectories and LOS checks use verified solver intervals.
  */
 
@@ -40,7 +42,11 @@ function headingAt(related, point) {
   if (!travel) return null;
   const path = traveledPath(travel, time);
   const [x, y] = path.at(-1);
-  const prev = path.findLast(([px, py]) => Math.hypot(x - px, y - py) > 1e-9);
+  let prev = null;
+  for (let i = path.length - 1; i >= 0; i--) {
+    const [px, py] = path[i];
+    if (Math.hypot(x - px, y - py) > 1e-9) { prev = path[i]; break; }
+  }
   const next = travel.path.find((p, i) => i > 0 && Math.hypot(p[0] - x, p[1] - y) > 1e-9);
   const dx = prev ? x - prev[0] : next ? next[0] - x : 0;
   const dy = prev ? y - prev[1] : next ? next[1] - y : 0;
@@ -160,8 +166,22 @@ function frameGeometry(record, states) {
     const inView = new Set(rows.filter(e => e.phase === "travel").map(signature));
     branch = record.policies[other].filter(e => e.phase === "travel" &&
       e.end_s > record.disturbance_s && !inView.has(signature(e)));
+    // When viewing reschedule and keep has no post-fault travel legs, surface keep's
+    // baseline station connectors for vehicles whose post-fault station diverges from reschedule.
+    if (!branch.length) {
+      const otherStates = stateFor(selected, other, time);
+      for (const curS of states) {
+        const altS = otherStates.find(s => s.vehicle === curS.vehicle);
+        if (!altS || curS.phase === "failed" || altS.phase === "failed") continue;
+        if (Math.hypot(curS.point[0] - altS.point[0], curS.point[1] - altS.point[1]) > 0.25) {
+          branch.push({ vehicle: curS.vehicle, path: [curS.point, altS.point] });
+        }
+      }
+    }
   }
   const showLos = $("los") ? $("los").checked : true;
+  const LOCKED_PHASES = new Set(["wait_partner", "observe", "missed_pair"]);
+  const SLEW_PHASES = new Set(["slew", "reset", "cancel_reset"]);
   const vehicles = states.map(state => {
     const related = rows.filter(e => e.vehicle === state.vehicle);
     const tracks = related.filter(e => e.phase === "travel" && time >= e.start_s)
@@ -170,23 +190,38 @@ function frameGeometry(record, states) {
     const target = targets.find(t => t.id === state.alert);
     const camera = [...state.point, camera_m];
     const az = state.pan * Math.PI / 180, el = state.tilt * Math.PI / 180;
-    const aim = [
-      camera[0] + 5.5 * Math.cos(el) * Math.cos(az),
-      camera[1] + 5.5 * Math.cos(el) * Math.sin(az),
-      camera[2] + 5.5 * Math.sin(el),
-    ];
-    const blocked = (!failed && target && showLos) ? hitBuilding(camera, target.point) : null;
+    const ux = Math.cos(el) * Math.cos(az);
+    const uy = Math.cos(el) * Math.sin(az);
+    const uz = Math.sin(el);
+    const aim = [camera[0] + 5.5 * ux, camera[1] + 5.5 * uy, camera[2] + 5.5 * uz];
+    const aimConeTip = [camera[0] + 18.0 * ux, camera[1] + 18.0 * uy, camera[2] + 18.0 * uz];
+    const isLocked = !failed && target && LOCKED_PHASES.has(state.phase);
+    const isSlewing = !failed && SLEW_PHASES.has(state.phase);
+    const blocked = (isLocked && showLos) ? hitBuilding(camera, target.point) : null;
     const hitInfo = blocked ? firstHitPoint(camera, target.point) : null;
+    // Physically faithful FOV cone: hidden while driving/idle/failed; aligned with actual
+    // (pan, tilt) during slew/reset; locked onto target ray during wait_partner/observe.
+    let sight = null;
+    if (showLos && isLocked) {
+      sight = {
+        target, blocked, hitPoint: hitInfo ? hitInfo.point : null,
+        cone: coneRibs(camera, target.point),
+        locked: true,
+      };
+    } else if (showLos && isSlewing && (Math.abs(state.pan) > 1e-3 || Math.abs(state.tilt) > 1e-3)) {
+      sight = {
+        target: null, blocked: null, hitPoint: null,
+        cone: coneRibs(camera, aimConeTip),
+        locked: false,
+      };
+    }
     return {
       id: state.vehicle, name: "V" + state.vehicle, point: [...state.point, 0.5],
       phase: state.phase, color: data.vehicle_colors[state.vehicle - 1],
       tracks, camera, aim, failed,
       heading: failed ? null : headingAt(related, state.point),
-      hasAim: !failed && state.phase !== "travel" && state.alert,
-      sight: (!failed && target && showLos) ? {
-        target, blocked, hitPoint: hitInfo ? hitInfo.point : null,
-        cone: coneRibs(camera, target.point),
-      } : null,
+      hasAim: !failed && (isLocked || isSlewing),
+      sight,
     };
   });
   return {
@@ -296,12 +331,15 @@ function buildTraces(frame) {
     if (v.heading) traces.push(lineTrace(v.heading, v.color, 5));
     if (v.hasAim) traces.push(lineTrace([v.camera, v.aim], "#E0F2FE", 3.5));
     if (v.sight) {
-      const { target, blocked, hitPoint, cone } = v.sight;
-      const losColor = blocked ? BLOCKED : CLEAR;
-      traces.push(lineTrace([v.camera, target.point], losColor, blocked ? 3 : 3.5, blocked ? "dash" : "solid"));
+      const { target, blocked, hitPoint, cone, locked } = v.sight;
+      if (target) {
+        const losColor = blocked ? BLOCKED : CLEAR;
+        traces.push(lineTrace([v.camera, target.point], losColor, blocked ? 3 : 3.5, blocked ? "dash" : "solid"));
+      }
       if (cone && cone.length) {
         const conePts = cone.flatMap(seg => [...seg, null]);
-        traces.push(lineTrace(conePts, blocked ? "rgba(244,63,94,0.35)" : "rgba(45,212,191,0.32)", 1.5));
+        const coneCol = blocked ? "rgba(244,63,94,0.35)" : (locked ? "rgba(45,212,191,0.34)" : "rgba(245,158,11,0.32)");
+        traces.push(lineTrace(conePts, coneCol, 1.5));
       }
       if (hitPoint) {
         traces.push(traceXY([hitPoint], {
@@ -441,7 +479,7 @@ function drawCanvas(canvas, frame, width, height, scale) {
       ctx.fillRect(px - 1.5, py - 1.5, 3, 3);
     }
     ctx.fillStyle = "rgba(244,63,94,0.30)";
-    for (const [x, y] of ov.occluded_xy) {
+    for (const [x, y] of (ov.infeasible_xy || ov.occluded_xy || [])) {
       const [px, py] = p([x, y, 0]);
       ctx.fillRect(px - 1.2, py - 1.2, 2.4, 2.4);
     }
@@ -484,9 +522,12 @@ function drawCanvas(canvas, frame, width, height, scale) {
     if (v.sight) {
       const losCol = v.sight.blocked ? BLOCKED : CLEAR;
       if (v.sight.cone) {
-        for (const rib of v.sight.cone) shape(rib, v.sight.blocked ? "rgba(244,63,94,0.28)" : "rgba(45,212,191,0.28)", 1);
+        const coneCol = v.sight.blocked ? "rgba(244,63,94,0.28)" : (v.sight.locked ? "rgba(45,212,191,0.30)" : "rgba(245,158,11,0.30)");
+        for (const rib of v.sight.cone) shape(rib, coneCol, 1);
       }
-      shape([v.camera, v.sight.target.point], losCol, v.sight.blocked ? 1.8 : 2.3, v.sight.blocked ? [6, 4] : []);
+      if (v.sight.target) {
+        shape([v.camera, v.sight.target.point], losCol, v.sight.blocked ? 1.8 : 2.3, v.sight.blocked ? [6, 4] : []);
+      }
       if (v.sight.hitPoint) {
         const [hx, hy] = p(v.sight.hitPoint);
         ctx.setLineDash([]); ctx.strokeStyle = BLOCKED; ctx.lineWidth = 2;
@@ -581,7 +622,7 @@ async function renderField(frame) {
     await window.Plotly.react(scene, buildTraces(frame), plotlyLayout(frame),
       { responsive: true, displaylogo: false, modeBarButtonsToRemove: ["toImage"] });
     if (!scene.querySelector(".gl-container canvas")) throw Error("Plotly did not create a WebGL canvas");
-    if (previous === "webgl" && activeRenderer === "canvas") return;
+    if (activeRenderer === "canvas") return;
     $("canvasScene").hidden = true;
     $("renderer").textContent = "WebGL 3D · dark digital twin";
     $("field").dataset.renderer = "webgl";

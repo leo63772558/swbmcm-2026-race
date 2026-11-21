@@ -1,7 +1,9 @@
 """Build and independently check the anonymous B engineering review archives.
 
-AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
-This workflow packages existing data and does not alter numerical evidence.
+AI assistance:
+  - ChatGPT (Codex, GPT-6.2 Sol), OpenAI; version release date: not publicly disclosed; used 2026-11-21.
+  - Antigravity (Gemini), Google DeepMind; version release date: not publicly disclosed; used 2026-11-21.
+Scope: clean-room archive packaging, hash verification, and release checks.
 """
 from argparse import ArgumentParser
 from datetime import datetime, timedelta, timezone
@@ -38,6 +40,9 @@ DOCUMENTS = (
     "FINAL_JUDGE_REVIEW.md", "REPRODUCE.md", "AI_USAGE_LOG.csv", "AI_Usage_Report.md",
     "requirements-review.txt",
 )
+OFFICIAL_SUPPORT_DOCUMENTS = (
+    "REPRODUCE.md", "AI_USAGE_LOG.csv", "AI_Usage_Report.md", "requirements-review.txt",
+)
 PRIVATE_PATH = re.compile(r"cns|signed|签名|参赛信息|payment|\.library-transfer", re.IGNORECASE)
 
 
@@ -63,18 +68,21 @@ def write_zip(path, entries):
     return file_manifest(path)
 
 
-def support_entries(review):
+def support_entries(review, *, official_clean=False):
+    docs = OFFICIAL_SUPPORT_DOCUMENTS if official_clean else DOCUMENTS
+    data_glob = "B题题面参数.csv" if official_clean else "B题题面*"
     entries = {
         **{path.relative_to(ROOT).as_posix(): path
-           for path in (ROOT / "data").glob("B题题面*") if path.is_file()},
+           for path in (ROOT / "data").glob(data_glob) if path.is_file()},
         **{f"results/{name}": ROOT / "results" / name for name in REFERENCE_NAMES},
         **{f"src/{name}": ROOT / "src" / name for name in SOURCE_NAMES},
         **{f"src/{path.name}": path for pattern in ("b_revision_*.py", "b_replay*")
            for path in (ROOT / "src").glob(pattern) if path.is_file()},
-        **{name: review / name for name in DOCUMENTS},
+        **{name: review / name for name in docs if (review / name).is_file()},
     }
     figure_dir = review / "figures"
     paper_dir = review / "paper"
+    paper_exts = (".tex", ".bib", ".md", ".csv") if official_clean else (".tex", ".pdf", ".bib", ".md", ".csv")
     files = [
         *(review / "results").glob("*"),
         *figure_dir.glob("fig[0-9][0-9]_*"),
@@ -82,7 +90,8 @@ def support_entries(review):
         *figure_dir.glob("P4_PANEL_INDEX.csv"),
         *(figure_dir / "replay_frames").rglob("*"),
         *(review / "simulator").rglob("*"),
-        *(path for path in paper_dir.rglob("*") if path.suffix in (".tex", ".pdf", ".bib", ".md", ".csv")),
+        *(path for path in paper_dir.rglob("*")
+          if path.suffix in paper_exts and not (official_clean and path.name == "B_review_tables.tex")),
         *(path for path in (review / "qa").glob("*.json") if path.name != "REPRODUCTION_CHECK.json"),
     ]
     entries.update({f"artifacts/{path.relative_to(review).as_posix()}": path
@@ -96,14 +105,22 @@ def support_entries(review):
 def inspect_paper(path):
     paper = PdfReader(path)
     assert not (paper.metadata and paper.metadata.author) and not paper.attachments
-    assert 2 < len(paper.pages) <= 25
+    appendix_start = None
+    for idx, pg in enumerate(paper.pages, start=1):
+        t = pg.extract_text() or ""
+        if idx > 2 and re.search(r"(?:^|\n)\s*Appendix\s+[A-Z]:", t):
+            appendix_start = idx
+            break
+    main_pages = (appendix_start - 1) if appendix_start is not None else len(paper.pages)
+    assert 2 < main_pages <= 25, f"Main body {main_pages} pages exceeds 25-page official cap"
     page_one = re.sub(r"\s+", "", paper.pages[0].extract_text() or "")
     assert "Summary" in page_one and "Keywords" in page_one
     assert path.stat().st_size < LIMIT
     return {"file": "paper/B_submission.pdf", "pages": len(paper.pages),
+            "main_body_pages": main_pages, "appendix_pages": len(paper.pages) - main_pages,
             "bytes": path.stat().st_size, "sha256": file_hash(path),
             "empty_author_metadata": True, "attachments": 0,
-            "in_requested_page_range": 14 <= len(paper.pages) <= 25}
+            "in_requested_page_range": 14 <= main_pages <= 25}
 
 
 def inspect_replay(review):
@@ -134,7 +151,7 @@ def build(review, bundle=None):
     )
     with TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent) as folder:
         temp = Path(folder)
-        payload = support_entries(review)
+        payload = support_entries(review, official_clean=False)
         seed = temp / "staged.zip"
         write_zip(seed, payload)
         extracted = temp / "clean"
@@ -148,8 +165,9 @@ def build(review, bundle=None):
         proof = rerun / "REPRODUCTION_CHECK.json"
         results = read_json(proof)
         assert len(results["pdf_text_matches"]) == 2
+        official_payload = support_entries(review, official_clean=True)
         upload = temp / (STEM + "fj.zip")
-        manifest = write_zip(upload, {**payload, "qa/REPRODUCTION_CHECK.json": proof})
+        manifest = write_zip(upload, {**official_payload, "qa/REPRODUCTION_CHECK.json": proof})
         acceptance = temp / "RELEASE_ACCEPTANCE.json"
         write_json(acceptance, {
             "status": "team_review_edition",

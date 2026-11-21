@@ -100,9 +100,12 @@ def main() -> int:
 
     if args.commit:
         subprocess.run(["git", "-C", str(REPO), "add", "-A"], check=True)
-        subprocess.run(["git", "-C", str(REPO), "commit", "-m", args.commit], check=False)
-        subprocess.run(["git", "-C", str(REPO), "push"], check=False)
-        print("\n已提交并尝试推送。")
+        c = subprocess.run(["git", "-C", str(REPO), "commit", "-m", args.commit], check=False)
+        if c.returncode != 0:
+            print("提交未执行（可能无变更或提交失败），跳过推送。")
+            return c.returncode
+        subprocess.run(["git", "-C", str(REPO), "push"], check=True)
+        print("\n已提交并推送。")
     else:
         print("\n下一步：git add -A && git commit -m \"...\" && git push")
     return 0

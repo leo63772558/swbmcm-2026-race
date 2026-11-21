@@ -86,6 +86,17 @@ def pdf_text_hashes(path):
     ]
 
 
+def verify_pdf_text(root, rel, expected, label):
+    actual = pdf_text_hashes(root / rel)
+    if len(actual) != len(expected):
+        raise ValueError(f"{label} PDF page count differs: {rel} ({len(actual)} versus {len(expected)})")
+    different_pages = [
+        str(i) for i, (a, b) in enumerate(zip(actual, expected, strict=True), 1) if a != b
+    ]
+    if different_pages:
+        raise ValueError(f"{label} PDF text differs: {rel}, pages {', '.join(different_pages)}")
+
+
 def build_manifest(root):
     manifest = {
         "artifacts_sha256": {
@@ -116,23 +127,40 @@ def load_manifest(reference):
             expected_hash = record["sha256"] if group == "paper_files" else record
             if required_hash(reference, rel) != expected_hash:
                 raise ValueError(f"Reference SHA-256 differs: {rel}")
+            if group == "paper_files":
+                verify_pdf_text(reference, rel, record["page_text_sha256"], "Reference")
     return manifest
 
 
 def compare(rerun, manifest):
     artifacts = manifest["artifacts_sha256"]
-    if set(result_paths(rerun)) != {rel for rel in artifacts if rel.startswith("results/")}:
-        raise ValueError("Reproduced result inventory differs from the manifest.")
-    for rel, expected_hash in artifacts.items():
-        if required_hash(rerun, rel) != expected_hash:
-            raise ValueError(f"Reproduced SHA-256 differs: {rel}")
-    for rel, record in manifest["paper_files"].items():
-        for index, (actual, expected) in enumerate(
-            zip(pdf_text_hashes(rerun / rel), record["page_text_sha256"], strict=True), start=1
-        ):
-            if actual != expected:
-                raise ValueError(f"Reproduced PDF text differs: {rel}, page {index}")
-    return sorted(artifacts), sorted(Path(rel).name for rel in manifest["paper_files"])
+    papers = manifest["paper_files"]
+    expected_hashes = {**artifacts, **{rel: record["sha256"] for rel, record in papers.items()}}
+    expected_results = {rel for rel in artifacts if rel.startswith("results/")}
+    actual_results = {
+        path.relative_to(rerun).as_posix() for path in (rerun / "results").iterdir()
+    } if (rerun / "results").is_dir() else set()
+    unexpected = sorted(actual_results - expected_results)
+    missing, different = [], []
+    for rel, expected_hash in sorted(expected_hashes.items()):
+        path = rerun / rel
+        if not path.is_file():
+            missing.append(rel)
+        elif file_hash(path) != expected_hash:
+            different.append(rel)
+    problems = []
+    if missing:
+        problems.append(f"Missing mandatory artifacts: {', '.join(missing)}")
+    if unexpected:
+        problems.append(f"Unexpected reproduced results: {', '.join(unexpected)}")
+    if different:
+        problems.append(f"Reproduced SHA-256 differs: {', '.join(different)}")
+    if problems:
+        raise ValueError("\n".join(problems))
+
+    for rel, record in papers.items():
+        verify_pdf_text(rerun, rel, record["page_text_sha256"], "Reproduced")
+    return sorted(artifacts), sorted(Path(rel).name for rel in papers)
 
 
 def main(out, reference, bundle):
@@ -141,6 +169,8 @@ def main(out, reference, bundle):
     if out.exists() or out.is_relative_to(ROOT/"data") or out.is_relative_to(ROOT/"results"):
         raise ValueError("Choose a fresh directory outside the source data and baseline results.")
     b_revision_paper.tex_engine(bundle)
+    if not which("pdftoppm"):
+        raise RuntimeError("Poppler pdftoppm is required for PDF layout checks")
     node = which("node")
     if not node:
         raise RuntimeError("Node.js required for replay consistency check")
@@ -175,12 +205,21 @@ def main(out, reference, bundle):
     b_revision_paper.generate(out,bundle)
     b_hardcore_audit.main(out)
     times["5_pdf"]=round(perf_counter()-tick,3)
-    matches,text_matches=compare(out,manifest)
-    qa={"byte_matches":len(matches),"matched_artifacts":matches,"pdf_text_matches":text_matches,
-        "verified_frozen_inputs":sorted(manifest["frozen_inputs_sha256"]),
-        "wall_seconds":times,"plan_id":read_json(results/"priority_3.json")["nominal_plan_id"]}
-    write_json(out/"REPRODUCTION_CHECK.json",qa)
-    print("Review archive reproduced:",len(matches),"byte matches and",len(text_matches),"PDF content matches.")
+    matches, pdf_matches = compare(out, manifest)
+    qa = {
+        "byte_matches": len(matches),
+        "matched_artifacts": matches,
+        "pdf_binary_match_count": len(pdf_matches),
+        "pdf_binary_matches": pdf_matches,
+        "pdf_text_matches": pdf_matches,
+        "verified_frozen_inputs": sorted(manifest["frozen_inputs_sha256"]),
+        "wall_seconds": times,
+        "plan_id": read_json(results / "priority_3.json")["nominal_plan_id"],
+    }
+    write_json(out / "REPRODUCTION_CHECK.json", qa)
+    print(f"Review archive reproduced: {len(matches)} artifact SHA-256 matches and "
+          f"{len(pdf_matches)} PDF SHA-256 and per-page text matches.")
+
 
 
 if __name__=="__main__":

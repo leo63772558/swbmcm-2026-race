@@ -5,6 +5,7 @@ Public model release date was not verified. Assistance: data binding and typeset
 """
 from argparse import ArgumentParser
 from math import ceil
+from os import environ
 from os.path import relpath
 from pathlib import Path
 from shutil import which
@@ -18,6 +19,7 @@ from b_revision_data import DEFAULT_OUTPUT, read_csv, read_json, write_csv, writ
 
 
 TEAM_NUMBER = "SWBMCM2613050"
+PDF_SOURCE_DATE_EPOCH = "1795219200"  # 2026-11-21 00:00:00 UTC
 
 
 def metrics(root):
@@ -312,12 +314,13 @@ def tex_engine(bundle):
 
 def compile_tex(path, bundle):
     kind, engine = tex_engine(bundle)
+    env = {**environ, "SOURCE_DATE_EPOCH": PDF_SOURCE_DATE_EPOCH, "FORCE_SOURCE_DATE": "1"}
     if kind == "tectonic":
         command = [engine, "--untrusted", "--only-cached", "--keep-logs", "--keep-intermediates"]
         if bundle:
             command.extend(["--bundle", Path(relpath(bundle.resolve(), path.parent.resolve())).as_posix()])
         command.append(path.name)
-        proc = subprocess.run(command, cwd=path.parent, check=False, capture_output=True, text=True,
+        proc = subprocess.run(command, cwd=path.parent, env=env, check=False, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=120)
         (path.parent / (path.stem + "_compile.txt")).write_text(proc.stdout + proc.stderr, encoding="utf-8")
         if proc.returncode:
@@ -326,7 +329,7 @@ def compile_tex(path, bundle):
     logs = []
     for _pass in range(3):
         proc = subprocess.run([engine, "-interaction=nonstopmode", "-halt-on-error", path.name],
-                              cwd=path.parent, check=False, capture_output=True, text=True,
+                              cwd=path.parent, env=env, check=False, capture_output=True, text=True,
                               encoding="utf-8", errors="replace", timeout=120)
         logs.append(proc.stdout + proc.stderr)
         if proc.returncode:

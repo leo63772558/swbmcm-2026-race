@@ -44,17 +44,19 @@ cd swbmcm-2026-race
 
 ## 三、当前进度
 
+当前队内复核版位于 [`10_比赛工作区/submission/b_revision_20261121/`](10_比赛工作区/submission/b_revision_20261121/)。
+
 | 阶段 | 状态 | 产物 |
 |---|---|---|
 | 定题与题面提取 | ✅ 已完成 | `01_problem/B-problem.pdf`、`01_problem/data/*.csv`、`10_比赛工作区/data/B题题面参数.csv` |
 | P1–P4 求解器与 6 项硬核审计 | ✅ 已完成（6/6 PASS） | `10_比赛工作区/src/b_revision_*.py`、`b_hardcore_audit.py`（1,000 配对 / 4,200 顺序精确 B&B 零间隙） |
-| 真实求解器敏感性 / 3D Pareto / P4 115 场景 | ✅ 已完成 | `results/Global_sensitivity_*.csv`、`Pareto_tradeoff_3d.csv`、`P4_dedup_expanded_cases.csv` |
-| 11 组顶刊图 + 离线 3D 数字孪生大屏 | ✅ 已完成 | `figures/fig01`–`fig11`（PDF+PNG）、`simulator/B_Simulator.html`（含 Auto-Tour 一键演示） |
-| 完整英文论文成稿（A4, ≤25 页） | ✅ 已完成（零告警） | `10_比赛工作区/submission/b_revision_20261121/paper/B_submission.pdf`（72 宏 / 15 文献 / 11 图全绑定） |
-| 自动化测试套件与 AI 合规报告 | ✅ 已完成（9/9 PASS） | `tests/test_*.py`（9 文件）、`AI_USAGE_LOG.csv`（11 列）、`AI_Usage_Report.md` |
-| 洁净室复跑与支撑材料包 | ✅ 已完成 | `BSWBMCM2613050fj.zip`（< 20 MB，洁净室全链路复跑通过） |
+| 敏感性、Pareto 与四项研究对照 | 实测结果 | `results/` 下的 36°/s 云台、30° 交角、局部绕角和 P4 阈值对照 |
+| 11 组图与离线回放 | 已验收 | `figures/fig01`–`fig11`（PDF + PNG）、`simulator/B_Simulator.html` |
+| 英文论文候选稿 | 24 页 A4 | `paper/B_submission.pdf`，93 项数值溯源、15 条参考文献、11 张图 |
+| 自动化测试和 AI 使用披露 | 随候选稿保存 | `tests/`、`AI_USAGE_LOG.csv`（11 列）、`AI_Usage_Report.md` |
+| 支撑材料与复现 | 查验封包 | `BSWBMCM2613050fj.zip`、`REPRODUCIBILITY_MANIFEST.json`、`RELEASE_ACCEPTANCE.json`、`REPRODUCE.md` |
 
-> 最终官网上传与签字承诺书由队员人工核验后完成。
+> 队伍按赛事规定完成独立核心工作、核验、改写、签核与官网提交。
 
 ---
 
@@ -73,14 +75,15 @@ cd swbmcm-2026-race
 ## 五、跑起来
 
 ```bash
-python -m pip install -r requirements.txt    # 依赖清单（与 requirements-review.txt 对齐）
+python -m pip install -r 10_比赛工作区/submission/b_revision_20261121/requirements-review.txt
+python -m pip install pytest
 python 03_code/run_all.py                    # 严格 Fail-Fast 一键洁净室复现全部 P1–P4、图表、PDF 与 6 项审计
 python -m pytest tests/ -v                   # 运行全部 9 文件单元测试与提交包匿名/合规验收
 ```
 
 规则：
 - 所有随机过程**固定 seed**，否则结果不可复现
-- 正文里的数字**一律从 `04_results/*.csv` 引用**，禁止手打
+- 本版排印数值溯源见 `paper/NUMBER_PROVENANCE.csv`，原精度保留在同版的 `results/`
 - 图同时导 PDF（进论文）和 PNG（快看）
 
 ---
@@ -88,7 +91,7 @@ python -m pytest tests/ -v                   # 运行全部 9 文件单元测试
 ## 六、硬约束（违反 = 取消评奖资格）
 
 - 全文 **12 pt Times New Roman**，全英文，**≤ 25 页**（含摘要页 + 目录页），A4
-- 页眉 `Team#SWBMCM2613050` + `Page N of M`，第 1 页无页眉
+- 正文页眉 `Team# BSWBMCM2613050` 与 `Page N of M`，从物理第 3 页起编号
 - **正文与附录均不得出现姓名、学校、指导老师**（匿名评审，代码注释里也不行）
 - AI 工具**必须申报**：论文内声明 + References 列工具 + 附《AI 工具使用情况报告》+ 台账见 `08_ai-log/`
 - 全文疑似 AIGC > 30% 或总相似比 > 50% → 判雷同，取消资格

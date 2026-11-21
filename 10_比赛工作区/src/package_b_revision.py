@@ -4,9 +4,9 @@ AI assistance: ChatGPT (Codex, GPT-6.2 Sol), OpenAI, used 2026-11-21.
 This workflow packages existing data and does not alter numerical evidence.
 """
 from argparse import ArgumentParser
+from contextlib import nullcontext
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
-from importlib.metadata import version
 from pathlib import Path, PurePosixPath
 from shutil import copyfile
 from tempfile import TemporaryDirectory
@@ -28,16 +28,15 @@ LIMIT = 20_000_000
 BEIJING = timezone(timedelta(hours=8))
 SOURCE_NAMES = (
     "problem_b_geometry.py", "solve_problem_b.py", "check_problem_b.py",
-    "check_b_p4_cross.py", "reproduce_b_revision.py",
-    "package_b_revision.py", "b_hardcore_audit.py",
+    "check_b_p4_cross.py", "reproduce_b_revision.py", "b_hardcore_audit.py",
 )
 REFERENCE_NAMES = (
     "B_P1.csv", "B_P2_localization.csv", "B_P2_fairness.csv", "B_P3.csv", "B_P4.csv",
 )
-DOCUMENTS = (
+SUPPORT_DOCUMENTS = ("REPRODUCE.md", "AI_USAGE_LOG.csv", "AI_Usage_Report.md")
+ENGINEERING_DOCUMENTS = (
     "TEAM_HANDOFF_CHECKLIST.md", "VERIFY_REPORT.md", "IMPROVEMENT_BACKLOG.md",
-    "FINAL_JUDGE_REVIEW.md", "REPRODUCE.md", "AI_USAGE_LOG.csv", "AI_Usage_Report.md",
-    "requirements-review.txt",
+    "FINAL_JUDGE_REVIEW.md", *SUPPORT_DOCUMENTS,
 )
 PRIVATE_PATH = re.compile(r"cns|signed|签名|参赛信息|payment|\.library-transfer", re.IGNORECASE)
 
@@ -72,7 +71,9 @@ def support_entries(review):
         **{f"src/{name}": ROOT / "src" / name for name in SOURCE_NAMES},
         **{f"src/{path.name}": path for pattern in ("b_revision_*.py", "b_replay*")
            for path in (ROOT / "src").glob(pattern) if path.is_file()},
-        **{name: review / name for name in DOCUMENTS},
+        **{name: review / name for name in SUPPORT_DOCUMENTS},
+        "03_code/run_all.py": ROOT.parent / "03_code" / "run_all.py",
+        "requirements.txt": review / "requirements-review.txt",
         f"artifacts/{MANIFEST_NAME}": review / MANIFEST_NAME,
     }
     figure_dir = review / "figures"
@@ -84,8 +85,9 @@ def support_entries(review):
         *figure_dir.glob("P4_PANEL_INDEX.csv"),
         *(figure_dir / "replay_frames").rglob("*"),
         *(review / "simulator").rglob("*"),
-        *(path for path in paper_dir.rglob("*") if path.suffix in (".tex", ".pdf", ".bib", ".md", ".csv")),
-        *(path for path in (review / "qa").glob("*.json") if path.name != "REPRODUCTION_CHECK.json"),
+        *(path for path in paper_dir.rglob("*") if path.suffix in (".tex", ".pdf", ".bib", ".csv")),
+        review / "qa" / "SIMULATOR_CHECKS.json",
+        review / "qa" / "PDF_CHECKS.json",
     ]
     entries.update({f"artifacts/{path.relative_to(review).as_posix()}": path
                     for path in files if path.is_file()})
@@ -98,7 +100,7 @@ def support_entries(review):
 def inspect_paper(path):
     paper = PdfReader(path)
     assert not (paper.metadata and paper.metadata.author) and not paper.attachments
-    assert 2 < len(paper.pages) <= 25
+    assert len(paper.pages) == 24
     page_one = re.sub(r"\s+", "", paper.pages[0].extract_text() or "")
     assert "Summary" in page_one and "Keywords" in page_one
     assert path.stat().st_size < LIMIT
@@ -124,35 +126,37 @@ def inspect_replay(review):
         assert run["route_footprint_check"]["pointHits"] == 0
 
 
-def build(review, bundle=None):
+def build(review, bundle=None, work=None):
     review = review.resolve()
     bundle = bundle.resolve(strict=True) if bundle else None
     paper = review / "paper" / "B_submission.pdf"
     paper_info = inspect_paper(paper)
     inspect_replay(review)
-    build_manifest(review)
-    dependencies = ("matplotlib", "numpy", "pypdf", "Pillow")
-    (review / "requirements-review.txt").write_text(
-        "\n".join(f"{name}=={version(name)}" for name in dependencies) + "\n", encoding="utf-8"
-    )
-    with TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent) as folder:
+    reproducibility = build_manifest(review)
+    if work is None:
+        workspace = TemporaryDirectory(prefix=".swb-b-review-", dir=review.parent)
+    else:
+        work = work.resolve()
+        work.mkdir(parents=True, exist_ok=False)
+        workspace = nullcontext(work)
+    with workspace as folder:
         temp = Path(folder)
-        payload = support_entries(review)
-        seed = temp / "staged.zip"
-        write_zip(seed, payload)
+        upload = temp / (STEM + "fj.zip")
+        manifest = write_zip(upload, support_entries(review))
         extracted = temp / "clean"
-        with ZipFile(seed) as archive:
+        extracted.mkdir()
+        with ZipFile(upload) as archive:
             archive.extractall(extracted)
         rerun = temp / "rerun"
-        cmd = [sys.executable, "-B", str(extracted / "src" / "reproduce_b_revision.py"), "--out", str(rerun)]
+        cmd = [sys.executable, "-B", "-u", "03_code/run_all.py", "--out", str(rerun)]
         if bundle:
             cmd.extend(["--tex-bundle", str(bundle)])
+        print(f"Reproducing {upload.name} ({upload.stat().st_size:,} bytes) from {extracted}", flush=True)
         subprocess.run(cmd, cwd=extracted, check=True)
         proof = rerun / "REPRODUCTION_CHECK.json"
         results = read_json(proof)
-        assert len(results["pdf_text_matches"]) == 2
-        upload = temp / (STEM + "fj.zip")
-        manifest = write_zip(upload, {**payload, "qa/REPRODUCTION_CHECK.json": proof})
+        assert results["pdf_binary_match_count"] == len(results["pdf_text_matches"]) == 2
+        assert results["byte_matches"] == len(reproducibility["artifacts_sha256"])
         acceptance = temp / "RELEASE_ACCEPTANCE.json"
         write_json(acceptance, {
             "status": "team_review_edition",
@@ -171,7 +175,9 @@ def build(review, bundle=None):
         write_zip(engineering, {
             "B_submission_review.pdf": paper,
             "P1_ERRATA.pdf": review / "paper" / "P1_ERRATA.pdf",
-            **{name: review / name for name in DOCUMENTS},
+            **{name: review / name for name in ENGINEERING_DOCUMENTS},
+            "requirements.txt": review / "requirements-review.txt",
+            "qa/REPRODUCTION_CHECK.json": proof,
             acceptance.name: acceptance,
             upload.name: upload,
         })
@@ -187,5 +193,6 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("--review", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--bundle", type=Path, default=None)
+    parser.add_argument("--work", type=Path, help="New directory to keep the archive, extraction, and rerun.")
     arguments = parser.parse_args()
-    build(arguments.review, arguments.bundle)
+    build(arguments.review, arguments.bundle, arguments.work)

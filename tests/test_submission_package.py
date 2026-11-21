@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import csv
+import io
+import json
 import os
 import re
 import subprocess
 import sys
 import zipfile
-from pathlib import Path
+from hashlib import sha256
+from pathlib import Path, PurePosixPath
 
 import pytest
 from pypdf import PdfReader
@@ -15,6 +18,12 @@ REPO = Path(__file__).resolve().parent.parent
 REVIEW_DIR = REPO / "10_比赛工作区" / "submission" / "b_revision_20261121"
 PDF_PATH = REVIEW_DIR / "paper" / "B_submission.pdf"
 ZIP_PATH = REVIEW_DIR / "BSWBMCM2613050fj.zip"
+MANIFEST_NAME = "REPRODUCIBILITY_MANIFEST.json"
+PROOF_NAME = "qa/REPRODUCTION_CHECK.json"
+ABSOLUTE_PERSONAL_PATH = re.compile(
+    r"\b[a-z]:[/\\]+(?:users|workbuddy|codex)[/\\]+|/(?:users|home)/[\w.-]+/",
+    re.IGNORECASE,
+)
 
 FORBIDDEN_IDENTITY_TOKENS = [
     "黄俊斌",
@@ -64,6 +73,9 @@ def test_submission_pdf_format_figures_and_anonymity():
     for fig_idx in range(1, 12):
         assert f"Figure {fig_idx}." in full_text, f"Missing Figure {fig_idx}. in B_submission.pdf"
     assert "AI Tool Usage Report" in " ".join(pages_text[-1].split())
+    assert "python 03_code/run_all.py" in " ".join(full_text.split())
+    assert not ABSOLUTE_PERSONAL_PATH.search(full_text)
+    assert not re.search(r"[\u3400-\u9fff]", full_text)
 
     for bad in FORBIDDEN_PAPER_TOKENS:
         assert bad not in full_text, f"Forbidden draft/inaccurate token found in PDF: {bad}"
@@ -105,12 +117,17 @@ def test_code_readmes_anonymized_and_run_all_fail_fast():
         for leak in FORBIDDEN_IDENTITY_TOKENS:
             assert leak not in txt, f"Anonymity violation in {readme}: {leak}"
 
+    _check_run_all_listing(REPO)
+
+
+def _check_run_all_listing(root):
     proc = subprocess.run(
-        [sys.executable, str(REPO / "03_code" / "run_all.py"), "--list"],
-        cwd=str(REPO),
+        [sys.executable, "-B", str(root / "03_code" / "run_all.py"), "--list"],
+        cwd=root,
         capture_output=True,
         encoding="utf-8",
         env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+        timeout=30,
         check=False,
     )
     assert proc.returncode == 0, f"run_all.py --list failed: {proc.stderr}"
@@ -118,38 +135,90 @@ def test_code_readmes_anonymized_and_run_all_fail_fast():
     assert proc.stdout.count("[READY]") == 9
 
 
-def test_supporting_zip_size_contents_and_full_anonymity_scan():
-    """BSWBMCM2613050fj.zip is <20 MB, contains AI_Usage_Report.md, and has zero identity leaks across all members."""
+def test_supporting_zip_contents_hashes_and_full_anonymity_scan(tmp_path):
+    """Check the sealed ZIP, its manifest, and the extracted entry point."""
     assert ZIP_PATH.is_file(), f"Missing supporting package: {ZIP_PATH}"
-    size_mb = ZIP_PATH.stat().st_size / (1024 * 1024)
-    assert size_mb < 20.0, f"ZIP exceeds 20 MB limit: {size_mb:.2f} MB"
+    size = ZIP_PATH.stat().st_size
+    assert size < 20_000_000, f"ZIP exceeds the size limit: {size:,} bytes"
 
-    text_exts = {".md", ".txt", ".csv", ".json", ".py", ".tex", ".html", ".cjs", ".js"}
-    with zipfile.ZipFile(ZIP_PATH, "r") as zf:
-        names = set(zf.namelist())
-        assert "AI_Usage_Report.md" in names
-        assert "AI_USAGE_LOG.csv" in names
-        assert "artifacts/paper/B_submission.pdf" in names
+    acceptance = json.loads((REVIEW_DIR / "RELEASE_ACCEPTANCE.json").read_text(encoding="utf-8"))
+    support = acceptance["support"]
+    assert support["filename"] == ZIP_PATH.name
+    assert support["bytes"] == size
+    assert support["sha256"] == sha256(ZIP_PATH.read_bytes()).hexdigest()
+    assert support["crc_passed"] is True
+    text_exts = {".md", ".txt", ".csv", ".json", ".py", ".tex", ".bib", ".html", ".cjs", ".js"}
+    with zipfile.ZipFile(ZIP_PATH) as zf:
+        entries = zf.namelist()
+        names = set(entries)
+        assert len(entries) == len(names) == support["member_count"]
+        assert {
+            "03_code/run_all.py", "requirements.txt", "AI_Usage_Report.md", "AI_USAGE_LOG.csv",
+            f"artifacts/{MANIFEST_NAME}", "artifacts/paper/B_submission.pdf",
+        } <= names
+        assert PROOF_NAME not in names, "Seal the support ZIP before recording the clean-room proof"
+        for member in ("AI_Usage_Report.md", "AI_USAGE_LOG.csv"):
+            assert zf.read(member) == (REVIEW_DIR / member).read_bytes()
+        ledger_rows = list(csv.reader(io.StringIO(zf.read("AI_USAGE_LOG.csv").decode("utf-8-sig"))))
+        assert len(ledger_rows) >= 2 and all(len(row) == 11 for row in ledger_rows)
+        manifest_bytes = zf.read(f"artifacts/{MANIFEST_NAME}")
+        assert manifest_bytes == (REVIEW_DIR / MANIFEST_NAME).read_bytes()
+        manifest = json.loads(manifest_bytes)
+        assert zf.read("artifacts/paper/B_submission.pdf") == PDF_PATH.read_bytes()
 
-        # Verify AI_USAGE_LOG.csv inside ZIP strictly obeys 11-column schema
-        import io
-        zip_ai_rows = list(csv.reader(io.StringIO(zf.read("AI_USAGE_LOG.csv").decode("utf-8-sig"))))
-        assert len(zip_ai_rows) >= 2
-        for line_no, row in enumerate(zip_ai_rows, start=1):
-            assert len(row) == 11, f"ZIP AI_USAGE_LOG.csv line {line_no} has {len(row)} columns"
-
-        for member in zf.namelist():
+        hashes = {}
+        for member in entries:
+            path = PurePosixPath(member)
+            assert path.parts and not path.is_absolute() and ".." not in path.parts
+            assert "\\" not in member and ":" not in path.parts[0]
+            assert all(leak not in member for leak in FORBIDDEN_IDENTITY_TOKENS)
+            # ZipFile.read verifies the member CRC while retrieving the hash input.
+            data = zf.read(member)
+            hashes[member] = sha256(data).hexdigest()
             ext = Path(member).suffix.lower()
             if ext in text_exts:
-                content = zf.read(member).decode("utf-8", errors="ignore")
-                for leak in FORBIDDEN_IDENTITY_TOKENS:
-                    assert leak not in content, f"Anonymity leak ({leak}) in ZIP member {member}"
+                content = data.decode("utf-8-sig", errors="ignore")
             elif ext == ".pdf":
-                import io
-                reader = PdfReader(io.BytesIO(zf.read(member)))
-                pdf_text = "\n".join((p.extract_text() or "") for p in reader.pages)
-                for leak in FORBIDDEN_IDENTITY_TOKENS:
-                    assert leak not in pdf_text, f"Anonymity leak ({leak}) in ZIP PDF {member}"
+                reader = PdfReader(io.BytesIO(data))
+                pages = [(page.extract_text() or "") for page in reader.pages]
+                content = "\n".join(pages) + "\n" + str(reader.metadata)
+                paper_record = manifest["paper_files"].get(member.removeprefix("artifacts/"))
+                if paper_record:
+                    page_hashes = [sha256(page.encode("utf-8")).hexdigest() for page in pages]
+                    assert page_hashes == paper_record["page_text_sha256"], member
+            else:
+                continue
+            assert not ABSOLUTE_PERSONAL_PATH.search(content), f"Personal path in ZIP member {member}"
+            for leak in FORBIDDEN_IDENTITY_TOKENS:
+                assert leak not in content, f"Anonymity leak ({leak}) in ZIP member {member}"
+
+        assert hashes == support["member_sha256"]
+        for group in ("artifacts_sha256", "frozen_inputs_sha256"):
+            assert manifest[group]
+            for path, digest in manifest[group].items():
+                assert hashes[f"artifacts/{path}"] == digest, path
+        assert set(manifest["paper_files"]) == {"paper/B_submission.pdf", "paper/P1_ERRATA.pdf"}
+        for path, record in manifest["paper_files"].items():
+            assert hashes[f"artifacts/{path}"] == record["sha256"], path
+        assert acceptance["paper"]["sha256"] == hashes["artifacts/paper/B_submission.pdf"]
+        assert acceptance["paper"]["pages"] == 24
+        zf.extractall(tmp_path)
+
+    _check_run_all_listing(tmp_path)
+
+    proof = json.loads((REVIEW_DIR / PROOF_NAME).read_text(encoding="utf-8"))
+    assert proof == acceptance["reproduction"]
+    assert proof["byte_matches"] == len(manifest["artifacts_sha256"])
+    assert proof["matched_artifacts"] == sorted(manifest["artifacts_sha256"])
+    assert proof["verified_frozen_inputs"] == sorted(manifest["frozen_inputs_sha256"])
+    pdf_names = sorted(Path(path).name for path in manifest["paper_files"])
+    assert proof["pdf_text_matches"] == pdf_names
+    assert proof["pdf_binary_matches"] == pdf_names
+    assert proof["pdf_binary_match_count"] == len(pdf_names)
+    assert set(proof["wall_seconds"]) == {
+        "1_correctness", "2_validation", "3_experiments", "3b_sensitivity_pareto",
+        "3c_p4_extended", "3d_corner_routes", "3e_dispatch_tradeoffs", "4_visuals", "5_pdf",
+    }
 
 
 def test_reproduction_manifest_requires_every_artifact(tmp_path, monkeypatch):
